@@ -29,10 +29,10 @@ GLuint load_shader_pair(const char* vert_shader_src, const char* frag_shader_src
 
 
 static const char vs_shader_str[] =
-"#version 130                      \n"
-"                                      \n"
-"in vec4 in_vertex; \n"
-"in vec4 in_color; \n"
+"#version 330 core                        \n"
+"                                         \n"
+"layout (location = 0) in vec4 in_vertex; \n"
+"layout (location = 1) in vec4 in_color; \n"
 "out vec4 vary_color; \n"
 "void main(void)                       \n"
 "{\n"
@@ -41,7 +41,7 @@ static const char vs_shader_str[] =
 "}";
 
 static const char fs_shader_str[] =
-"#version 130                      \n"
+"#version 330 core                     \n"
 "                                      \n"
 "in vec4 vary_color;                   \n"
 "out vec4 frag_color;                  \n"
@@ -74,6 +74,9 @@ int main()
 
 	glUseProgram(program);
 
+	GLuint vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
 
 	GLuint triangle;
 	glGenBuffers(1, &triangle);
@@ -121,7 +124,11 @@ void setup_context()
 		exit(0);
 	}
 
-	window = SDL_CreateWindow("Ex 1", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+	window = SDL_CreateWindow("Ex 2", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
 		cleanup();
 		exit(0);
@@ -129,12 +136,22 @@ void setup_context()
 
 	glcontext = SDL_GL_CreateContext(window);
 	
+	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
 		printf("Error: %s\n", glewGetErrorString(err));
 		cleanup();
 		exit(0);
 	}
+
+	check_errors(0, "Clearing stupid error after glewInit");
+
+	int major, minor, profile;
+	SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &major);
+	SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &minor);
+	SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &profile);
+
+	printf("OpenGL version %d.%d with profile %d\n", major, minor, profile);
 }
 
 void cleanup()

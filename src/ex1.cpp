@@ -29,16 +29,16 @@ GLuint load_shader_pair(const char* vert_shader_src, const char* frag_shader_src
 
 
 static const char vs_shader_str[] =
-"#version 130                      \n"
+"#version 330 core                     \n"
 "                                      \n"
-"in vec4 vertex; \n"
+"layout (location = 0) in vec4 vertex; \n"
 "void main(void)                       \n"
 "{\n"
 "	gl_Position = vertex;\n"
 "}";
 
 static const char fs_shader_str[] =
-"#version 130                      \n"
+"#version 330 core                     \n"
 "                                      \n"
 "uniform vec4 color;                   \n"
 "out vec4 frag_color;                  \n"
@@ -55,7 +55,6 @@ int main()
 	                    0.5, -0.5, 0,
 	                    0,    0.5, 0 };
 
-
 	//no error checking done for any of this except shader compilation
 	GLuint program = load_shader_pair(vs_shader_str, fs_shader_str);
 	if (!program) {
@@ -69,12 +68,18 @@ int main()
 	int loc = glGetUniformLocation(program, "color");
 	glUniform4fv(loc, 1, Red);
 
+	//no default vao in core profile ...
+	GLuint vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
 	GLuint triangle;
 	glGenBuffers(1, &triangle);
 	glBindBuffer(GL_ARRAY_BUFFER, triangle);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
 
 
 	unsigned int old_time = 0, new_time=0, counter = 0;
@@ -113,6 +118,10 @@ void setup_context()
 		exit(0);
 	}
 
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
 	window = SDL_CreateWindow("Ex 1", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
 		cleanup();
@@ -121,12 +130,22 @@ void setup_context()
 
 	glcontext = SDL_GL_CreateContext(window);
 	
+	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
 		printf("Error: %s\n", glewGetErrorString(err));
 		cleanup();
 		exit(0);
 	}
+
+	check_errors(0, "Clearing stupid error after glewInit");
+
+	int major, minor, profile;
+	SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &major);
+	SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &minor);
+	SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &profile);
+
+	printf("OpenGL version %d.%d with profile %d\n", major, minor, profile);
 }
 
 void cleanup()

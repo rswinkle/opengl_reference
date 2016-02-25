@@ -64,7 +64,9 @@ const char frag_shader[] = "#version 130\n"
 
 
 
-
+	GLuint vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
 
 	GLuint buf;
 	glGenBuffers(1, &buf);
@@ -124,6 +126,10 @@ void setup_context()
 		exit(0);
 	}
 
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
 	window = SDL_CreateWindow("OpenGL is left handed!", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
 		cleanup();
@@ -138,6 +144,14 @@ void setup_context()
 		cleanup();
 		exit(0);
 	}
+
+
+	int major, minor, profile;
+	SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &major);
+	SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &minor);
+	SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &profile);
+
+	printf("OpenGL version %d.%d with profile %d\n", major, minor, (profile);
 }
 
 void cleanup()
