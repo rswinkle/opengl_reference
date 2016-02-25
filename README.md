@@ -15,6 +15,6 @@ I'll maintain a table/list of programs here
 
 | Program | Image |
 | --- | --- |
-| ex1.cpp | TODO |
-| ex2.cpp | TODO |
-| left_handed.cpp | TODO |
+| ex1.cpp | ![ex1](./media/Ex 1.png) |
+| ex2.cpp | ![ex2](./media/Ex 2.png) |
+| left_handed.cpp | ![left_handed](./media/left handed.png) |
