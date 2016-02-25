@@ -1,4 +1,5 @@
 #include <c_utils.h>
+#include <primitives.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -12,11 +13,17 @@
 #include <SDL2/SDL.h>
 
 #include <stdio.h>
+#include <vector>
 
 #define WIDTH 640
 #define HEIGHT 480
 
 using namespace std;
+
+using glm::vec3;
+using glm::vec4;
+using glm::mat3;
+using glm::mat4;
 
 
 SDL_Window* window;
@@ -34,16 +41,25 @@ GLuint load_shader_pair(const char* vert_shader_src, const char* frag_shader_src
 GLuint load_shader_file_pair(const char* vert_file, const char* frag_file);
 
 
-int main()
+struct vert_attribs
+{
+	vec3 pos;
+	vec3 normal;
+
+	vert_attribs(vec3 p, vec3 n) : pos(p), normal(n) {}
+};
+
+int polygon_mode;
+
+
+int main(int argc, char** argv)
 {
 	setup_context();
 
-	float points[] = { -0.5, -0.5, -4,
-	                    0.5, -0.5, -4,
-	                    0,    0.5, -4 };
+	polygon_mode = 2;
 
 	//no error checking done for any of this except shader compilation
-	GLuint program = load_shader_file_pair("../media/shaders/basic_transform.vp", "../media/shaders/simple_color.fp");
+	GLuint program = load_shader_file_pair("../media/shaders/gouraud_ads.vp", "../media/shaders/gouraud_ads.fp");
 	if (!program) {
 		printf("failed to compile/link shaders\n");
 		exit(0);
@@ -51,15 +67,24 @@ int main()
 
 	glUseProgram(program);
 
-	glm::vec4 Red(1, 0, 0, 1);
-	int loc = glGetUniformLocation(program, "color");
-	glUniform4fv(loc, 1, (GLfloat*)&Red);
 
-	glm::mat4 mvp_mat = glm::perspective(3.14159f/4.0f, WIDTH/(float)HEIGHT, 0.1f, 30.0f);
 
-	loc = glGetUniformLocation(program, "mvp_mat");
-	glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(mvp_mat));
+	vector<vec3> verts;
+	vector<ivec3> tris;
+	vector<vec2> tex;
+	generate_sphere(verts, tris, tex, 2.0f, 14, 7);
+	//generate_sphere(verts, tris, tex, 2.0f, 30, 15);
 
+	vector<vert_attribs> vert_data;
+	vec3 tmp;
+	for (int i=0; i<tris.size(); ++i) {
+		tmp = verts[tris[i].x];
+		vert_data.push_back(vert_attribs(tmp, normalize(tmp)));
+		tmp = verts[tris[i].y];
+		vert_data.push_back(vert_attribs(tmp, normalize(tmp)));
+		tmp = verts[tris[i].z];
+		vert_data.push_back(vert_attribs(tmp, normalize(tmp)));
+	}
 
 
 
@@ -68,14 +93,37 @@ int main()
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	GLuint triangle;
-	glGenBuffers(1, &triangle);
-	glBindBuffer(GL_ARRAY_BUFFER, triangle);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+	GLuint buffer;
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, vert_data.size()*sizeof(vert_attribs), &vert_data[0], GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2*sizeof(vec3), 0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2*sizeof(vec3), (void*)sizeof(vec3));
 
 
+	vec4 material(0.2, 0.6, 1.0, 128.0);
+	int loc = glGetUniformLocation(program, "material");
+	glUniform4fv(loc, 1, glm::value_ptr(material));
+
+	mat4 proj_mat = glm::perspective(3.14159f/4.0f, WIDTH/(float)HEIGHT, 0.1f, 30.0f);
+	mat4 view_mat = glm::lookAt(vec3(0, 0, 10), vec3(0, 0, -1), vec3(0, 1, 0));
+
+	mat4 mvp_mat;
+	mat4 vp_mat = proj_mat * view_mat;
+	mat3 normal_mat;
+	mat4 rot_mat(1);
+
+	int mvp_loc = glGetUniformLocation(program, "mvp_mat");
+	glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp_mat));
+
+	int normal_loc = glGetUniformLocation(program, "normal_mat");
+	glUniformMatrix3fv(normal_loc, 1, GL_FALSE, glm::value_ptr(normal_mat));
+
+
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 
 	unsigned int old_time = 0, new_time=0, counter = 0;
 	while (1) {
@@ -90,14 +138,22 @@ int main()
 			counter = 0;
 		}
 
+
+		rot_mat = glm::rotate(mat4(1), 0.5f*new_time/1000.0f, vec3(0, 1, 0));
+
+		normal_mat = mat3(view_mat*rot_mat);
+		glUniformMatrix3fv(normal_loc, 1, GL_FALSE, glm::value_ptr(normal_mat));
+
+		mvp_mat = vp_mat * rot_mat;
+		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp_mat));
 		
-		glClear(GL_COLOR_BUFFER_BIT);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		glDrawArrays(GL_TRIANGLES, 0, vert_data.size());
 
 		SDL_GL_SwapWindow(window);
 	}
 
-	glDeleteBuffers(1, &triangle);
+	glDeleteBuffers(1, &buffer);
 	glDeleteProgram(program);
 
 	cleanup();
@@ -161,8 +217,17 @@ int handle_events()
 		} else if (e.type == SDL_KEYDOWN) {
 			sc = e.key.keysym.scancode;
 
-			if (sc == SDL_SCANCODE_ESCAPE)
+			if (sc == SDL_SCANCODE_ESCAPE) {
 				return 1;
+			} else if (sc == SDL_SCANCODE_P) {
+				polygon_mode = (polygon_mode + 1) % 3;
+				if (polygon_mode == 0)
+					glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+				else if (polygon_mode == 1)
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				else
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			}
 		}
 	}
 	return 0;
@@ -171,6 +236,45 @@ int handle_events()
 
 
 
+int load_model(const char* filename, vector<vec3>& verts, vector<ivec3>&tris);
+{
+	FILE* file = NULL;
+	unsigned int num = 0;
+	vec3 vec;
+	ivec3 ivec;
+
+	if (!(file = fopen(filename, "r")))
+		return 0;
+
+	fscanf(file, "%u", &num);
+	if (!num)
+		return 0;
+
+	printf("%u vertices\n", num);
+	
+	verts.reserve(num);
+	for (int i=0; i<num; ++i) {
+		fscanf(file, " (%f, %f, %f)", &vec->x, &vec->y, &vec->z);
+		verts.push_back(vec);
+	}
+
+	fscanf(file, "%u", &num);
+	if (!num)
+		return 0;
+
+	printf("%u triangles\n", num);
+	
+	tris.reserve(num);
+
+	for (int i=0; i<num; ++i) {
+		fscanf(f, " (%d, %d, %d)", &ivec->x, &ivec->y, &ivec->z);
+		tris.push_back(ivec);
+	}
+
+	fclose(file);
+
+	return 1;
+}
 
 
 

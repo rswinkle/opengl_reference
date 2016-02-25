@@ -26,7 +26,7 @@ ifeq ($(config),debug)
   DEFINES   += -DDEBUG
   INCLUDES  += -I../inc
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -ansi -fno-strict-aliasing -Wunused-variable -Wreturn-type
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -std=c++11 -fno-strict-aliasing -Wunused-variable -Wreturn-type
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += 
   LIBS      += -lSDL2 -lGLEW -lGL
@@ -48,7 +48,7 @@ ifeq ($(config),release)
   DEFINES   += -DNDEBUG -DOptimize
   INCLUDES  += -I../inc
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -ansi -fno-strict-aliasing -Wunused-variable -Wreturn-type
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -std=c++11 -fno-strict-aliasing -Wunused-variable -Wreturn-type
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -s
   LIBS      += -lSDL2 -lGLEW -lGL
@@ -66,6 +66,7 @@ endif
 OBJECTS := \
 	$(OBJDIR)/ex3.o \
 	$(OBJDIR)/c_utils.o \
+	$(OBJDIR)/primitives.o \
 
 RESOURCES := \
 
@@ -130,6 +131,9 @@ $(OBJDIR)/ex3.o: ../src/ex3.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/c_utils.o: ../src/c_utils.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/primitives.o: ../src/primitives.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 

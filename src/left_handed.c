@@ -151,7 +151,7 @@ void setup_context()
 	SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &minor);
 	SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &profile);
 
-	printf("OpenGL version %d.%d with profile %d\n", major, minor, (profile);
+	printf("OpenGL version %d.%d with profile %d\n", major, minor, profile);
 }
 
 void cleanup()

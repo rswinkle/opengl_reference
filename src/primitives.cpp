@@ -1,4 +1,10 @@
-#include "Primitives.h"
+#include "primitives.h"
+
+//#include <glm/gtc/constants.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#define RM_PI 3.14159265358979323846264338327950288
+#define RM_2PI 6.28318530717958647692528676655900576
 
 
 void generate_box(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, float dimX, float dimY, float dimZ, bool plane, ivec3 seg, vec3 origin)
@@ -89,15 +95,16 @@ void generate_box(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, f
 		tex.push_back(vec2(0, 1));
 		tex.push_back(vec2(1, 1));
 	} else {
+		float segx = seg.x, segy = seg.y, segz = seg.z;
 		//front and back
-		generate_plane(verts, tris, tex, origin+x_vec, y_vec/seg.y, (-x_vec)/seg.x, seg.y, seg.x, true);
-		generate_plane(verts, tris, tex, origin+z_vec, y_vec/seg.y, x_vec/seg.x, seg.y, seg.x, true);
+		generate_plane(verts, tris, tex, origin+x_vec, y_vec/segy, (-x_vec)/segx, segy, segx, true);
+		generate_plane(verts, tris, tex, origin+z_vec, y_vec/segy, x_vec/segx, segy, segx, true);
 		//left and right
-		generate_plane(verts, tris, tex, origin, y_vec/seg.y, z_vec/seg.z, seg.y, seg.z, true);
-		generate_plane(verts, tris, tex, origin+x_vec+z_vec, y_vec/seg.y, (-z_vec)/seg.z, seg.y, seg.z, true);
+		generate_plane(verts, tris, tex, origin, y_vec/segy, z_vec/segz, segy, segz, true);
+		generate_plane(verts, tris, tex, origin+x_vec+z_vec, y_vec/segy, (-z_vec)/segz, segy, segz, true);
 		//top and bottom
-		generate_plane(verts, tris, tex, origin, z_vec/seg.z, x_vec/seg.x, seg.z, seg.x, true);
-		generate_plane(verts, tris, tex, origin+y_vec+z_vec, (-z_vec)/seg.z, x_vec/seg.x, seg.z, seg.x, true);
+		generate_plane(verts, tris, tex, origin, z_vec/segz, x_vec/segx, segz, segx, true);
+		generate_plane(verts, tris, tex, origin+y_vec+z_vec, (-z_vec)/segz, x_vec/segx, segz, segx, true);
 
 	}
 }
@@ -245,10 +252,9 @@ void generate_sphere(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex
 	float down = RM_PI/float(stacks);
 	float around = RM_2PI/float(slices);
 
-	mat3 rotdown, rotaround;
-	rsw::load_rotation_mat3(rotdown, vec3(0, 1, 0), down);
-	rsw::load_rotation_mat3(rotaround, vec3(0, 0, 1), around);
-
+	mat4 rotdown4(1), rotaround4(1);
+	mat3 rotdown = mat3(glm::rotate(rotdown4, down, vec3(0.0f, 1.0f, 0.0f)));
+	mat3 rotaround = mat3(glm::rotate(rotaround4, around, vec3(0.0f, 0.0f, 1.0f)));
 
 	vec3 point(0, 0, radius);
 	vec3 tmp;
@@ -343,8 +349,8 @@ void generate_sphere(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex
 // Draw a torus (doughnut) in xy plane
 void generate_torus(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, float major_r, float minor_r, size_t major_slices, size_t minor_slices)
 {
-    double majorStep = RM_2PI / major_slices;
-    double minorStep = RM_2PI / minor_slices;
+    double major_step = RM_2PI / major_slices;
+    double minor_step = RM_2PI / minor_slices;
     int i, j;
 	
 	double a0, a1, b;
@@ -352,15 +358,15 @@ void generate_torus(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex,
 
 
 	for (i=0; i<major_slices; ++i) {
-		a0 = i * majorStep;
-		a1 = a0 + majorStep;
+		a0 = i * major_step;
+		a1 = a0 + major_step;
 		x0 = (float) cos(a0);
 		y0 = (float) sin(a0);
 		x1 = (float) cos(a1);
 		y1 = (float) sin(a1);
 
 		for (j=0; j<minor_slices; ++j) {
-			b = j * minorStep;
+			b = j * minor_step;
 			c = (float) cos(b);
 			r = minor_r * c + major_r;
 			z = minor_r * (float) sin(b);
@@ -409,108 +415,6 @@ void generate_torus(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex,
 
 		}
 	}
-
-
-
-/*
-    for (i=0; i<numMajor; ++i) {
-		double a0 = i * majorStep;
-		double a1 = a0 + majorStep;
-		GLfloat x0 = (GLfloat) cos(a0);
-		GLfloat y0 = (GLfloat) sin(a0);
-		GLfloat x1 = (GLfloat) cos(a1);
-		GLfloat y1 = (GLfloat) sin(a1);
-
-		M3DVector3f vVertex[4];
-		M3DVector3f vNormal[4];
-		M3DVector2f vTexture[4];
-		
-		for (j=0; j<=numMinor; ++j) 
-		{
-			double b = j * minorStep;
-			GLfloat c = (GLfloat) cos(b);
-			GLfloat r = minorRadius * c + majorRadius;
-			GLfloat z = minorRadius * (GLfloat) sin(b);
-			
-			// First point
-			verts.push_back(vec3(x0 * r, y0 * r, z);
-			tex.push_back(vec2((float)i/(float)numMajor), (float)j/(float)numMinor);
-			vTexture[0][0] = (float)(i)/(float)(numMajor);
-			vTexture[0][1] = (float)(j)/(float)(numMinor);
-			vNormal[0][0] = x0*c;
-			vNormal[0][1] = y0*c;
-			vNormal[0][2] = z/minorRadius;
-			m3dNormalizeVector3(vNormal[0]);
-			vVertex[0][0] = x0 * r;
-			vVertex[0][1] = y0 * r;
-			vVertex[0][2] = z;
-			
-			// Second point
-			verts.push_back(vec3(x1 * r, y1 * r, z);
-			tex.push_back(vec2((float)(i+1)/(float)numMajor, (float)j/(float)numMinor));
-
-			vTexture[1][0] = (float)(i+1)/(float)(numMajor);
-			vTexture[1][1] = (float)(j)/(float)(numMinor);
-			vNormal[1][0] = x1*c;
-			vNormal[1][1] = y1*c;
-			vNormal[1][2] = z/minorRadius;
-			m3dNormalizeVector3(vNormal[1]);
-			vVertex[1][0] = x1*r;
-			vVertex[1][1] = y1*r;
-			vVertex[1][2] = z;
-
-			// Next one over
-			b = (j+1) * minorStep;
-			c = (GLfloat) cos(b);
-			r = minorRadius * c + majorRadius;
-			z = minorRadius * (GLfloat) sin(b);
-						
-			// Third (based on first)
-			verts.push_back(vec3(x0 * r, y0 * r, z);
-			tex.push_back(vec2((float)i/(float)numMajor, (float)(j+1)/(float)numMinor));
-
-			vTexture[2][0] = (float)(i)/(float)(numMajor);
-			vTexture[2][1] = (float)(j+1)/(float)(numMinor);
-			vNormal[2][0] = x0*c;
-			vNormal[2][1] = y0*c;
-			vNormal[2][2] = z/minorRadius;
-			m3dNormalizeVector3(vNormal[2]);
-			vVertex[2][0] = x0 * r;
-			vVertex[2][1] = y0 * r;
-			vVertex[2][2] = z;
-			
-			// Fourth (based on second)
-			verts.push_back(vec3(x1 * r, y1 * r, z);
-			tex.push_back(vec2((float)(i+1)/(float)numMajor, (float)(j+1)/(float)numMinor));
-
-			vTexture[3][0] = (float)(i+1)/(float)(numMajor);
-			vTexture[3][1] = (float)(j+1)/(float)(numMinor);
-			vNormal[3][0] = x1*c;
-			vNormal[3][1] = y1*c;
-			vNormal[3][2] = z/minorRadius;
-			m3dNormalizeVector3(vNormal[3]);
-			vVertex[3][0] = x1*r;
-			vVertex[3][1] = y1*r;
-			vVertex[3][2] = z;
-
-			tris.push_back(
-
-			torusBatch.AddTriangle(vVertex, vNormal, vTexture);			
-			
-			// Rearrange for next triangle
-			memcpy(vVertex[0], vVertex[1], sizeof(M3DVector3f));
-			memcpy(vNormal[0], vNormal[1], sizeof(M3DVector3f));
-			memcpy(vTexture[0], vTexture[1], sizeof(M3DVector2f));
-			
-			memcpy(vVertex[1], vVertex[3], sizeof(M3DVector3f));
-			memcpy(vNormal[1], vNormal[3], sizeof(M3DVector3f));
-			memcpy(vTexture[1], vTexture[3], sizeof(M3DVector2f));
-					
-			torusBatch.AddTriangle(vVertex, vNormal, vTexture);			
-		}
-	}
-	torusBatch.End();
-	*/
 }
 
 
@@ -520,8 +424,8 @@ void generate_cone(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, 
 	size_t i;
 	vec3 tmp(radius, 0, 0);
 	float deg = RM_PI/float(slices);
-	mat3 rot_mat;
-	rsw::load_rotation_mat3(rot_mat, vec3(0,0,1), deg);
+	mat4 rot_mat4;
+	mat3 rot_mat = mat3(glm::rotate(rot_mat4, deg, vec3(0,0,1)));
 
 	verts.push_back(vec3(0, 0, height));
 	for (i=0; i<slices; i++) {

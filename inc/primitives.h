@@ -2,15 +2,13 @@
 #ifndef PRIMITIVES_H
 #define PRIMITIVES_H
 
-#include <glm/glm.h>
+#include <glm/glm.hpp>
 using glm::vec3;
 using glm::ivec3;
 using glm::vec4;
 using glm::vec2;
 using glm::mat4;
 using glm::mat3;
-
-
 
 
 

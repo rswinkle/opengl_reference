@@ -55,7 +55,8 @@ solution "opengl_reference"
 		language "C++"
 		files {
 			"src/ex3.cpp",
-			"src/c_utils.cpp"
+			"src/c_utils.cpp",
+			"src/primitives.cpp"
 		}
 		--includedirs { }
 		links { "SDL2", "GLEW", "GL" }
