@@ -1,0 +1,15 @@
+// Passthrough
+// Vertex Shader
+// Robert Winkler
+#version 330 core
+
+// Incoming per vertex... position (fills in 1 for w if from vec3 buf)
+layout (location = 0) in vec4 vertex;
+
+void main(void)
+{
+	gl_Position = vertex;
+}
+
+
+

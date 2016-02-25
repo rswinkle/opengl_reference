@@ -1,0 +1,15 @@
+// Vertex Shader
+#version 330
+
+
+layout (location = 0) in vec3 v_vertex;
+layout (location = 4) in vec4 v_color;
+
+out vec4 varying_color;
+
+void main(void)
+{
+	varying_color = v_color;
+	gl_Position = vec4(v_vertex, 1);
+}
+
