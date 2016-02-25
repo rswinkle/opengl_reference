@@ -8,7 +8,8 @@ be framework/template programs for starting new projects.
 There are better repositories of modern OpenGL programs to
 use for learning because they're more complete/organized,
 they go with a book etc.  However, this is mostly for my own
-personal use/code.
+personal use/code and will be constantly changing especially
+initially.
 
 
 I'll maintain a table/list of programs here

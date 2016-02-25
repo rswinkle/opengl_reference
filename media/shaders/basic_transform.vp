@@ -1,0 +1,15 @@
+// transform
+// Vertex Shader
+// Robert Winkler
+#version 330 core
+
+uniform mat4 mvp_mat;
+
+// Incoming per vertex... position (fills in 1 for w if from vec3 buf)
+layout (location = 0) in vec4 vertex;
+
+void main(void)
+{
+	gl_Position = mvp_mat * vertex;
+}
+

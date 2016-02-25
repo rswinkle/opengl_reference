@@ -9,6 +9,6 @@ out vec4 vFragColor;
 
 void main(void)
 {
-	vFragColor = v_color;
+	vFragColor = color;
 }
 

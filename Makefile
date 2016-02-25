@@ -6,7 +6,7 @@ ifndef config
 endif
 export config
 
-PROJECTS := ex1 ex2 left_handed
+PROJECTS := ex1 ex2 ex3 left_handed
 
 .PHONY: all clean help $(PROJECTS)
 
@@ -20,6 +20,10 @@ ex2:
 	@echo "==== Building ex2 ($(config)) ===="
 	@${MAKE} --no-print-directory -C build -f ex2.make
 
+ex3: 
+	@echo "==== Building ex3 ($(config)) ===="
+	@${MAKE} --no-print-directory -C build -f ex3.make
+
 left_handed: 
 	@echo "==== Building left_handed ($(config)) ===="
 	@${MAKE} --no-print-directory -C build -f left_handed.make
@@ -27,6 +31,7 @@ left_handed:
 clean:
 	@${MAKE} --no-print-directory -C build -f ex1.make clean
 	@${MAKE} --no-print-directory -C build -f ex2.make clean
+	@${MAKE} --no-print-directory -C build -f ex3.make clean
 	@${MAKE} --no-print-directory -C build -f left_handed.make clean
 
 help:
@@ -41,6 +46,7 @@ help:
 	@echo "   clean"
 	@echo "   ex1"
 	@echo "   ex2"
+	@echo "   ex3"
 	@echo "   left_handed"
 	@echo ""
 	@echo "For more information, see http://industriousone.com/premake/quick-start"

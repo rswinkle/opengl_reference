@@ -2,6 +2,7 @@
 solution "opengl_reference"
 	configurations { "Debug", "Release" }
 	--location "build"
+	includedirs { "inc" }
 	
 	project "ex1"
 		location "build"
@@ -31,6 +32,30 @@ solution "opengl_reference"
 		language "C++"
 		files {
 			"src/ex2.cpp"
+		}
+		--includedirs { }
+		links { "SDL2", "GLEW", "GL" }
+		targetdir "build"
+		
+		configuration "Debug"
+			defines { "DEBUG" }
+			flags { "Symbols" }
+
+		configuration "Release"
+			defines { "NDEBUG" }
+			defines { "Optimize" }
+
+		configuration { "linux", "gmake" }
+			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+
+	
+	project "ex3"
+		location "build"
+		kind "ConsoleApp"
+		language "C++"
+		files {
+			"src/ex3.cpp",
+			"src/c_utils.cpp"
 		}
 		--includedirs { }
 		links { "SDL2", "GLEW", "GL" }
