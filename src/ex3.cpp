@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/constants.hpp>
 
 #include <GL/glew.h>
 
@@ -40,6 +41,9 @@ int link_program(GLuint program);
 GLuint load_shader_pair(const char* vert_shader_src, const char* frag_shader_src);
 GLuint load_shader_file_pair(const char* vert_file, const char* frag_file);
 
+int load_model(const char* filename, vector<vec3>& verts, vector<ivec3>&tris);
+void compute_face_normals(vector<vec3>& verts, vector<ivec3>& tris, vector<vec3>& normals);
+
 
 struct vert_attribs
 {
@@ -65,7 +69,6 @@ const char* shader_files[] =
 
 int mvp_loc, normal_loc;
 
-
 int main(int argc, char** argv)
 {
 	setup_context();
@@ -76,19 +79,52 @@ int main(int argc, char** argv)
 	vector<vec3> verts;
 	vector<ivec3> tris;
 	vector<vec2> tex;
-	generate_sphere(verts, tris, tex, 2.0f, 14, 7);
-	//generate_sphere(verts, tris, tex, 2.0f, 30, 15);
-
 	vector<vert_attribs> vert_data;
+	int ret;
 	vec3 tmp;
-	for (int i=0; i<tris.size(); ++i) {
-		tmp = verts[tris[i].x];
-		vert_data.push_back(vert_attribs(tmp, normalize(tmp)));
-		tmp = verts[tris[i].y];
-		vert_data.push_back(vert_attribs(tmp, normalize(tmp)));
-		tmp = verts[tris[i].z];
-		vert_data.push_back(vert_attribs(tmp, normalize(tmp)));
+
+	if (argc == 1) {
+		printf("usage: %s [model_file]\n", argv[0]);
+		printf("No model given, so generating a sphere...\n");
+		generate_sphere(verts, tris, tex, 2.0f, 14, 7);
+		for (int i=0; i<tris.size(); ++i) {
+			tmp = verts[tris[i].x];
+			vert_data.push_back(vert_attribs(tmp, normalize(tmp)));
+			tmp = verts[tris[i].y];
+			vert_data.push_back(vert_attribs(tmp, normalize(tmp)));
+			tmp = verts[tris[i].z];
+			vert_data.push_back(vert_attribs(tmp, normalize(tmp)));
+		}
+	} else {
+		ret = load_model(argv[1], verts, tris);
+		if (!ret) {
+			printf("Failed to load %s!\nGenerating a sphere instead.\n", argv[1]);
+			verts.clear();
+			tris.clear();
+			generate_sphere(verts, tris, tex, 2.0f, 14, 7);
+			for (int i=0; i<tris.size(); ++i) {
+				tmp = verts[tris[i].x];
+				vert_data.push_back(vert_attribs(tmp, normalize(tmp)));
+				tmp = verts[tris[i].y];
+				vert_data.push_back(vert_attribs(tmp, normalize(tmp)));
+				tmp = verts[tris[i].z];
+				vert_data.push_back(vert_attribs(tmp, normalize(tmp)));
+			}
+		} else {
+			vector<vec3> normals;
+			vec3 norm;
+			compute_face_normals(verts, tris, normals);
+			for (int i=0; i<tris.size(); ++i) {
+				tmp = verts[tris[i].x];
+				vert_data.push_back(vert_attribs(tmp, normals[i]));
+				tmp = verts[tris[i].y];
+				vert_data.push_back(vert_attribs(tmp, normals[i]));
+				tmp = verts[tris[i].z];
+				vert_data.push_back(vert_attribs(tmp, normals[i]));
+			}
+		}
 	}
+
 
 	//no default vao in core profile ...
 	GLuint vao;
@@ -297,6 +333,17 @@ int load_model(const char* filename, vector<vec3>& verts, vector<ivec3>&tris)
 	return 1;
 }
 
+void compute_face_normals(vector<vec3>& verts, vector<ivec3>& tris, vector<vec3>& normals)
+{
+	vec3 v1, v2, tmp;
+	for (int i=0; i<tris.size(); ++i) {
+		v1 = verts[tris[i].y] - verts[tris[i].x];
+		v2 = verts[tris[i].z] - verts[tris[i].x];
+		tmp = glm::cross(v1, v2);
+
+		normals.push_back(normalize(tmp));
+	}
+}
 
 
 
