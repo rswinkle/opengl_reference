@@ -279,7 +279,6 @@ int handle_events()
 					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			} else if (sc == SDL_SCANCODE_S) {
 				cur_prog = (cur_prog + 1) % NUM_PROGRAMS;
-				printf("%d %d\n", cur_prog, programs[cur_prog]);
 
 				glUseProgram(programs[cur_prog]);
 				mvp_loc = glGetUniformLocation(programs[cur_prog], "mvp_mat");

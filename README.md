@@ -19,4 +19,5 @@ I'll maintain a table/list of programs here
 | --- | --- |
 | ex1.cpp | ![ex1](./media/ex_1.png) |
 | ex2.cpp | ![ex2](./media/ex_2.png) |
+| ex3.cpp | ![ex3](./media/ex_3.png) |
 | left_handed.cpp | ![left_handed](./media/left_handed.png) |
