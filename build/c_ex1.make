@@ -20,9 +20,9 @@ ifndef AR
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/Debug/left_handed
+  OBJDIR     = obj/Debug/c_ex1
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/left_handed
+  TARGET     = $(TARGETDIR)/c_ex1
   DEFINES   += -DDEBUG
   INCLUDES  += -I../inc -I../inc/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -42,9 +42,9 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/Release/left_handed
+  OBJDIR     = obj/Release/c_ex1
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/left_handed
+  TARGET     = $(TARGETDIR)/c_ex1
   DEFINES   += -DNDEBUG -DOptimize
   INCLUDES  += -I../inc -I../inc/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -64,7 +64,7 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/left_handed.o \
+	$(OBJDIR)/ex1.o \
 
 RESOURCES := \
 
@@ -82,7 +82,7 @@ all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
 	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking left_handed
+	@echo Linking c_ex1
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -103,7 +103,7 @@ else
 endif
 
 clean:
-	@echo Cleaning left_handed
+	@echo Cleaning c_ex1
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -125,7 +125,7 @@ $(GCH): $(PCH)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/left_handed.o: ../src/left_handed.c
+$(OBJDIR)/ex1.o: ../src/ex1.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 

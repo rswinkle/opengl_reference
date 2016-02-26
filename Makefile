@@ -6,11 +6,19 @@ ifndef config
 endif
 export config
 
-PROJECTS := ex1 ex2 ex3 left_handed
+PROJECTS := c_ex1 c_ex2 ex1 ex2 ex3 flying left_handed
 
 .PHONY: all clean help $(PROJECTS)
 
 all: $(PROJECTS)
+
+c_ex1: 
+	@echo "==== Building c_ex1 ($(config)) ===="
+	@${MAKE} --no-print-directory -C build -f c_ex1.make
+
+c_ex2: 
+	@echo "==== Building c_ex2 ($(config)) ===="
+	@${MAKE} --no-print-directory -C build -f c_ex2.make
 
 ex1: 
 	@echo "==== Building ex1 ($(config)) ===="
@@ -24,14 +32,21 @@ ex3:
 	@echo "==== Building ex3 ($(config)) ===="
 	@${MAKE} --no-print-directory -C build -f ex3.make
 
+flying: 
+	@echo "==== Building flying ($(config)) ===="
+	@${MAKE} --no-print-directory -C build -f flying.make
+
 left_handed: 
 	@echo "==== Building left_handed ($(config)) ===="
 	@${MAKE} --no-print-directory -C build -f left_handed.make
 
 clean:
+	@${MAKE} --no-print-directory -C build -f c_ex1.make clean
+	@${MAKE} --no-print-directory -C build -f c_ex2.make clean
 	@${MAKE} --no-print-directory -C build -f ex1.make clean
 	@${MAKE} --no-print-directory -C build -f ex2.make clean
 	@${MAKE} --no-print-directory -C build -f ex3.make clean
+	@${MAKE} --no-print-directory -C build -f flying.make clean
 	@${MAKE} --no-print-directory -C build -f left_handed.make clean
 
 help:
@@ -44,9 +59,12 @@ help:
 	@echo "TARGETS:"
 	@echo "   all (default)"
 	@echo "   clean"
+	@echo "   c_ex1"
+	@echo "   c_ex2"
 	@echo "   ex1"
 	@echo "   ex2"
 	@echo "   ex3"
+	@echo "   flying"
 	@echo "   left_handed"
 	@echo ""
 	@echo "For more information, see http://industriousone.com/premake/quick-start"

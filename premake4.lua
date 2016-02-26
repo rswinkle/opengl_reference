@@ -2,8 +2,44 @@
 solution "opengl_reference"
 	configurations { "Debug", "Release" }
 	--location "build"
-	includedirs { "inc" }
+	includedirs { "inc", "inc/glcommon" }
+	links { "SDL2", "GLEW", "GL" }
+
+	configuration "Debug"
+		defines { "DEBUG" }
+		flags { "Symbols" }
+
+	configuration "Release"
+		defines { "NDEBUG" }
+		defines { "Optimize" }
 	
+	project "c_ex1"
+		location "build"
+		kind "ConsoleApp"
+		language "C"
+		files {
+			"src/ex1.c"
+		}
+		targetdir "build"
+		
+		configuration { "linux", "gmake" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+
+
+	project "c_ex2"
+		location "build"
+		kind "ConsoleApp"
+		language "C"
+		files {
+			"src/ex2.c"
+		}
+		targetdir "build"
+		
+		configuration { "linux", "gmake" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+
+
+
 	project "ex1"
 		location "build"
 		kind "ConsoleApp"
@@ -11,20 +47,11 @@ solution "opengl_reference"
 		files {
 			"src/ex1.cpp"
 		}
-		--includedirs { }
-		links { "SDL2", "GLEW", "GL" }
 		targetdir "build"
 		
-		configuration "Debug"
-			defines { "DEBUG" }
-			flags { "Symbols" }
-
-		configuration "Release"
-			defines { "NDEBUG" }
-			defines { "Optimize" }
-
 		configuration { "linux", "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+
 
 	project "ex2"
 		location "build"
@@ -33,17 +60,7 @@ solution "opengl_reference"
 		files {
 			"src/ex2.cpp"
 		}
-		--includedirs { }
-		links { "SDL2", "GLEW", "GL" }
 		targetdir "build"
-		
-		configuration "Debug"
-			defines { "DEBUG" }
-			flags { "Symbols" }
-
-		configuration "Release"
-			defines { "NDEBUG" }
-			defines { "Optimize" }
 
 		configuration { "linux", "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
@@ -55,21 +72,26 @@ solution "opengl_reference"
 		language "C++"
 		files {
 			"src/ex3.cpp",
-			"src/c_utils.cpp",
-			"src/primitives.cpp"
+			"src/glcommon/c_utils.cpp",
+			"src/glcommon/primitives.cpp"
 		}
-		--includedirs { }
-		links { "SDL2", "GLEW", "GL" }
 		targetdir "build"
 		
-		configuration "Debug"
-			defines { "DEBUG" }
-			flags { "Symbols" }
+		configuration { "linux", "gmake" }
+			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
-		configuration "Release"
-			defines { "NDEBUG" }
-			defines { "Optimize" }
-
+	project "flying"
+		location "build"
+		kind "ConsoleApp"
+		language "C++"
+		files {
+			"src/flying.cpp",
+			"src/glcommon/glm_glframe.cpp",
+			"src/glcommon/c_utils.cpp",
+			"src/glcommon/primitives.cpp"
+		}
+		targetdir "build"
+		
 		configuration { "linux", "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
@@ -81,17 +103,7 @@ solution "opengl_reference"
 		files {
 			"src/left_handed.c"
 		}
-		--includedirs { }
-		links { "SDL2", "GLEW", "GL" }
 		targetdir "build"
 		
-		configuration "Debug"
-			defines { "DEBUG" }
-			flags { "Symbols" }
-
-		configuration "Release"
-			defines { "NDEBUG" }
-			defines { "Optimize" }
-
 		configuration { "linux", "gmake" }
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }

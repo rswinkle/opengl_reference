@@ -10,8 +10,6 @@
 #define WIDTH 640
 #define HEIGHT 480
 
-using namespace std;
-
 
 SDL_Window* window;
 SDL_GLContext glcontext;
@@ -284,4 +282,5 @@ GLuint load_shader_pair(const char* vert_shader_src, const char* frag_shader_src
 
 	return link_program(program);
 }
+
 
