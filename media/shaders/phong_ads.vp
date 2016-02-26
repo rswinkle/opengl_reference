@@ -1,0 +1,29 @@
+// Simple Phong lighting
+
+// only normal interpolated because
+// non-local viewer
+// directional light
+
+// Vertex Shader
+// Robert Winkler
+#version 330 core
+
+layout (location = 0) in vec4 vertex;
+layout (location = 1) in vec3 normal;
+
+
+uniform mat4 mvp_mat;
+uniform mat3 normal_mat;
+
+// out to fragment program
+out vec3 eye_normal;
+
+void main(void)
+{
+	// Get surface normal in eye coordinates
+	//make sure normal_mat and normal are normalized before drawing
+	eye_normal = normal_mat * normal;
+
+	gl_Position = mvp_mat * vertex;
+}
+

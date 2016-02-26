@@ -50,6 +50,20 @@ struct vert_attribs
 };
 
 int polygon_mode;
+int cur_prog;
+
+#define NUM_PROGRAMS 2
+int programs[NUM_PROGRAMS];
+
+const char* shader_files[] =
+{
+"../media/shaders/gouraud_ads.vp",
+"../media/shaders/gouraud_ads.fp",
+"../media/shaders/phong_ads.vp",
+"../media/shaders/phong_ads.fp"
+};
+
+int mvp_loc, normal_loc;
 
 
 int main(int argc, char** argv)
@@ -57,17 +71,7 @@ int main(int argc, char** argv)
 	setup_context();
 
 	polygon_mode = 2;
-
-	//no error checking done for any of this except shader compilation
-	GLuint program = load_shader_file_pair("../media/shaders/gouraud_ads.vp", "../media/shaders/gouraud_ads.fp");
-	if (!program) {
-		printf("failed to compile/link shaders\n");
-		exit(0);
-	}
-
-	glUseProgram(program);
-
-
+	cur_prog = 0;
 
 	vector<vec3> verts;
 	vector<ivec3> tris;
@@ -86,8 +90,6 @@ int main(int argc, char** argv)
 		vert_data.push_back(vert_attribs(tmp, normalize(tmp)));
 	}
 
-
-
 	//no default vao in core profile ...
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
@@ -103,9 +105,23 @@ int main(int argc, char** argv)
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2*sizeof(vec3), (void*)sizeof(vec3));
 
 
+
+	int loc;
 	vec4 material(0.2, 0.6, 1.0, 128.0);
-	int loc = glGetUniformLocation(program, "material");
-	glUniform4fv(loc, 1, glm::value_ptr(material));
+	//no error checking done for any of this except shader compilation
+	for (int i=0; i<NUM_PROGRAMS; ++i) {
+		programs[i] = load_shader_file_pair(shader_files[i*2], shader_files[i*2+1]);
+		if (!programs[i]) {
+			printf("failed to compile/link shaders\n");
+			exit(0);
+		}
+
+		glUseProgram(programs[i]);
+		loc = glGetUniformLocation(programs[i], "material");
+		glUniform4fv(loc, 1, glm::value_ptr(material));
+	}
+
+	glUseProgram(programs[cur_prog]);
 
 	mat4 proj_mat = glm::perspective(3.14159f/4.0f, WIDTH/(float)HEIGHT, 0.1f, 30.0f);
 	mat4 view_mat = glm::lookAt(vec3(0, 0, 10), vec3(0, 0, -1), vec3(0, 1, 0));
@@ -115,11 +131,8 @@ int main(int argc, char** argv)
 	mat3 normal_mat;
 	mat4 rot_mat(1);
 
-	int mvp_loc = glGetUniformLocation(program, "mvp_mat");
-	glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp_mat));
-
-	int normal_loc = glGetUniformLocation(program, "normal_mat");
-	glUniformMatrix3fv(normal_loc, 1, GL_FALSE, glm::value_ptr(normal_mat));
+	mvp_loc = glGetUniformLocation(programs[cur_prog], "mvp_mat");
+	normal_loc = glGetUniformLocation(programs[cur_prog], "normal_mat");
 
 
 	glEnable(GL_CULL_FACE);
@@ -153,8 +166,9 @@ int main(int argc, char** argv)
 		SDL_GL_SwapWindow(window);
 	}
 
+	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &buffer);
-	glDeleteProgram(program);
+	glDeleteProgram(programs[cur_prog]);
 
 	cleanup();
 
@@ -227,6 +241,13 @@ int handle_events()
 					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 				else
 					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			} else if (sc == SDL_SCANCODE_S) {
+				cur_prog = (cur_prog + 1) % NUM_PROGRAMS;
+				printf("%d %d\n", cur_prog, programs[cur_prog]);
+
+				glUseProgram(programs[cur_prog]);
+				mvp_loc = glGetUniformLocation(programs[cur_prog], "mvp_mat");
+				normal_loc = glGetUniformLocation(programs[cur_prog], "normal_mat");
 			}
 		}
 	}
@@ -236,7 +257,7 @@ int handle_events()
 
 
 
-int load_model(const char* filename, vector<vec3>& verts, vector<ivec3>&tris);
+int load_model(const char* filename, vector<vec3>& verts, vector<ivec3>&tris)
 {
 	FILE* file = NULL;
 	unsigned int num = 0;
@@ -254,7 +275,7 @@ int load_model(const char* filename, vector<vec3>& verts, vector<ivec3>&tris);
 	
 	verts.reserve(num);
 	for (int i=0; i<num; ++i) {
-		fscanf(file, " (%f, %f, %f)", &vec->x, &vec->y, &vec->z);
+		fscanf(file, " (%f, %f, %f)", &vec.x, &vec.y, &vec.z);
 		verts.push_back(vec);
 	}
 
@@ -267,7 +288,7 @@ int load_model(const char* filename, vector<vec3>& verts, vector<ivec3>&tris);
 	tris.reserve(num);
 
 	for (int i=0; i<num; ++i) {
-		fscanf(f, " (%d, %d, %d)", &ivec->x, &ivec->y, &ivec->z);
+		fscanf(file, " (%d, %d, %d)", &ivec.x, &ivec.y, &ivec.z);
 		tris.push_back(ivec);
 	}
 
@@ -331,7 +352,7 @@ int link_program(GLuint program)
 		return 0;
 	}
 
-	return 1;
+	return program;
 }
 
 int compile_shader_str(GLuint shader, const char* shader_str)

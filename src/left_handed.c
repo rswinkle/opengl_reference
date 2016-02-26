@@ -212,7 +212,7 @@ int link_program(GLuint program)
 		return 0;
 	}
 
-	return 1;
+	return program;
 }
 
 int compile_shader_str(GLuint shader, const char* shader_str)
