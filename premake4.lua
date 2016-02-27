@@ -73,7 +73,8 @@ solution "opengl_reference"
 		files {
 			"src/ex3.cpp",
 			"src/glcommon/c_utils.cpp",
-			"src/glcommon/primitives.cpp"
+			"src/glcommon/primitives.cpp",
+			"src/glcommon/glm_halfedge.cpp"
 		}
 		targetdir "build"
 		

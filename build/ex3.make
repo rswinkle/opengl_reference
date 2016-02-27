@@ -67,6 +67,7 @@ OBJECTS := \
 	$(OBJDIR)/ex3.o \
 	$(OBJDIR)/c_utils.o \
 	$(OBJDIR)/primitives.o \
+	$(OBJDIR)/glm_halfedge.o \
 
 RESOURCES := \
 
@@ -134,6 +135,9 @@ $(OBJDIR)/c_utils.o: ../src/glcommon/c_utils.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/primitives.o: ../src/glcommon/primitives.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/glm_halfedge.o: ../src/glcommon/glm_halfedge.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 

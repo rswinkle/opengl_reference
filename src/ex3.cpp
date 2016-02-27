@@ -1,10 +1,13 @@
 #include <c_utils.h>
 #include <primitives.h>
 
+#include <glm_halfedge.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/constants.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include <GL/glew.h>
 
@@ -42,7 +45,6 @@ GLuint load_shader_pair(const char* vert_shader_src, const char* frag_shader_src
 GLuint load_shader_file_pair(const char* vert_file, const char* frag_file);
 
 int load_model(const char* filename, vector<vec3>& verts, vector<ivec3>&tris);
-void compute_face_normals(vector<vec3>& verts, vector<ivec3>& tris, vector<vec3>& normals);
 
 
 struct vert_attribs
@@ -86,47 +88,47 @@ int main(int argc, char** argv)
 	if (argc == 1) {
 		printf("usage: %s [model_file]\n", argv[0]);
 		printf("No model given, so generating a sphere...\n");
-		generate_sphere(verts, tris, tex, 2.0f, 14, 7);
-		for (int i=0; i<tris.size(); ++i) {
-			tmp = verts[tris[i].x];
-			vert_data.push_back(vert_attribs(tmp, normalize(tmp)));
-			tmp = verts[tris[i].y];
-			vert_data.push_back(vert_attribs(tmp, normalize(tmp)));
-			tmp = verts[tris[i].z];
-			vert_data.push_back(vert_attribs(tmp, normalize(tmp)));
-		}
+		generate_sphere(verts, tris, tex, 5.0f, 14, 7);
+		//generate_sphere(verts, tris, tex, 2.0f, 30, 15);
 	} else {
 		ret = load_model(argv[1], verts, tris);
 		if (!ret) {
 			printf("Failed to load %s!\nGenerating a sphere instead.\n", argv[1]);
 			verts.clear();
 			tris.clear();
-			generate_sphere(verts, tris, tex, 2.0f, 14, 7);
-			for (int i=0; i<tris.size(); ++i) {
-				tmp = verts[tris[i].x];
-				vert_data.push_back(vert_attribs(tmp, normalize(tmp)));
-				tmp = verts[tris[i].y];
-				vert_data.push_back(vert_attribs(tmp, normalize(tmp)));
-				tmp = verts[tris[i].z];
-				vert_data.push_back(vert_attribs(tmp, normalize(tmp)));
-			}
-		} else {
-			vector<vec3> normals;
-			vec3 norm;
-			compute_face_normals(verts, tris, normals);
-			for (int i=0; i<tris.size(); ++i) {
-				tmp = verts[tris[i].x];
-				vert_data.push_back(vert_attribs(tmp, normals[i]));
-				tmp = verts[tris[i].y];
-				vert_data.push_back(vert_attribs(tmp, normals[i]));
-				tmp = verts[tris[i].z];
-				vert_data.push_back(vert_attribs(tmp, normals[i]));
-			}
+			generate_sphere(verts, tris, tex, 5.0f, 14, 7);
 		}
 	}
 
+	vector<vec3> normals;
+	compute_normals(verts, tris, NULL, 3.14159f/2, normals);
+	//compute_face_normals(verts, tris, normals);
 
-	//no default vao in core profile ...
+	int v;
+	vector<vec3> normal_lines;
+	for (int i=0, j=0; i<tris.size(); ++i, j=i*3) {
+		v = tris[i].x;
+		vert_data.push_back(vert_attribs(verts[v], normals[j]));
+		normal_lines.push_back(verts[v]);
+		normal_lines.push_back(verts[v] + normals[j]*0.5f);
+
+		v = tris[i].y;
+		vert_data.push_back(vert_attribs(verts[v], normals[j+1]));
+		normal_lines.push_back(verts[v]);
+		normal_lines.push_back(verts[v] + normals[j+1]*0.5f);
+
+		v = tris[i].z;
+		vert_data.push_back(vert_attribs(verts[v], normals[j+2]));
+		normal_lines.push_back(verts[v]);
+		normal_lines.push_back(verts[v] + normals[j+2]*0.5f);
+	}
+
+
+	for (int i=0; i<normal_lines.size(); i+=2) {
+//		printf("%s\n%s\n\n", glm::to_string(normal_lines[i]).c_str(), glm::to_string(normal_lines[i+1]).c_str());
+	}
+
+
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -141,8 +143,30 @@ int main(int argc, char** argv)
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2*sizeof(vec3), (void*)sizeof(vec3));
 
 
+	
+	GLuint normal_vao, norm_buf;
+	glGenVertexArrays(1, &normal_vao);
+	glBindVertexArray(normal_vao);
+	glGenBuffers(1, &norm_buf);
+	glBindBuffer(GL_ARRAY_BUFFER, norm_buf);
+	glBufferData(GL_ARRAY_BUFFER, normal_lines.size()*sizeof(vec3), &normal_lines[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+	glBindVertexArray(0);
+
 
 	int loc;
+	GLuint normal_prog = load_shader_file_pair("../media/shaders/basic_transform.vp", "../media/shaders/simple_color.fp");
+	glUseProgram(normal_prog);
+
+	vec4 Red(1.0, 0.0, 0.0, 1.0);
+	loc = glGetUniformLocation(normal_prog, "color");
+	glUniform4fv(loc, 1, glm::value_ptr(Red));
+
+
+
 	vec4 material(0.2, 0.6, 1.0, 128.0);
 	//no error checking done for any of this except shader compilation
 	for (int i=0; i<NUM_PROGRAMS; ++i) {
@@ -159,8 +183,8 @@ int main(int argc, char** argv)
 
 	glUseProgram(programs[cur_prog]);
 
-	mat4 proj_mat = glm::perspective(3.14159f/4.0f, WIDTH/(float)HEIGHT, 0.1f, 30.0f);
-	mat4 view_mat = glm::lookAt(vec3(0, 0, 10), vec3(0, 0, -1), vec3(0, 1, 0));
+	mat4 proj_mat = glm::perspective(3.14159f/4.0f, WIDTH/(float)HEIGHT, 1.0f, 100.0f);
+	mat4 view_mat = glm::lookAt(vec3(0, 5, 20), vec3(0, 5, -1), vec3(0, 1, 0));
 
 	mat4 mvp_mat;
 	mat4 vp_mat = proj_mat * view_mat;
@@ -188,6 +212,8 @@ int main(int argc, char** argv)
 		}
 
 
+		glUseProgram(programs[cur_prog]);
+
 		rot_mat = glm::rotate(mat4(1), 0.5f*new_time/1000.0f, vec3(0, 1, 0));
 
 		normal_mat = mat3(view_mat*rot_mat);
@@ -197,7 +223,19 @@ int main(int argc, char** argv)
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp_mat));
 		
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+		glBindVertexArray(vao);
 		glDrawArrays(GL_TRIANGLES, 0, vert_data.size());
+
+		
+		/*
+		glUseProgram(normal_prog);
+		loc = glGetUniformLocation(normal_prog, "mvp_mat");
+		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(mvp_mat));
+
+		glBindVertexArray(normal_vao);
+		glDrawArrays(GL_LINES, 0, normal_lines.size());
+		*/
 
 		SDL_GL_SwapWindow(window);
 	}
@@ -330,18 +368,6 @@ int load_model(const char* filename, vector<vec3>& verts, vector<ivec3>&tris)
 	fclose(file);
 
 	return 1;
-}
-
-void compute_face_normals(vector<vec3>& verts, vector<ivec3>& tris, vector<vec3>& normals)
-{
-	vec3 v1, v2, tmp;
-	for (int i=0; i<tris.size(); ++i) {
-		v1 = verts[tris[i].y] - verts[tris[i].x];
-		v2 = verts[tris[i].z] - verts[tris[i].x];
-		tmp = glm::cross(v1, v2);
-
-		normals.push_back(normalize(tmp));
-	}
 }
 
 
