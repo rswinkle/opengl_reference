@@ -13,6 +13,7 @@ solution "opengl_reference"
 		defines { "NDEBUG" }
 		defines { "Optimize" }
 	
+
 	project "c_ex1"
 		location "build"
 		kind "ConsoleApp"
@@ -80,6 +81,21 @@ solution "opengl_reference"
 		
 		configuration { "linux", "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+
+
+	project "ex4"
+		location "build"
+		kind "ConsoleApp"
+		language "C++"
+		files {
+			"src/ex4.cpp",
+			"src/glcommon/gltools.cpp"
+		}
+		targetdir "build"
+		
+		configuration { "linux", "gmake" }
+			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+
 
 	project "flying"
 		location "build"

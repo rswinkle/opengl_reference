@@ -6,7 +6,7 @@ ifndef config
 endif
 export config
 
-PROJECTS := c_ex1 c_ex2 ex1 ex2 ex3 flying left_handed
+PROJECTS := c_ex1 c_ex2 ex1 ex2 ex3 ex4 flying left_handed
 
 .PHONY: all clean help $(PROJECTS)
 
@@ -32,6 +32,10 @@ ex3:
 	@echo "==== Building ex3 ($(config)) ===="
 	@${MAKE} --no-print-directory -C build -f ex3.make
 
+ex4: 
+	@echo "==== Building ex4 ($(config)) ===="
+	@${MAKE} --no-print-directory -C build -f ex4.make
+
 flying: 
 	@echo "==== Building flying ($(config)) ===="
 	@${MAKE} --no-print-directory -C build -f flying.make
@@ -46,6 +50,7 @@ clean:
 	@${MAKE} --no-print-directory -C build -f ex1.make clean
 	@${MAKE} --no-print-directory -C build -f ex2.make clean
 	@${MAKE} --no-print-directory -C build -f ex3.make clean
+	@${MAKE} --no-print-directory -C build -f ex4.make clean
 	@${MAKE} --no-print-directory -C build -f flying.make clean
 	@${MAKE} --no-print-directory -C build -f left_handed.make clean
 
@@ -64,6 +69,7 @@ help:
 	@echo "   ex1"
 	@echo "   ex2"
 	@echo "   ex3"
+	@echo "   ex4"
 	@echo "   flying"
 	@echo "   left_handed"
 	@echo ""
