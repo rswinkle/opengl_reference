@@ -5,12 +5,7 @@
 
 #include <vector>
 
-using namespace std;
-
-using glm::vec3;
-using glm::ivec3;
-
-
+using std::vector;
 
 typedef struct half_edge
 {
@@ -38,11 +33,11 @@ typedef struct half_edge_data
 } half_edge_data;
 
 
-void compute_face_normals(vector<vec3>& verts, vector<ivec3>& triangles, vector<vec3>& normals);
+void compute_face_normals(vector<glm::vec3>& verts, vector<glm::ivec3>& triangles, vector<glm::vec3>& normals);
 
-void compute_half_edge(vector<vec3>& verts, vector<ivec3>& tri, half_edge_data* he_data);
+void compute_half_edge(vector<glm::vec3>& verts, vector<glm::ivec3>& tri, half_edge_data* he_data);
 
 
-void compute_normals(vector<vec3>&verts, vector<ivec3>& triangles, half_edge_data* he_data, float sharp_angle, vector<vec3>& normals);
+void compute_normals(vector<glm::vec3>&verts, vector<glm::ivec3>& triangles, half_edge_data* he_data, float sharp_angle, vector<glm::vec3>& normals);
 
 #endif

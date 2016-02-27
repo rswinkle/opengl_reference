@@ -4,6 +4,12 @@
 #include <stdio.h>
 #include <math.h>
 
+using glm::vec3;
+using glm::ivec3;
+
+using namespace std;
+
+
 
 
 void compute_face_normals(vector<vec3>& verts, vector<ivec3>& t, vector<vec3>& normals)

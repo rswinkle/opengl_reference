@@ -3,6 +3,10 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+using glm::vec3;
+using glm::vec4;
+using glm::mat4;
+using glm::mat3;
 
 // Default position and orientation. At the origin, looking
 // down the positive Z axis (right handed coordinate system.
