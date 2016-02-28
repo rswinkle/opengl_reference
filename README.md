@@ -17,9 +17,9 @@ I'll maintain a table/list of programs here
 
 | Program | Description | Image |
 | --- | --- |
-| ex1.cpp | Hello Triangle                                          | ![ex1](./media/ex_1.png) |
-| ex2.cpp | Hello Interpolation                                     | ![ex2](./media/ex_2.png) |
-| ex3.cpp | Switch between gouraud and Phong shading                | ![ex3](./media/ex_3.png) |
-| ex4.cpp | Switch between textures, filtering modes                | ![ex4](./media/ex_4.png) |
-| flying.cpp | Template with 6DOF flying controls ala Descent                     | ![flying](./media/flying.png) |
-| left_handed.cpp | [OpenGL *is* left handed](https://stackoverflow.com/questions/5168163/is-the-opengl-coordinate-system-right-handed-or-left-handed/22675164#22675164). | ![left_handed](./media/left_handed.png) |
+| ex1.cpp | Hello Triangle                                          | ![ex1](./media/screenshots/ex_1.png) |
+| ex2.cpp | Hello Interpolation                                     | ![ex2](./media/screenshots/ex_2.png) |
+| ex3.cpp | Switch between gouraud and Phong shading                | ![ex3](./media/screenshots/ex_3.png) |
+| ex4.cpp | Switch between textures, filtering modes                | ![ex4](./media/screenshots/ex_4.png) |
+| flying.cpp | Template with 6DOF flying controls ala Descent                     | ![flying](./media/screenshots/flying.png) |
+| left_handed.cpp | [OpenGL *is* left handed](https://stackoverflow.com/questions/5168163/is-the-opengl-coordinate-system-right-handed-or-left-handed/22675164#22675164). | ![left_handed](./media/screenshots/left_handed.png) |
