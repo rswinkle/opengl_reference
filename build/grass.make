@@ -20,19 +20,19 @@ ifndef AR
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/Debug/ex2
+  OBJDIR     = obj/Debug/grass
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/ex2
+  TARGET     = $(TARGETDIR)/grass
   DEFINES   += -DDEBUG
   INCLUDES  += -I../inc -I../inc/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -ansi -fno-strict-aliasing -Wunused-variable -Wreturn-type
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += 
   LIBS      += -lSDL2 -lGLEW -lGL
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
+  LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -42,19 +42,19 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/Release/ex2
+  OBJDIR     = obj/Release/grass
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/ex2
+  TARGET     = $(TARGETDIR)/grass
   DEFINES   += -DNDEBUG -DOptimize
   INCLUDES  += -I../inc -I../inc/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -ansi -fno-strict-aliasing -Wunused-variable -Wreturn-type
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -s
   LIBS      += -lSDL2 -lGLEW -lGL
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
+  LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -64,7 +64,10 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/ex2.o \
+	$(OBJDIR)/grass.o \
+	$(OBJDIR)/gltools.o \
+	$(OBJDIR)/glm_glframe.o \
+	$(OBJDIR)/c_utils.o \
 
 RESOURCES := \
 
@@ -82,7 +85,7 @@ all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
 	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking ex2
+	@echo Linking grass
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -103,7 +106,7 @@ else
 endif
 
 clean:
-	@echo Cleaning ex2
+	@echo Cleaning grass
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -122,11 +125,20 @@ ifneq (,$(PCH))
 $(GCH): $(PCH)
 	@echo $(notdir $<)
 	-$(SILENT) cp $< $(OBJDIR)
-	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/ex2.o: ../src/ex2.c
+$(OBJDIR)/grass.o: ../src/grass.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/gltools.o: ../src/glcommon/gltools.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/glm_glframe.o: ../src/glcommon/glm_glframe.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/c_utils.o: ../src/glcommon/c_utils.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)

@@ -1,0 +1,76 @@
+//Vertex Shader
+//based on the example in
+//Superbible 5 and 7 by Graham Sellers
+//Robert Winkler
+
+
+#version 330 core
+
+
+in vec4 vertex;
+
+
+uniform mat4 mvp_mat;
+
+
+int random(int seed, int iterations)
+{
+	int val = seed;
+	int n;
+	for (n=0; n<iterations; ++n) {
+		val = ((val >> 7) ^ (val << 9)) * 15485863;
+	}
+	return val;
+}
+
+
+mat4 make_yrot_mat(float angle)
+{
+	float st = sin(angle);
+	float ct = cos(angle);
+	return mat4(vec4( ct, 0.0,  st, 0.0),
+	            vec4(0.0, 1.0, 0.0, 0.0),
+	            vec4(-st, 0.0,  ct, 0.0),
+	            vec4(0.0, 0.0, 0.0, 1.0));
+}
+
+mat4 make_xrot_mat(float angle)
+{
+	float st = sin(angle);
+	float ct = cos(angle);
+	return mat4(vec4(1.0, 0.0, 0.0, 0.0),
+	            vec4(0.0,  ct, -st, 0.0),
+	            vec4(0.0,  st,  ct, 0.0),
+	            vec4(0.0, 0.0, 0.0, 1.0));
+}
+
+
+
+void main(void)
+{
+	vec4 offset = vec4(float(gl_InstanceID >> 8) - 128.0, 0.0f,
+	                   float(gl_InstanceID & 0xFF) - 128.0, 0.0f);
+
+	int num1 = random(gl_InstanceID, 3);
+	int num2 = random(num1, 2);
+
+
+	//offset += vec4(float(num1 & 0xFF)/128.0, 0.0, float(num2 & 0xFF)/128.0, 0.0f);
+
+	offset += vec4(float(num1 & 0xFF)/128.0, 0.0, float(num2 & 0xFF)/128.0, 0.0f);
+
+	float max_tilt = 3.14159/6.0;
+	float angle1 = float(num2);
+
+	//float angle2 = mod(float(num1), max_tilt);
+
+	mat4 yrot = make_yrot_mat(angle1);
+	//mat4 xrot = make_xrot_mat(angle2);
+	
+	vec4 pos = yrot * vertex + offset;
+	
+	gl_Position = mvp_mat * pos;
+
+}
+
+

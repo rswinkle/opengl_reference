@@ -6,19 +6,11 @@ ifndef config
 endif
 export config
 
-PROJECTS := c_ex1 c_ex2 ex1 ex2 ex3 ex4 flying left_handed
+PROJECTS := ex1 ex2 ex3 ex4 grass flying left_handed
 
 .PHONY: all clean help $(PROJECTS)
 
 all: $(PROJECTS)
-
-c_ex1: 
-	@echo "==== Building c_ex1 ($(config)) ===="
-	@${MAKE} --no-print-directory -C build -f c_ex1.make
-
-c_ex2: 
-	@echo "==== Building c_ex2 ($(config)) ===="
-	@${MAKE} --no-print-directory -C build -f c_ex2.make
 
 ex1: 
 	@echo "==== Building ex1 ($(config)) ===="
@@ -36,6 +28,10 @@ ex4:
 	@echo "==== Building ex4 ($(config)) ===="
 	@${MAKE} --no-print-directory -C build -f ex4.make
 
+grass: 
+	@echo "==== Building grass ($(config)) ===="
+	@${MAKE} --no-print-directory -C build -f grass.make
+
 flying: 
 	@echo "==== Building flying ($(config)) ===="
 	@${MAKE} --no-print-directory -C build -f flying.make
@@ -45,12 +41,11 @@ left_handed:
 	@${MAKE} --no-print-directory -C build -f left_handed.make
 
 clean:
-	@${MAKE} --no-print-directory -C build -f c_ex1.make clean
-	@${MAKE} --no-print-directory -C build -f c_ex2.make clean
 	@${MAKE} --no-print-directory -C build -f ex1.make clean
 	@${MAKE} --no-print-directory -C build -f ex2.make clean
 	@${MAKE} --no-print-directory -C build -f ex3.make clean
 	@${MAKE} --no-print-directory -C build -f ex4.make clean
+	@${MAKE} --no-print-directory -C build -f grass.make clean
 	@${MAKE} --no-print-directory -C build -f flying.make clean
 	@${MAKE} --no-print-directory -C build -f left_handed.make clean
 
@@ -64,12 +59,11 @@ help:
 	@echo "TARGETS:"
 	@echo "   all (default)"
 	@echo "   clean"
-	@echo "   c_ex1"
-	@echo "   c_ex2"
 	@echo "   ex1"
 	@echo "   ex2"
 	@echo "   ex3"
 	@echo "   ex4"
+	@echo "   grass"
 	@echo "   flying"
 	@echo "   left_handed"
 	@echo ""

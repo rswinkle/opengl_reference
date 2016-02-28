@@ -26,13 +26,13 @@ ifeq ($(config),debug)
   DEFINES   += -DDEBUG
   INCLUDES  += -I../inc -I../inc/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -ansi -fno-strict-aliasing -Wunused-variable -Wreturn-type
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += 
   LIBS      += -lSDL2 -lGLEW -lGL
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -48,13 +48,13 @@ ifeq ($(config),release)
   DEFINES   += -DNDEBUG -DOptimize
   INCLUDES  += -I../inc -I../inc/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -ansi -fno-strict-aliasing -Wunused-variable -Wreturn-type
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -s
   LIBS      += -lSDL2 -lGLEW -lGL
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -122,11 +122,11 @@ ifneq (,$(PCH))
 $(GCH): $(PCH)
 	@echo $(notdir $<)
 	-$(SILENT) cp $< $(OBJDIR)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/ex1.o: ../src/ex1.cpp
+$(OBJDIR)/ex1.o: ../src/ex1.c
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)

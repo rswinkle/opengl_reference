@@ -14,7 +14,7 @@ solution "opengl_reference"
 		defines { "Optimize" }
 	
 
-	project "c_ex1"
+	project "ex1"
 		location "build"
 		kind "ConsoleApp"
 		language "C"
@@ -27,7 +27,7 @@ solution "opengl_reference"
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 
-	project "c_ex2"
+	project "ex2"
 		location "build"
 		kind "ConsoleApp"
 		language "C"
@@ -38,33 +38,6 @@ solution "opengl_reference"
 		
 		configuration { "linux", "gmake" }
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
-
-
-
-	project "ex1"
-		location "build"
-		kind "ConsoleApp"
-		language "C++"
-		files {
-			"src/ex1.cpp"
-		}
-		targetdir "build"
-		
-		configuration { "linux", "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
-
-
-	project "ex2"
-		location "build"
-		kind "ConsoleApp"
-		language "C++"
-		files {
-			"src/ex2.cpp"
-		}
-		targetdir "build"
-
-		configuration { "linux", "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	
 	project "ex3"
@@ -91,6 +64,22 @@ solution "opengl_reference"
 			"src/ex4.cpp",
 			"src/glcommon/c_utils.cpp",
 			"src/glcommon/gltools.cpp"
+		}
+		targetdir "build"
+		
+		configuration { "linux", "gmake" }
+			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+
+
+	project "grass"
+		location "build"
+		kind "ConsoleApp"
+		language "C++"
+		files {
+			"src/grass.cpp",
+			"src/glcommon/gltools.cpp",
+			"src/glcommon/glm_glframe.cpp",
+			"src/glcommon/c_utils.cpp",
 		}
 		targetdir "build"
 		
