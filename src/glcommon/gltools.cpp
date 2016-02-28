@@ -1,3 +1,5 @@
+
+#include <c_utils.h>
 #include <gltools.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -106,6 +108,20 @@ GLuint load_shader_pair(const char* vert_shader_src, const char* frag_shader_src
 	glDeleteShader(frag_shader);
 
 	return link_program(program);
+}
+
+GLuint load_shader_file_pair(const char* vert_file, const char* frag_file)
+{
+	c_array vs_str, fs_str;
+
+	if (!file_open_read(vert_file, "r", &vs_str))
+		return 0;
+	if (!file_open_read(frag_file, "r", &fs_str)) {
+		free(vs_str.data);
+		return 0;
+	}
+
+	return load_shader_pair((char*)vs_str.data, (char*)fs_str.data);
 }
 
 

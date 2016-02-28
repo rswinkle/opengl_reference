@@ -89,6 +89,7 @@ solution "opengl_reference"
 		language "C++"
 		files {
 			"src/ex4.cpp",
+			"src/glcommon/c_utils.cpp",
 			"src/glcommon/gltools.cpp"
 		}
 		targetdir "build"

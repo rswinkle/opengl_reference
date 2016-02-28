@@ -1,12 +1,20 @@
 #include <gltools.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <SDL2/SDL.h>
 
 #include <stdio.h>
+#include <stdint.h>
 
 #define WIDTH 640
 #define HEIGHT 480
+
+using glm::mat4;
+using glm::vec3;
+
 
 
 SDL_Window* window;
@@ -14,92 +22,134 @@ SDL_GLContext glcontext;
 
 void cleanup();
 void setup_context();
-int handle_events();
+int handle_events(unsigned int last_time, unsigned int cur_time, mat4& mvp_mat);
+
+
+#define NUM_TEXTURES 3
+GLuint textures[NUM_TEXTURES];
+int tex_index;
+int tex_filter;
 
 
 
-
-static const char vs_shader_str[] =
-"#version 330 core                        \n"
-"                                         \n"
-"layout (location = 0) in vec4 in_vertex; \n"
-"layout (location = 1) in vec4 in_color;  \n"
-"out vec4 vary_color;                     \n"
-"void main(void)                          \n"
-"{                                        \n"
-"	vary_color = in_color;                \n"
-"	gl_Position = in_vertex;              \n"
-"}";
-
-static const char fs_shader_str[] =
-"#version 330 core                     \n"
-"                                      \n"
-"in vec4 vary_color;                   \n"
-"out vec4 frag_color;                  \n"
-"void main(void)                       \n"
-"{                                     \n"
-"	frag_color = vary_color;           \n"
-"}";
 
 int main()
 {
 	setup_context();
 
-	float points_n_colors[] = {
-		-0.5, -0.5, 0.0,
-		 1.0,  0.0, 0.0,
+	float points_n_tex[] =
+	{
+		-0.5,  0.5, -0.1,
+		-0.5, -0.5, -0.1,
+		 0.5,  0.5, -0.1,
+		 0.5, -0.5, -0.1,
 
-		 0.5, -0.5, 0.0,
-		 0.0,  1.0, 0.0,
+		 0.0, 0.0,
+		 0.0, 1.0,
+		 1.0, 0.0,
+		 1.0, 1.0
+	};
 
-		 0.0,  0.5, 0.0,
-		 0.0,  0.0, 1.0 };
+
+	//make a 3x3 checkerboard texture to
+	//really demonstrate GL_LINEAR vs GL_NEAREST
+	//ABGR because LSB machine
+	uint32_t test_texture[9];
+	for (int i=0; i<9; ++i) {
+		if (i % 2)
+			test_texture[i] = 0xFF000000;
+		else
+			test_texture[i] = ~0x0;
+	}
 
 
-	//no error checking done for any of this except shader compilation
-	GLuint program = load_shader_pair(vs_shader_str, fs_shader_str);
+
+	glGenTextures(NUM_TEXTURES, textures);
+	glBindTexture(GL_TEXTURE_2D, textures[0]);
+	if (!load_texture2D("../media/textures/test1.jpg", GL_NEAREST, GL_NEAREST, GL_MIRRORED_REPEAT, false)) {
+		printf("failed to load texture\n");
+		return 0;
+	}
+
+
+	glBindTexture(GL_TEXTURE_2D, textures[1]);
+
+	if (!load_texture2D("../media/textures/test2.jpg", GL_NEAREST, GL_NEAREST, GL_REPEAT, false)) {
+		printf("failed to load texture\n");
+		return 0;
+	}
+
+	glBindTexture(GL_TEXTURE_2D, textures[2]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA, 3, 3, 0, GL_RGBA, GL_UNSIGNED_BYTE, test_texture);
+
+
+	//start with tex0
+	glBindTexture(GL_TEXTURE_2D, textures[0]);
+
+
+	const char vs_file[] = "../media/shaders/texturing.vp";
+	const char fs_file[] = "../media/shaders/texturing.fp";
+
+	GLuint program = load_shader_file_pair(vs_file, fs_file);
 	if (!program) {
 		printf("failed to compile/link shaders\n");
 		exit(0);
 	}
 
 	glUseProgram(program);
+	int loc = glGetUniformLocation(program, "color_map");
+	glUniform1i(loc, 0);
+	
 
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	GLuint triangle;
-	glGenBuffers(1, &triangle);
-	glBindBuffer(GL_ARRAY_BUFFER, triangle);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(points_n_colors), points_n_colors, GL_STATIC_DRAW);
+
+	GLuint square;
+	glGenBuffers(1, &square);
+	glBindBuffer(GL_ARRAY_BUFFER, square);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(points_n_tex), points_n_tex, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6, 0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6, (void*)(sizeof(float)*3));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(float)*12));
 
 
-	unsigned int old_time = 0, new_time=0, counter = 0;
+	mat4 mvp_mat(1);
+	int mvp_loc = glGetUniformLocation(program, "mvp_mat");
+
+
+
+	unsigned int old_time = 0, new_time=0, counter = 0, last_time=0;
 	while (1) {
-		if (handle_events())
+		new_time = SDL_GetTicks();
+		if (handle_events(last_time, new_time, mvp_mat))
 			break;
 
-		counter++;
-		new_time = SDL_GetTicks();
+		last_time = new_time;
+
 		if (new_time - old_time > 3000) {
 			printf("%f FPS\n", counter*1000.f/(new_time-old_time));
 			old_time = new_time;
 			counter = 0;
 		}
 
+		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp_mat));
 		
 		glClear(GL_COLOR_BUFFER_BIT);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 		SDL_GL_SwapWindow(window);
+
+		last_time = new_time;
+		++counter;
 	}
 
-	glDeleteBuffers(1, &triangle);
+	glDeleteBuffers(1, &square);
 	glDeleteProgram(program);
 
 	cleanup();
@@ -119,7 +169,7 @@ void setup_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	window = SDL_CreateWindow("Ex 2", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Ex 4", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
 		cleanup();
 		exit(0);
@@ -153,20 +203,80 @@ void cleanup()
 	SDL_Quit();
 }
 
-int handle_events()
+int handle_events(unsigned int last_time, unsigned int cur_time, mat4& mvp_mat)
 {
 	SDL_Event e;
 	int sc;
 	while (SDL_PollEvent(&e)) {
-		if (e.type == SDL_QUIT) {
-			return 1;
-		} else if (e.type == SDL_KEYDOWN) {
+		switch (e.type) {
+		case SDL_KEYDOWN:
 			sc = e.key.keysym.scancode;
-
-			if (sc == SDL_SCANCODE_ESCAPE)
+			
+			switch (sc) {
+			case SDL_SCANCODE_ESCAPE:
 				return 1;
+			case SDL_SCANCODE_1:
+				tex_index = (tex_index + 1) % NUM_TEXTURES;
+				glBindTexture(GL_TEXTURE_2D, textures[tex_index]);
+				break;
+			case SDL_SCANCODE_F:
+			{
+				int filter;
+				if (tex_filter == 0) {
+					filter = GL_LINEAR;
+					printf("GL_LINEAR\n");
+				} else {
+					filter = GL_NEAREST;
+					printf("GL_NEAREST\n");
+				}
+				for (int i=0; i<NUM_TEXTURES; ++i) {
+					glBindTexture(GL_TEXTURE_2D, textures[i]);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+				}
+				tex_filter = !tex_filter;
+				glBindTexture(GL_TEXTURE_2D, textures[tex_index]);
+			}
+			default:
+				;
+			}
+
+
+			break; //sdl_keydown
+
+		case SDL_QUIT:
+			return 1;
+			break;
 		}
 	}
+
+	//SDL_PumpEvents() is called above in SDL_PollEvent()
+	const Uint8 *state = SDL_GetKeyboardState(NULL);
+
+	float time = (cur_time - last_time)/1000.0f;
+
+#define MOVE_SPEED 3.14159f/6.0f
+//DEG_TO_RAD(30)
+
+	mat4 tmp(1);
+	
+	if (state[SDL_SCANCODE_LEFT]) {
+		tmp = glm::rotate(tmp, time*MOVE_SPEED, vec3(0, 0, 1));
+	}
+	if (state[SDL_SCANCODE_RIGHT]) {
+		tmp = glm::rotate(tmp, -time*MOVE_SPEED, vec3(0, 0, 1));
+	}
+	if (state[SDL_SCANCODE_UP]) {
+		tmp = glm::scale(tmp, vec3(1.01f, 1.01f, 1));
+	}
+	if (state[SDL_SCANCODE_DOWN]) {
+		tmp = glm::scale(tmp, vec3(0.99f, 0.99f, 1));
+		//the_uniforms.mvp_mat = the_uniforms.mvp_mat * rsw::scale_mat4(0.99, 0.99, 1);
+	}
+
+	mvp_mat = mvp_mat * tmp;
+
+
 	return 0;
 }
 

@@ -16,6 +16,7 @@ void check_errors(int n, const char* str);
 int compile_shader_str(GLuint shader, const char* shader_str);
 int link_program(GLuint program);
 GLuint load_shader_pair(const char* vert_shader_src, const char* frag_shader_src);
+GLuint load_shader_file_pair(const char* vert_file, const char* frag_file);
 
 
 

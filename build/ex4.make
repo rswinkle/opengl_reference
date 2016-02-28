@@ -65,6 +65,7 @@ endif
 
 OBJECTS := \
 	$(OBJDIR)/ex4.o \
+	$(OBJDIR)/c_utils.o \
 	$(OBJDIR)/gltools.o \
 
 RESOURCES := \
@@ -127,6 +128,9 @@ $(GCH): $(PCH)
 endif
 
 $(OBJDIR)/ex4.o: ../src/ex4.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/c_utils.o: ../src/glcommon/c_utils.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/gltools.o: ../src/glcommon/gltools.cpp

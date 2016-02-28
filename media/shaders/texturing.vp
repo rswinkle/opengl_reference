@@ -1,0 +1,19 @@
+//Simple texturing
+//Vertex Shader
+// Robert Winkler
+#version 330 core
+
+uniform mat4 mvp_mat;
+
+
+layout (location = 0) in vec4 v_vertex;
+layout (location = 2) in vec2 v_texcoords;
+
+smooth out vec2 texcoords;
+
+void main(void)
+{
+    texcoords = v_texcoords;
+    gl_Position = mvp_mat * v_vertex;
+}
+

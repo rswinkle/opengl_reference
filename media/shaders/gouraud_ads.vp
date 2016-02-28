@@ -8,9 +8,9 @@
 layout (location = 0) in vec4 vertex;
 layout (location = 1) in vec3 normal;
 
-uniform vec3	light_dir;
-uniform mat4	mvp_mat;
-uniform mat3	normal_mat;
+uniform vec3 light_dir;
+uniform mat4 mvp_mat;
+uniform mat3 normal_mat;
 
 // a, d, s, shininess
 uniform vec4 material;
