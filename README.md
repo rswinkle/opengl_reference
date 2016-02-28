@@ -16,7 +16,7 @@ and finish my own OpenGL math/helper code.
 I'll maintain a table/list of programs here
 
 | Program | Description | Image |
-| --- | --- |
+| --- | --- | --- |
 | ex1.cpp | Hello Triangle                                          | ![ex1](./media/screenshots/ex_1.png) |
 | ex2.cpp | Hello Interpolation                                     | ![ex2](./media/screenshots/ex_2.png) |
 | ex3.cpp | Switch between gouraud and Phong shading                | ![ex3](./media/screenshots/ex_3.png) |
