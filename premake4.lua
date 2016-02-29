@@ -71,6 +71,23 @@ solution "opengl_reference"
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 
+	project "sphereworld_color"
+		location "build"
+		kind "ConsoleApp"
+		language "C++"
+		files {
+			"src/sphereworld_color.cpp",
+			"src/glcommon/glm_glframe.cpp",
+			"src/glcommon/gltools.cpp",
+			"src/glcommon/primitives.cpp",
+			"src/glcommon/glm_halfedge.cpp",
+			"src/glcommon/c_utils.cpp",
+		}
+		targetdir "build"
+		
+		configuration { "linux", "gmake" }
+			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+
 	project "grass"
 		location "build"
 		kind "ConsoleApp"
@@ -94,8 +111,8 @@ solution "opengl_reference"
 		files {
 			"src/flying.cpp",
 			"src/glcommon/glm_glframe.cpp",
+			"src/glcommon/gltools.cpp",
 			"src/glcommon/c_utils.cpp",
-			"src/glcommon/primitives.cpp"
 		}
 		targetdir "build"
 		

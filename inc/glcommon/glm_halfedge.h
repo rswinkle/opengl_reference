@@ -40,4 +40,6 @@ void compute_half_edge(vector<glm::vec3>& verts, vector<glm::ivec3>& tri, half_e
 
 void compute_normals(vector<glm::vec3>&verts, vector<glm::ivec3>& triangles, half_edge_data* he_data, float sharp_angle, vector<glm::vec3>& normals);
 
+
+
 #endif

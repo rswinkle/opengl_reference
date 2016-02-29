@@ -63,10 +63,10 @@ int programs[NUM_PROGRAMS];
 
 const char* shader_files[] =
 {
-"../media/shaders/gouraud_ads.vp",
+"../media/shaders/gouraud_ads_grayscale.vp",
 "../media/shaders/gouraud_ads.fp",
 "../media/shaders/phong_ads.vp",
-"../media/shaders/phong_ads.fp"
+"../media/shaders/phong_ads_grayscale.fp"
 };
 
 int mvp_loc, normal_loc;

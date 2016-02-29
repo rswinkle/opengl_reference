@@ -1,6 +1,7 @@
 #include <primitives.h>
-
 #include <gltools.h>
+
+#include <glm_halfedge.h>
 
 #include <glm_glframe.h>
 
@@ -8,6 +9,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/random.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/string_cast.hpp>
 
@@ -29,7 +31,7 @@
 //TODO
 #define RM_PI (3.14159265358979323846)
 #define RM_2PI (2.0 * RM_PI)
-#define PI_DIV_180 (0.017453292519943296)
+#define PI_DIV_180 (0.017453292519943296f)
 #define INV_PI_DIV_180 (57.2957795130823229)
 
 #define DEG_TO_RAD(x)  ((x)*PI_DIV_180)
@@ -53,6 +55,29 @@ void cleanup();
 void setup_context();
 int handle_events(GLFrame& camera_frame, unsigned int last_time, unsigned int cur_time);
 
+
+
+
+
+struct Mesh
+{
+	vector<vec3> verts;
+	vector<ivec3> tris;
+	vector<vec3> normals;
+
+	vector<vec2> texcoords;
+
+	half_edge_data he_data;
+};
+
+
+struct vert_attribs
+{
+	vec3 pos;
+	vec3 normal;
+
+	vert_attribs(vec3 p, vec3 n) : pos(p), normal(n) {}
+};
 
 
 int polygon_mode;
@@ -96,6 +121,7 @@ SDL_Scancode controls[NCONTROLS] =
 };
 
 
+#define FLOOR_SIZE 40
 
 
 
@@ -108,21 +134,71 @@ int main(int argc, char** argv)
 
 
 	vector<vec3> line_verts;
-#define GRID_SIZE 200
-	for (int i=0, j=-GRID_SIZE/2; i < 11; ++i, j+=GRID_SIZE/10) {
-		line_verts.push_back(vec3(j, -1, -GRID_SIZE/2));
-		line_verts.push_back(vec3(j, -1, GRID_SIZE/2));
-		line_verts.push_back(vec3(-GRID_SIZE/2, -1, j));
-		line_verts.push_back(vec3(GRID_SIZE/2, -1, j));
+	for (int i=0, j=-FLOOR_SIZE/2; i < 11; ++i, j+=FLOOR_SIZE/10) {
+		line_verts.push_back(vec3(j, -1, -FLOOR_SIZE/2));
+		line_verts.push_back(vec3(j, -1, FLOOR_SIZE/2));
+		line_verts.push_back(vec3(-FLOOR_SIZE/2, -1, j));
+		line_verts.push_back(vec3(FLOOR_SIZE/2, -1, j));
 	}
-#undef GRID_SIZE
 
-	line_verts.push_back(vec3(0));
-	line_verts.push_back(vec3(2,0,0));
-	line_verts.push_back(vec3(0));
-	line_verts.push_back(vec3(0,2,0));
-	line_verts.push_back(vec3(0));
-	line_verts.push_back(vec3(0,0,2));
+	GLuint line_vao, line_buf;
+	glGenVertexArrays(1, &line_vao);
+	glBindVertexArray(line_vao);
+
+	glGenBuffers(1, &line_buf);
+	glBindBuffer(GL_ARRAY_BUFFER, line_buf);
+	glBufferData(GL_ARRAY_BUFFER, line_verts.size()*3*sizeof(float), &line_verts[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	Mesh torus;
+	Mesh sphere;
+
+	generate_torus(torus.verts, torus.tris, torus.texcoords, 0.4, 0.15, 30, 30);
+	generate_sphere(sphere.verts, sphere.tris, sphere.texcoords, 0.1, 26, 13);
+
+	compute_normals(torus.verts, torus.tris, NULL, DEG_TO_RAD(30), torus.normals);
+	compute_normals(sphere.verts, sphere.tris, NULL, DEG_TO_RAD(30), sphere.normals);
+
+
+	vector<vert_attribs> vert_data;
+
+	int v;
+	for (int i=0, j=0; i<torus.tris.size(); ++i, j+=3) {
+		v = torus.tris[i].x;
+		vert_data.push_back(vert_attribs(torus.verts[v], torus.normals[j]));
+
+		v = torus.tris[i].y;
+		vert_data.push_back(vert_attribs(torus.verts[v], torus.normals[j+1]));
+
+		v = torus.tris[i].z;
+		vert_data.push_back(vert_attribs(torus.verts[v], torus.normals[j+2]));
+	}
+
+	for (int i=0, j=0; i<sphere.tris.size(); ++i, j+=3) {
+		v = sphere.tris[i].x;
+		vert_data.push_back(vert_attribs(sphere.verts[v], sphere.normals[j]));
+
+		v = sphere.tris[i].y;
+		vert_data.push_back(vert_attribs(sphere.verts[v], sphere.normals[j+1]));
+
+		v = sphere.tris[i].z;
+		vert_data.push_back(vert_attribs(sphere.verts[v], sphere.normals[j+2]));
+	}
+
+#define NUM_SPHERES 50
+	vector<vec3> instance_pos;
+	vec2 rand_pos;
+	for (int i=0; i<NUM_SPHERES+1; ++i) {
+		rand_pos = glm::diskRand(FLOOR_SIZE/2.0f);
+		if (i)
+			instance_pos.push_back(vec3(rand_pos.x, 0.4, rand_pos.y));
+		else
+			instance_pos.push_back(vec3());
+	}
+
+
+
 
 	GLuint vao, buffer;
 	glGenVertexArrays(1, &vao);
@@ -130,29 +206,73 @@ int main(int argc, char** argv)
 
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, line_verts.size()*3*sizeof(float), &line_verts[0], GL_STATIC_DRAW);
+
+	size_t total_size = (torus.tris.size()*3 + sphere.tris.size()*3) * sizeof(vert_attribs);
+	size_t sphere_offset = torus.tris.size()*3;
+	glBufferData(GL_ARRAY_BUFFER, total_size, &vert_data[0], GL_STATIC_DRAW);
+
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vert_attribs), 0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vert_attribs), (void*)sizeof(vec3));
 
-	GLuint prog = load_shader_file_pair("../media/shaders/basic_transform.vp", "../media/shaders/simple_color.fp");
+	GLuint inst_buf;
+	glGenBuffers(1, &inst_buf);
+	glBindBuffer(GL_ARRAY_BUFFER, inst_buf);
+	glBufferData(GL_ARRAY_BUFFER, instance_pos.size()*3*sizeof(float), &instance_pos[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribDivisor(3, 1);
 
 
 
 
-	glUseProgram(prog);
 
-	mat4 proj_mat = glm::perspective(glm::quarter_pi<float>(), WIDTH/(float)HEIGHT, 0.1f, 300.0f);
+
+	GLuint basic_shader = load_shader_file_pair("../media/shaders/basic_transform.vp", "../media/shaders/simple_color.fp");
+
+	GLuint gouraud_shader = load_shader_file_pair("../media/shaders/gouraud_ads.vp", "../media/shaders/gouraud_ads.fp");
+
+	GLuint phong_shader = load_shader_file_pair("../media/shaders/phong_ads.vp", "../media/shaders/phong_ads.fp");
+
+
+
+	mat4 proj_mat = glm::perspective(DEG_TO_RAD(35.0f), WIDTH/(float)HEIGHT, 1.0f, 100.0f);
 	mat4 view_mat;
-
 	mat4 mvp_mat;
+	mat3 normal_mat;
 
-	int mvp_loc = glGetUniformLocation(prog, "mvp_mat");
 
-	int color_loc = glGetUniformLocation(prog, "color");
+	vec3 torus_color(0.3, 0, 0);
+	vec4 floor_color(0, 1, 0, 1);
+	vec3 sphere_color(0, 0, 0.3);
 
-	vec4 Red(1, 0, 0, 1);
-	vec4 Green(0, 1, 0, 1);
-	vec4 Blue(0, 0, 1, 1);
+	int basic_mvp_loc = glGetUniformLocation(basic_shader, "mvp_mat");
+	int basic_color_loc = glGetUniformLocation(basic_shader, "color");
+	glUseProgram(basic_shader);
+	glUniform4fv(basic_color_loc, 1, glm::value_ptr(floor_color));
+
+	int gouraud_mvp_loc = glGetUniformLocation(gouraud_shader, "mvp_mat");
+	int gouraud_norm_mat_loc = glGetUniformLocation(gouraud_shader, "normal_mat");
+
+	int phong_mvp_loc = glGetUniformLocation(phong_shader, "mvp_mat");
+	int phong_norm_mat_loc = glGetUniformLocation(phong_shader, "normal_mat");
+	int phong_mat_color_loc = glGetUniformLocation(phong_shader, "material_color");
+	int phong_diff_loc = glGetUniformLocation(phong_shader, "diff_intensity");
+	int phong_spec_loc = glGetUniformLocation(phong_shader, "spec_intensity");
+	int phong_shininess_loc = glGetUniformLocation(phong_shader, "shininess");
+
+
+	glUseProgram(gouraud_shader);
+
+	glUseProgram(phong_shader);
+	glUniform1f(phong_diff_loc, 0.6f);
+	glUniform1f(phong_spec_loc, 1.0f);
+	glUniform1f(phong_shininess_loc, 128.0f);
+
+
+
+	glUseProgram(basic_shader);
 
 	GLFrame camera(true);
 
@@ -179,21 +299,30 @@ int main(int argc, char** argv)
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 
-		view_mat = glm::lookAt(camera.origin, camera.forward, camera.up);
-		//cout << glm::to_string(view_mat) << "\n";
 		view_mat = camera.get_camera_matrix();
-		//cout << glm::to_string(view_mat) << "\n\n";
-
 		mvp_mat = proj_mat * view_mat;
-		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp_mat));
+
+
+		glUseProgram(basic_shader);
+		glUniformMatrix4fv(basic_mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp_mat));
+		glBindVertexArray(line_vao);
+		glDrawArrays(GL_LINES, 0, line_verts.size());
 
 		
 
-		glUniform4fv(color_loc, 1, glm::value_ptr(Red));
-		glDrawArrays(GL_LINES, 0, line_verts.size() - 6);
+		glUseProgram(phong_shader);
 
-		glUniform4fv(color_loc, 1, glm::value_ptr(Blue));
-		glDrawArrays(GL_LINES, line_verts.size()-6, 6);
+		glUniformMatrix4fv(phong_mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp_mat));
+		normal_mat = mat3(view_mat);
+		glUniformMatrix3fv(phong_norm_mat_loc, 1, GL_FALSE, glm::value_ptr(normal_mat));
+
+		glBindVertexArray(vao);
+		glUniform3f(phong_mat_color_loc, torus_color.x, torus_color.y, torus_color.z);
+		glDrawArrays(GL_TRIANGLES, 0, torus.tris.size()*3);
+
+		glUniform3f(phong_mat_color_loc, sphere_color.x, sphere_color.y, sphere_color.z);
+		glDrawArraysInstanced(GL_TRIANGLES, torus.tris.size()*3, sphere.tris.size()*3, NUM_SPHERES);
+
 
 		SDL_GL_SwapWindow(window);
 
@@ -203,7 +332,7 @@ int main(int argc, char** argv)
 
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &buffer);
-	glDeleteProgram(prog);
+	glDeleteProgram(basic_shader);
 
 	cleanup();
 
@@ -343,6 +472,7 @@ int handle_events(GLFrame& camera_frame, unsigned int last_time, unsigned int cu
 
 	return 0;
 }
+
 
 
 

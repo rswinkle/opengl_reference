@@ -20,9 +20,9 @@ ifndef AR
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/Debug/flying
+  OBJDIR     = obj/Debug/sphereworld_color
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/flying
+  TARGET     = $(TARGETDIR)/sphereworld_color
   DEFINES   += -DDEBUG
   INCLUDES  += -I../inc -I../inc/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -42,9 +42,9 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/Release/flying
+  OBJDIR     = obj/Release/sphereworld_color
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/flying
+  TARGET     = $(TARGETDIR)/sphereworld_color
   DEFINES   += -DNDEBUG -DOptimize
   INCLUDES  += -I../inc -I../inc/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -64,9 +64,11 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/flying.o \
+	$(OBJDIR)/sphereworld_color.o \
 	$(OBJDIR)/glm_glframe.o \
 	$(OBJDIR)/gltools.o \
+	$(OBJDIR)/primitives.o \
+	$(OBJDIR)/glm_halfedge.o \
 	$(OBJDIR)/c_utils.o \
 
 RESOURCES := \
@@ -85,7 +87,7 @@ all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
 	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking flying
+	@echo Linking sphereworld_color
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -106,7 +108,7 @@ else
 endif
 
 clean:
-	@echo Cleaning flying
+	@echo Cleaning sphereworld_color
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -128,13 +130,19 @@ $(GCH): $(PCH)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/flying.o: ../src/flying.cpp
+$(OBJDIR)/sphereworld_color.o: ../src/sphereworld_color.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/glm_glframe.o: ../src/glcommon/glm_glframe.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/gltools.o: ../src/glcommon/gltools.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/primitives.o: ../src/glcommon/primitives.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/glm_halfedge.o: ../src/glcommon/glm_halfedge.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/c_utils.o: ../src/glcommon/c_utils.cpp
