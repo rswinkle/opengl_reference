@@ -1,4 +1,4 @@
-// Gouraud lighting
+// Gouraud grayscale lighting
 // Vertex Shader
 // Robert Winkler
 #version 330 core
@@ -12,14 +12,8 @@ uniform vec3 light_dir;
 uniform mat4 mvp_mat;
 uniform mat3 normal_mat;
 
-
-//aka ambient
-uniform vec3 material_color;
-
-// d, s, shininess
-uniform float diff_intensity;
-uniform float spec_intensity;
-uniform float shininess;
+// a, d, s, shininess
+uniform vec4 material;
 
 
 // out to fragment program
@@ -35,23 +29,25 @@ void main(void)
 	vec3 light_dir = normalize(vec3(-1, 1, 0.5));
 	vec3 eye_dir = vec3(0, 0, 1);	
 	
-	//as if all lights are white
-	vec3 out_light = material_color;
+	// add ambient, everything is grayscale in this shader
+	//as if all lights are perfectly white
+	vec3 out_light = vec3(material.x);
+	
 	
 	// Dot product gives us diffuse intensity
 	float diff = max(0.0, dot(eye_normal, light_dir));
 
 	// add diffuse light
-	out_light += diff * diff_intensity.x;
+	out_light += diff * material.y;
 
 
 	// Specular Light
 	vec3 r = reflect(-light_dir, eye_normal);
 	float spec = max(0.0, dot(eye_dir, r));
 	if(diff > 0) {
-		float fSpec = pow(spec, shininess);
+		float fSpec = pow(spec, material.w);
 		
-		out_light += spec_intensity * fSpec;
+		out_light += material.z * fSpec;
 	}
 	
 	
@@ -61,4 +57,3 @@ void main(void)
 	// Don't forget to transform the geometry!
 	gl_Position = mvp_mat * vertex;
 }
-

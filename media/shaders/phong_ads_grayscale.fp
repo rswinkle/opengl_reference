@@ -1,4 +1,4 @@
-// Simple Phong lighting
+// Grayscale Phong lighting
 
 // only normal coming in
 // non-local viewer
@@ -8,7 +8,7 @@
 // Robert Winkler
 #version 330
 
-out vec4 FragColor;
+out vec4 fragcolor;
 
 
 // a, d, s, shininess
@@ -45,7 +45,7 @@ void main(void)
 		out_light += material.z * fSpec;
 	}
 	
-	FragColor = vec4(out_light, 1);
+	fragcolor = vec4(out_light, 1);
 	
 }
 
