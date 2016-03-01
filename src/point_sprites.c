@@ -26,10 +26,16 @@ int main()
 	                    0,    0.5, 0 };
 
 
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	GLuint textures[2];
+	glGenTextures(2, textures);
+	glBindTexture(GL_TEXTURE_2D, textures[0]);
 	if (!load_texture2D("../media/textures/test1.jpg", GL_NEAREST, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_FALSE)) {
+		printf("failed to load texture\n");
+		return 0;
+	}
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, textures[1]);
+	if (!load_texture2D("../media/textures/clouds.tga", GL_NEAREST, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_FALSE)) {
 		printf("failed to load texture\n");
 		return 0;
 	}
@@ -46,7 +52,9 @@ int main()
 		exit(0);
 	}
 	glUseProgram(texture_prog);
-	glUniform1i(glGetUniformLocation(texture_prog, "tex"), 0);
+	set_uniform1i(texture_prog, "tex", 0);
+	set_uniform1i(texture_prog, "dissolve_tex", 1);
+	
 
 	glUseProgram(simple_prog);
 
@@ -76,8 +84,8 @@ int main()
 
 	glGetFloatv(GL_POINT_SIZE, ret_dat);
 	printf("point size = %f\n", ret_dat[0]);
-	check_errors(1, NULL);
 
+	check_errors(0, NULL);
 
 	unsigned int old_time = 0, new_time=0, counter = 0;
 	while (1) {
@@ -92,10 +100,15 @@ int main()
 			counter = 0;
 		}
 
+		float diss_factor = fmodf(new_time/1000.0f, 10.0f);
+		diss_factor /= 10.0f;
+
+		set_uniform1f(texture_prog, "dissolve_factor", diss_factor);
 		
 		glClear(GL_COLOR_BUFFER_BIT);
 		glUseProgram(simple_prog);
 		glDrawArrays(GL_POINTS, 0, 2);
+
 		glUseProgram(texture_prog);
 		glDrawArrays(GL_POINTS, 2, 1);
 

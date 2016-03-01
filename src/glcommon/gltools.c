@@ -123,6 +123,41 @@ GLuint load_shader_file_pair(const char* vert_file, const char* frag_file)
 	return load_shader_pair((char*)vs_str.data, (char*)fs_str.data);
 }
 
+void set_uniform1i(GLuint program, const char* name, int val)
+{
+	int loc = glGetUniformLocation(program, name);
+	if (loc >= 0)
+		glUniform1i(loc, val);
+	else
+		printf("Uniform: %s not found.\n", name);
+}
+
+void set_uniform2i(GLuint program, const char* name, int x, int y)
+{
+	int loc = glGetUniformLocation(program, name);
+	if (loc >= 0)
+		glUniform2i(loc, x, y);
+	else
+		printf("Uniform: %s not found.\n", name);
+}
+
+void set_uniform3i(GLuint program, const char* name, int x, int y, int z)
+{
+	int loc = glGetUniformLocation(program, name);
+	if (loc >= 0)
+		glUniform3i(loc, x, y, z);
+	else
+		printf("Uniform: %s not found.\n", name);
+}
+
+void set_uniform4i(GLuint program, const char* name, int x, int y, int z, int w)
+{
+	int loc = glGetUniformLocation(program, name);
+	if (loc >= 0)
+		glUniform4i(loc, x, y, z, w);
+	else
+		printf("Uniform: %s not found.\n", name);
+}
 
 void set_uniform1f(GLuint program, const char* name, float val)
 {

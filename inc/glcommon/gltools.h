@@ -18,6 +18,11 @@ int link_program(GLuint program);
 GLuint load_shader_pair(const char* vert_shader_src, const char* frag_shader_src);
 GLuint load_shader_file_pair(const char* vert_file, const char* frag_file);
 
+void set_uniform1i(GLuint program, const char* name, int val);
+void set_uniform2i(GLuint program, const char* name, int x, int y);
+void set_uniform3i(GLuint program, const char* name, int x, int y, int z);
+void set_uniform4i(GLuint program, const char* name, int x, int y, int z, int w);
+
 void set_uniform1f(GLuint program, const char* name, float val);
 void set_uniform2f(GLuint program, const char* name, float x, float y);
 void set_uniform3f(GLuint program, const char* name, float x, float y, float z);
