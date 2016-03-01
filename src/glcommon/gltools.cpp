@@ -125,6 +125,100 @@ GLuint load_shader_file_pair(const char* vert_file, const char* frag_file)
 }
 
 
+void set_uniform1f(GLuint program, const char* name, float val)
+{
+	int loc = glGetUniformLocation(program, name);
+	if (loc >= 0)
+		glUniform1f(loc, val);
+	else
+		printf("Uniform: %s not found.\n", name);
+}
+
+void set_uniform2f(GLuint program, const char* name, float x, float y)
+{
+	int loc = glGetUniformLocation(program, name);
+	if (loc >= 0)
+		glUniform2f(loc, x, y);
+	else
+		printf("Uniform: %s not found.\n", name);
+}
+
+void set_uniform3f(GLuint program, const char* name, float x, float y, float z)
+{
+	int loc = glGetUniformLocation(program, name);
+	if (loc >= 0)
+		glUniform3f(loc, x, y, z);
+	else
+		printf("Uniform: %s not found.\n", name);
+}
+
+void set_uniform4f(GLuint program, const char* name, float x, float y, float z, float w)
+{
+	int loc = glGetUniformLocation(program, name);
+	if (loc >= 0)
+		glUniform4f(loc, x, y, z, w);
+	else
+		printf("Uniform: %s not found.\n", name);
+}
+
+void set_uniform2fv(GLuint program, const char* name, GLfloat* v)
+{
+	int loc = glGetUniformLocation(program, name);
+	if (loc >= 0)
+		glUniform2fv(loc, 1, v);
+	else
+		printf("Uniform: %s not found.\n", name);
+}
+
+void set_uniform3fv(GLuint program, const char* name, GLfloat* v)
+{
+	int loc = glGetUniformLocation(program, name);
+	if (loc >= 0)
+		glUniform3fv(loc, 1, v);
+	else
+		printf("Uniform: %s not found.\n", name);
+}
+
+void set_uniform4fv(GLuint program, const char* name, GLfloat* v)
+{
+	int loc = glGetUniformLocation(program, name);
+	if (loc >= 0)
+		glUniform4fv(loc, 1, v);
+	else
+		printf("Uniform: %s not found.\n", name);
+}
+
+
+void set_uniform_mat4f(GLuint program, const char* name, GLfloat* mat)
+{
+	int loc = glGetUniformLocation(program, name);
+	if (loc >= 0) {
+		//TODO transpose if necessary
+		glUniformMatrix4fv(loc, 1, GL_FALSE, mat);
+	} else {
+		printf("Uniform: %s not found.\n", name);
+	}
+}
+
+void set_uniform_mat3f(GLuint program, const char* name, GLfloat* mat)
+{
+	int loc = glGetUniformLocation(program, name);
+	if (loc >= 0) {
+		//TODO transpose if necessary
+		glUniformMatrix3fv(loc, 1, GL_FALSE, mat);
+	} else {
+		printf("Uniform: %s not found.\n", name);
+	}
+}
+
+
+
+
+
+
+
+
+
 
 
 

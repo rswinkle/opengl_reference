@@ -243,33 +243,27 @@ int main(int argc, char** argv)
 	mat3 normal_mat;
 
 
-	vec3 torus_color(0.3, 0, 0);
 	vec4 floor_color(0, 1, 0, 1);
-	vec3 sphere_color(0, 0, 0.3);
 
-	int basic_mvp_loc = glGetUniformLocation(basic_shader, "mvp_mat");
-	int basic_color_loc = glGetUniformLocation(basic_shader, "color");
+	vec3 torus_ambient(0.0, 0, 0);
+	vec3 torus_diffuse(1.0, 0, 0);
+	vec3 torus_specular(0, 0, 0);
+
+	vec3 sphere_ambient(0, 0, 0.2);
+	vec3 sphere_diffuse(0, 0, 0.7);
+	vec3 sphere_specular(1, 1, 1);
+
+
 	glUseProgram(basic_shader);
-	glUniform4fv(basic_color_loc, 1, glm::value_ptr(floor_color));
-
-	int gouraud_mvp_loc = glGetUniformLocation(gouraud_shader, "mvp_mat");
-	int gouraud_norm_mat_loc = glGetUniformLocation(gouraud_shader, "normal_mat");
-
-	int phong_mvp_loc = glGetUniformLocation(phong_shader, "mvp_mat");
-	int phong_norm_mat_loc = glGetUniformLocation(phong_shader, "normal_mat");
-	int phong_mat_color_loc = glGetUniformLocation(phong_shader, "material_color");
-	int phong_diff_loc = glGetUniformLocation(phong_shader, "diff_intensity");
-	int phong_spec_loc = glGetUniformLocation(phong_shader, "spec_intensity");
-	int phong_shininess_loc = glGetUniformLocation(phong_shader, "shininess");
-
+	set_uniform4fv(basic_shader, "color", glm::value_ptr(floor_color));
 
 	glUseProgram(gouraud_shader);
 
 	glUseProgram(phong_shader);
-	glUniform1f(phong_diff_loc, 0.6f);
-	glUniform1f(phong_spec_loc, 1.0f);
-	glUniform1f(phong_shininess_loc, 128.0f);
+	set_uniform1f(phong_shader, "shininess", 128.0f);
 
+	vec3 light_dir(0, 10, 5);
+	set_uniform3fv(phong_shader, "light_direction", glm::value_ptr(light_dir));
 
 
 	glUseProgram(basic_shader);
@@ -304,7 +298,7 @@ int main(int argc, char** argv)
 
 
 		glUseProgram(basic_shader);
-		glUniformMatrix4fv(basic_mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp_mat));
+		set_uniform_mat4f(basic_shader, "mvp_mat", glm::value_ptr(mvp_mat));
 		glBindVertexArray(line_vao);
 		glDrawArrays(GL_LINES, 0, line_verts.size());
 
@@ -312,15 +306,21 @@ int main(int argc, char** argv)
 
 		glUseProgram(phong_shader);
 
-		glUniformMatrix4fv(phong_mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp_mat));
+		set_uniform_mat4f(phong_shader, "mvp_mat", glm::value_ptr(mvp_mat));
 		normal_mat = mat3(view_mat);
-		glUniformMatrix3fv(phong_norm_mat_loc, 1, GL_FALSE, glm::value_ptr(normal_mat));
+		set_uniform_mat3f(phong_shader, "normal_mat", glm::value_ptr(normal_mat));
+
+		set_uniform3fv(phong_shader, "ambient_color", glm::value_ptr(torus_ambient));
+		set_uniform3fv(phong_shader, "diffuse_color", glm::value_ptr(torus_diffuse));
+		set_uniform3fv(phong_shader, "spec_color", glm::value_ptr(torus_specular));
 
 		glBindVertexArray(vao);
-		glUniform3f(phong_mat_color_loc, torus_color.x, torus_color.y, torus_color.z);
 		glDrawArrays(GL_TRIANGLES, 0, torus.tris.size()*3);
 
-		glUniform3f(phong_mat_color_loc, sphere_color.x, sphere_color.y, sphere_color.z);
+		set_uniform3fv(phong_shader, "ambient_color", glm::value_ptr(sphere_ambient));
+		set_uniform3fv(phong_shader, "diffuse_color", glm::value_ptr(sphere_diffuse));
+		set_uniform3fv(phong_shader, "spec_color", glm::value_ptr(sphere_specular));
+
 		glDrawArraysInstanced(GL_TRIANGLES, torus.tris.size()*3, sphere.tris.size()*3, NUM_SPHERES);
 
 
