@@ -3,7 +3,7 @@ solution "opengl_reference"
 	configurations { "Debug", "Release" }
 	--location "build"
 	includedirs { "inc", "inc/glcommon" }
-	links { "SDL2", "GLEW", "GL" }
+	links { "SDL2", "GLEW", "GL", "m" }
 
 	configuration "Debug"
 		defines { "DEBUG" }
@@ -70,6 +70,19 @@ solution "opengl_reference"
 		configuration { "linux", "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
+	project "point_sprites"
+		location "build"
+		kind "ConsoleApp"
+		language "C"
+		files {
+			"src/point_sprites.c",
+			"src/glcommon/c_utils.c",
+			"src/glcommon/gltools.c"
+		}
+		targetdir "build"
+		
+		configuration { "linux", "gmake" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "sphereworld_color"
 		location "build"

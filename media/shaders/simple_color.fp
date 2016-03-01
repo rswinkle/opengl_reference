@@ -5,10 +5,10 @@
 
 uniform vec4 color;
 
-out vec4 vFragColor;
+out vec4 fragcolor;
 
 void main(void)
 {
-	vFragColor = color;
+	fragcolor = color;
 }
 

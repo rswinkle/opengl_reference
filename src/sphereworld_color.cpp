@@ -1,5 +1,5 @@
 #include <primitives.h>
-#include <gltools.h>
+#include <gltools.h> //brings in glew.h and gl.h
 
 #include <glm_halfedge.h>
 
@@ -13,10 +13,6 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-#include <GL/glew.h>
-
-//included in SDL.h?
-//#include <GL/gl.h>
 
 #include <SDL2/SDL.h>
 

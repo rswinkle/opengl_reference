@@ -6,7 +6,7 @@ ifndef config
 endif
 export config
 
-PROJECTS := ex1 ex2 ex3 ex4 sphereworld_color grass flying left_handed
+PROJECTS := ex1 ex2 ex3 ex4 point_sprites sphereworld_color grass flying left_handed
 
 .PHONY: all clean help $(PROJECTS)
 
@@ -27,6 +27,10 @@ ex3:
 ex4: 
 	@echo "==== Building ex4 ($(config)) ===="
 	@${MAKE} --no-print-directory -C build -f ex4.make
+
+point_sprites: 
+	@echo "==== Building point_sprites ($(config)) ===="
+	@${MAKE} --no-print-directory -C build -f point_sprites.make
 
 sphereworld_color: 
 	@echo "==== Building sphereworld_color ($(config)) ===="
@@ -49,6 +53,7 @@ clean:
 	@${MAKE} --no-print-directory -C build -f ex2.make clean
 	@${MAKE} --no-print-directory -C build -f ex3.make clean
 	@${MAKE} --no-print-directory -C build -f ex4.make clean
+	@${MAKE} --no-print-directory -C build -f point_sprites.make clean
 	@${MAKE} --no-print-directory -C build -f sphereworld_color.make clean
 	@${MAKE} --no-print-directory -C build -f grass.make clean
 	@${MAKE} --no-print-directory -C build -f flying.make clean
@@ -68,6 +73,7 @@ help:
 	@echo "   ex2"
 	@echo "   ex3"
 	@echo "   ex4"
+	@echo "   point_sprites"
 	@echo "   sphereworld_color"
 	@echo "   grass"
 	@echo "   flying"
