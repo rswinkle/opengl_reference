@@ -14,11 +14,11 @@
 uniform vec3 ambient_color;
 uniform vec3 diffuse_color;
 uniform vec3 spec_color;
-
 uniform float shininess;
 
+uniform vec3 light_direction;
+
 in vec3 eye_normal;
-in vec3 light_dir;
 
 
 out vec4 fragcolor;
@@ -31,7 +31,7 @@ void main(void)
 	//non-local viewer
 	vec3 eye_dir = vec3(0, 0, 1);
 
-	vec3 s = normalize(light_dir);
+	vec3 s = normalize(light_direction);
 	vec3 n = normalize(eye_normal);
 	vec3 v = eye_dir;
 	

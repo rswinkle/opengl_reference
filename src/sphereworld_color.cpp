@@ -150,7 +150,7 @@ int main(int argc, char** argv)
 	Mesh torus;
 	Mesh sphere;
 
-	generate_torus(torus.verts, torus.tris, torus.texcoords, 0.4, 0.15, 30, 30);
+	generate_torus(torus.verts, torus.tris, torus.texcoords, 0.3, 0.1, 40, 20);
 	generate_sphere(sphere.verts, sphere.tris, sphere.texcoords, 0.1, 26, 13);
 
 	compute_normals(torus.verts, torus.tris, NULL, DEG_TO_RAD(30), torus.normals);
@@ -233,10 +233,11 @@ int main(int argc, char** argv)
 
 
 
-	mat4 proj_mat = glm::perspective(DEG_TO_RAD(35.0f), WIDTH/(float)HEIGHT, 1.0f, 100.0f);
+	mat4 proj_mat = glm::perspective(DEG_TO_RAD(35.0f), WIDTH/(float)HEIGHT, 0.3f, 100.0f);
 	mat4 view_mat;
 	mat4 mvp_mat;
 	mat3 normal_mat;
+	mat4 translate_sphere = glm::translate(mat4(1), vec3(0.8f, 0.4f, 0.0f));
 
 
 	vec4 floor_color(0, 1, 0, 1);
@@ -258,8 +259,7 @@ int main(int argc, char** argv)
 	glUseProgram(phong_shader);
 	set_uniform1f(phong_shader, "shininess", 128.0f);
 
-	vec3 light_dir(0, 10, 5);
-	set_uniform3fv(phong_shader, "light_direction", glm::value_ptr(light_dir));
+	vec3 light_direction(0, 10, 5);
 
 
 	glUseProgram(basic_shader);
@@ -273,13 +273,14 @@ int main(int argc, char** argv)
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 
 	unsigned int old_time = 0, new_time=0, counter = 0, last_time = SDL_GetTicks();
+	float total_time;
 	while (1) {
 		new_time = SDL_GetTicks();
 		if (handle_events(camera, last_time, new_time))
 			break;
 
 		last_time = new_time;
-
+		total_time = new_time/1000.0f;
 		if (new_time - old_time > 3000) {
 			printf("%f FPS\n", counter*1000.f/(new_time-old_time));
 			old_time = new_time;
@@ -300,24 +301,46 @@ int main(int argc, char** argv)
 
 		
 
+		glBindVertexArray(vao);
+
 		glUseProgram(phong_shader);
+
+
+		vec3 light_dir = mat3(view_mat)*light_direction;
+		set_uniform3fv(phong_shader, "light_direction", glm::value_ptr(light_dir));
 
 		set_uniform_mat4f(phong_shader, "mvp_mat", glm::value_ptr(mvp_mat));
 		normal_mat = mat3(view_mat);
+		set_uniform_mat3f(phong_shader, "normal_mat", glm::value_ptr(normal_mat));
+
+		set_uniform3fv(phong_shader, "ambient_color", glm::value_ptr(sphere_ambient));
+		set_uniform3fv(phong_shader, "diffuse_color", glm::value_ptr(sphere_diffuse));
+		set_uniform3fv(phong_shader, "spec_color", glm::value_ptr(sphere_specular));
+
+		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, torus.tris.size()*3, sphere.tris.size()*3, NUM_SPHERES, 1);
+
+		mat4 rot_mat = glm::rotate(mat4(1), -1*total_time*DEG_TO_RAD(60.0f), vec3(0, 1, 0));
+		mvp_mat = mvp_mat * rot_mat * translate_sphere;
+		normal_mat = mat3(view_mat*rot_mat);
+		set_uniform_mat3f(phong_shader, "normal_mat", glm::value_ptr(normal_mat));
+
+		set_uniform_mat4f(phong_shader, "mvp_mat", glm::value_ptr(mvp_mat));
+		glDrawArrays(GL_TRIANGLES, torus.tris.size()*3, sphere.tris.size()*3);
+
+
+		//draw rotating torus
+		mvp_mat = proj_mat * view_mat;
+		rot_mat = glm::rotate(mat4(1), total_time*DEG_TO_RAD(60.0f), vec3(0, 1, 0));
+		mvp_mat = mvp_mat * rot_mat;
+		set_uniform_mat4f(phong_shader, "mvp_mat", glm::value_ptr(mvp_mat));
+		normal_mat = mat3(view_mat*rot_mat);
 		set_uniform_mat3f(phong_shader, "normal_mat", glm::value_ptr(normal_mat));
 
 		set_uniform3fv(phong_shader, "ambient_color", glm::value_ptr(torus_ambient));
 		set_uniform3fv(phong_shader, "diffuse_color", glm::value_ptr(torus_diffuse));
 		set_uniform3fv(phong_shader, "spec_color", glm::value_ptr(torus_specular));
 
-		glBindVertexArray(vao);
 		glDrawArrays(GL_TRIANGLES, 0, torus.tris.size()*3);
-
-		set_uniform3fv(phong_shader, "ambient_color", glm::value_ptr(sphere_ambient));
-		set_uniform3fv(phong_shader, "diffuse_color", glm::value_ptr(sphere_diffuse));
-		set_uniform3fv(phong_shader, "spec_color", glm::value_ptr(sphere_specular));
-
-		glDrawArraysInstanced(GL_TRIANGLES, torus.tris.size()*3, sphere.tris.size()*3, NUM_SPHERES);
 
 
 		SDL_GL_SwapWindow(window);
