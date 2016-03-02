@@ -4,6 +4,15 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+
+
+#ifndef ROW_MAJOR
+#define ROW_MAJOR GL_FALSE
+#else
+#define ROW_MAJOR GL_TRUE
+#endif
+
+
 void check_errors(int n, const char* str)
 {
 	GLenum error;
@@ -228,7 +237,7 @@ void set_uniform_mat4f(GLuint program, const char* name, GLfloat* mat)
 	int loc = glGetUniformLocation(program, name);
 	if (loc >= 0) {
 		//TODO transpose if necessary
-		glUniformMatrix4fv(loc, 1, GL_FALSE, mat);
+		glUniformMatrix4fv(loc, 1, ROW_MAJOR, mat);
 	} else {
 		printf("Uniform: %s not found.\n", name);
 	}
@@ -239,7 +248,7 @@ void set_uniform_mat3f(GLuint program, const char* name, GLfloat* mat)
 	int loc = glGetUniformLocation(program, name);
 	if (loc >= 0) {
 		//TODO transpose if necessary
-		glUniformMatrix3fv(loc, 1, GL_FALSE, mat);
+		glUniformMatrix3fv(loc, 1, ROW_MAJOR, mat);
 	} else {
 		printf("Uniform: %s not found.\n", name);
 	}

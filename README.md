@@ -13,7 +13,8 @@ a bunch of OpenGL programs will also force me to learn glm
 and finish my own OpenGL math/helper code.
 
 
-I'll maintain a table/list of programs here
+I'll try to maintain a table/list of programs here.  Maybe
+I'll split them up by category later.
 
 | Program | Description | Image |
 | --- | --- | --- |
