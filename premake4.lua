@@ -2,7 +2,7 @@
 solution "opengl_reference"
 	configurations { "Debug", "Release" }
 	--location "build"
-	includedirs { "inc", "inc/glcommon" }
+	includedirs { "inc", "src/glcommon" }
 	links { "SDL2", "GLEW", "GL", "m" }
 
 	configuration "Debug"
