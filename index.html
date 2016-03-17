@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+	<head>
+	
+<title>opengl_reference | Robert Winkler</title>
+
+
+	<link rel="stylesheet" type="text/css" href="/css/global.css">
+	<meta charset="utf-8" />
+	<script type="text/javascript" src="/scripts/changetheme.js"></script>
+
+	</head>
+
+
+<body>
+
+
+	<div class="navbar">
+		<div class="container flex">
+			<div>
+			<h1>Robert Winkler</h1>
+			<a id="theme" href="#dark" onclick="change('/css/global.css', '/css/dark.css');">Dark Theme</a>
+			</div>
+			<table>
+				<tr>
+					<td><a href="/">Home</a></td>
+					<td><a href="/blog/">Blog</a></td>
+					<td><a href="/projects/">Projects</a></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+
+<div class="container">
+
+
+
+<h1>opengl_reference</h1>
+
+<p>This is going to be a repository of modern (3.3/4.x) OpenGL programs.
+Most of these will be either exploring/demonstrating concepts or
+be framework/template programs for starting new projects.</p>
+<p>There are better repositories of modern OpenGL programs to
+use for learning because they're more complete/organized,
+they go with a book etc.  However, this is mostly for my own
+personal use/code and will be constantly changing.  Writing
+a bunch of OpenGL programs will also force me to learn glm
+and finish my own OpenGL math/helper code.</p>
+<h1>Download</h1>
+<p>Get the source from <a href="https://github.com/rswinkle/opengl_reference">Github</a>.</p>
+<p>I'll try to maintain a table/list of programs here.  Maybe
+I'll split them up by category (templates/frameworks, feature examples, demos, "games") later.</p>
+<table>
+<thead>
+<tr>
+<th>Program</th>
+<th>Description</th>
+<th>Image</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ex1.c</td>
+<td>Hello Triangle</td>
+<td><img alt="ex1" src="https://raw.githubusercontent.com/rswinkle/opengl_reference/master/media/screenshots/ex_1.png"></td>
+</tr>
+<tr>
+<td>ex2.c</td>
+<td>Hello Interpolation</td>
+<td><img alt="ex2" src="https://raw.githubusercontent.com/rswinkle/opengl_reference/master/media/screenshots/ex_2.png"></td>
+</tr>
+<tr>
+<td>ex3.cpp</td>
+<td>Load a model from ./media/models.  Switch between Gouraud and Phong shading with s.  Switch between polygon modes with p.</td>
+<td><img alt="ex3" src="https://raw.githubusercontent.com/rswinkle/opengl_reference/master/media/screenshots/ex_3.png"></td>
+</tr>
+<tr>
+<td>ex4.cpp</td>
+<td>Switch between textures with 1, filtering modes with f, zoom/rotate with arrow keys</td>
+<td><img alt="ex4" src="https://raw.githubusercontent.com/rswinkle/opengl_reference/master/media/screenshots/ex_4.png"></td>
+</tr>
+<tr>
+<td>grass.cpp</td>
+<td>Based on example in superbible, uses flying controls, WIP</td>
+<td><img alt="grass" src="https://raw.githubusercontent.com/rswinkle/opengl_reference/master/media/screenshots/grass.png"></td>
+</tr>
+<tr>
+<td>point_sprites.c</td>
+<td>Point Sprite example, uses multitexturing and discard keyword in fragment shader to "disolve" textured point.</td>
+<td><img alt="point_sprites" src="https://raw.githubusercontent.com/rswinkle/opengl_reference/master/media/screenshots/point_sprites.png"></td>
+</tr>
+<tr>
+<td>sphereworld_color.cpp</td>
+<td>Based on SphereWorld example from SB with ADS lighting, moving/rotating objects, with flying controls.</td>
+<td><img alt="sphere_world_color" src="https://raw.githubusercontent.com/rswinkle/opengl_reference/master/media/screenshots/sphereworld_color.png"></td>
+</tr>
+<tr>
+<td>flying.cpp</td>
+<td>Template with 6DOF flying controls ala Descent. Mouse + WASDQE + LShift + Space</td>
+<td><img alt="flying" src="https://raw.githubusercontent.com/rswinkle/opengl_reference/master/media/screenshots/flying.png"></td>
+</tr>
+<tr>
+<td>left_handed.cpp</td>
+<td><a href="https://stackoverflow.com/questions/5168163/is-the-opengl-coordinate-system-right-handed-or-left-handed/22675164#22675164">OpenGL <em>is</em> left handed</a>.</td>
+<td><img alt="left_handed" src="https://raw.githubusercontent.com/rswinkle/opengl_reference/master/media/screenshots/left_handed.png"></td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+
+
+	<div class="footer">
+		<div class="container flex">
+			<a href="https://github.com/rswinkle">
+				<img alt="github" src="/images/icons/github.svg">
+			</a>
+			<a href="https://www.linkedin.com/in/rswinkle">
+				<img alt="linkedin" src="/images/icons/linkedin.svg">
+			</a>
+			<a href="https://www.google.com/+RobertWinkler25">
+				<img alt="google+" src="/images/icons/google+.svg">
+			</a>
+			<a href="https://www.goodreads.com/user/show/909505-robert">
+				<img alt="goodreads" src="/images/icons/goodreads.svg">
+			</a>
+			<a href="https://twitter.com/robertwinkler9">
+				<img alt="twitter" src="/images/icons/twitter.svg">
+			</a>
+			<a href="https://stackoverflow.com/users/2624136/rswinkle">
+				<img alt="stackoverflow" src="/images/icons/stackoverflow.svg">
+			</a>
+			<a href="http://www.youtube.com/c/RobertWinkler25">
+				<img alt="youtube" src="/images/icons/youtube.svg">
+			</a>
+			<a href="https://www.reddit.com/user/robert_winkler/">
+				<img alt="reddit" src="/images/icons/reddit.svg">
+			</a>
+		</div>
+	</div>
+	<p class="container" style="font-size:0.75em;color:#b3b3b3;text-align:center;">
+		© Robert Winkler, 2010 - 2016. Site design based closely on
+		<a href="http://www.michaelfogleman.com/">Michael Fogelman's awesome site</a>.
+	</p>
+
+
+</body>
+
+</html>
