@@ -307,7 +307,7 @@ GLboolean load_texture2D(const char* filename, GLenum min_filter, GLenum mag_fil
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, (GLfloat*)&green);
 
 
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); //I think
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA, w, h, 0,

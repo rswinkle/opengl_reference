@@ -1,3 +1,6 @@
+#ifndef GLTOOLS_H
+#define GLTOOLS_H
+
 #include <GL/glew.h>
 #include <GL/gl.h>
 
@@ -43,3 +46,6 @@ void set_uniform_mat3f(GLuint program, const char* name, GLfloat* mat);
 //textures
 GLboolean load_texture2D(const char* filename, GLenum min_filter, GLenum mag_filter, GLenum wrap_mode, GLboolean flip);
 GLboolean load_texture_cubemap(const char* filename[], GLenum min_filter, GLenum mag_filter, GLboolean flip);
+
+
+#endif
