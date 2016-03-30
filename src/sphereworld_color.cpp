@@ -1,4 +1,4 @@
-#include <primitives.h>
+#include <glm_primitives.h>
 #include <gltools.h> //brings in glew.h and gl.h
 
 #include <glm_halfedge.h>

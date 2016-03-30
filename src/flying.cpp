@@ -1,7 +1,4 @@
-#include <primitives.h>
-
 #include <gltools.h>
-
 #include <glm_glframe.h>
 
 

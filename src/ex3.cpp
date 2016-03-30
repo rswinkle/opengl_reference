@@ -1,6 +1,5 @@
 #include <c_utils.h>
-#include <primitives.h>
-
+#include <glm_primitives.h>
 #include <glm_halfedge.h>
 
 #include <glm/glm.hpp>

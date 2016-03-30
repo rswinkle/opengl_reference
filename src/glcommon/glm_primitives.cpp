@@ -1,4 +1,4 @@
-#include "primitives.h"
+#include "glm_primitives.h"
 
 //#include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>

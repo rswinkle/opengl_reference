@@ -47,7 +47,7 @@ solution "opengl_reference"
 		files {
 			"src/ex3.cpp",
 			"src/glcommon/c_utils.cpp",
-			"src/glcommon/primitives.cpp",
+			"src/glcommon/glm_primitives.cpp",
 			"src/glcommon/glm_halfedge.cpp"
 		}
 		targetdir "build"
@@ -92,7 +92,7 @@ solution "opengl_reference"
 			"src/sphereworld_color.cpp",
 			"src/glcommon/glm_glframe.cpp",
 			"src/glcommon/gltools.cpp",
-			"src/glcommon/primitives.cpp",
+			"src/glcommon/glm_primitives.cpp",
 			"src/glcommon/glm_halfedge.cpp",
 			"src/glcommon/c_utils.cpp",
 		}

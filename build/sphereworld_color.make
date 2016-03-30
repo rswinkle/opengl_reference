@@ -67,7 +67,7 @@ OBJECTS := \
 	$(OBJDIR)/sphereworld_color.o \
 	$(OBJDIR)/glm_glframe.o \
 	$(OBJDIR)/gltools.o \
-	$(OBJDIR)/primitives.o \
+	$(OBJDIR)/glm_primitives.o \
 	$(OBJDIR)/glm_halfedge.o \
 	$(OBJDIR)/c_utils.o \
 
@@ -139,7 +139,7 @@ $(OBJDIR)/glm_glframe.o: ../src/glcommon/glm_glframe.cpp
 $(OBJDIR)/gltools.o: ../src/glcommon/gltools.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/primitives.o: ../src/glcommon/primitives.cpp
+$(OBJDIR)/glm_primitives.o: ../src/glcommon/glm_primitives.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/glm_halfedge.o: ../src/glcommon/glm_halfedge.cpp
