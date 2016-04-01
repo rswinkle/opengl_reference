@@ -40,12 +40,12 @@ solution "opengl_reference"
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	
-	project "ex3"
+	project "glm_modelviewer"
 		location "build"
 		kind "ConsoleApp"
 		language "C++"
 		files {
-			"src/ex3.cpp",
+			"src/glm_modelviewer.cpp",
 			"src/glcommon/c_utils.cpp",
 			"src/glcommon/glm_primitives.cpp",
 			"src/glcommon/glm_halfedge.cpp"
@@ -56,12 +56,12 @@ solution "opengl_reference"
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 
-	project "ex4"
+	project "glm_texturing"
 		location "build"
 		kind "ConsoleApp"
 		language "C++"
 		files {
-			"src/ex4.cpp",
+			"src/glm_texturing.cpp",
 			"src/glcommon/c_utils.cpp",
 			"src/glcommon/gltools.cpp"
 		}
@@ -84,12 +84,12 @@ solution "opengl_reference"
 		configuration { "linux", "gmake" }
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
-	project "sphereworld_color"
+	project "glm_sphereworld_color"
 		location "build"
 		kind "ConsoleApp"
 		language "C++"
 		files {
-			"src/sphereworld_color.cpp",
+			"src/glm_sphereworld_color.cpp",
 			"src/glcommon/glm_glframe.cpp",
 			"src/glcommon/gltools.cpp",
 			"src/glcommon/glm_primitives.cpp",
@@ -101,12 +101,12 @@ solution "opengl_reference"
 		configuration { "linux", "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
-	project "grass"
+	project "glm_grass"
 		location "build"
 		kind "ConsoleApp"
 		language "C++"
 		files {
-			"src/grass.cpp",
+			"src/glm_grass.cpp",
 			"src/glcommon/gltools.cpp",
 			"src/glcommon/glm_glframe.cpp",
 			"src/glcommon/c_utils.cpp",
@@ -117,12 +117,12 @@ solution "opengl_reference"
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 
-	project "flying"
+	project "glm_flying"
 		location "build"
 		kind "ConsoleApp"
 		language "C++"
 		files {
-			"src/flying.cpp",
+			"src/glm_flying.cpp",
 			"src/glcommon/glm_glframe.cpp",
 			"src/glcommon/gltools.cpp",
 			"src/glcommon/c_utils.cpp",

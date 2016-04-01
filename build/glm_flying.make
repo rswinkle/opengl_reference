@@ -20,9 +20,9 @@ ifndef AR
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/Debug/ex3
+  OBJDIR     = obj/Debug/glm_flying
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/ex3
+  TARGET     = $(TARGETDIR)/glm_flying
   DEFINES   += -DDEBUG
   INCLUDES  += -I../inc -I../src/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -42,9 +42,9 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/Release/ex3
+  OBJDIR     = obj/Release/glm_flying
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/ex3
+  TARGET     = $(TARGETDIR)/glm_flying
   DEFINES   += -DNDEBUG -DOptimize
   INCLUDES  += -I../inc -I../src/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -64,10 +64,10 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/ex3.o \
+	$(OBJDIR)/glm_flying.o \
+	$(OBJDIR)/glm_glframe.o \
+	$(OBJDIR)/gltools.o \
 	$(OBJDIR)/c_utils.o \
-	$(OBJDIR)/glm_primitives.o \
-	$(OBJDIR)/glm_halfedge.o \
 
 RESOURCES := \
 
@@ -85,7 +85,7 @@ all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
 	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking ex3
+	@echo Linking glm_flying
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -106,7 +106,7 @@ else
 endif
 
 clean:
-	@echo Cleaning ex3
+	@echo Cleaning glm_flying
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -128,16 +128,16 @@ $(GCH): $(PCH)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/ex3.o: ../src/ex3.cpp
+$(OBJDIR)/glm_flying.o: ../src/glm_flying.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/glm_glframe.o: ../src/glcommon/glm_glframe.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/gltools.o: ../src/glcommon/gltools.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/c_utils.o: ../src/glcommon/c_utils.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/glm_primitives.o: ../src/glcommon/glm_primitives.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/glm_halfedge.o: ../src/glcommon/glm_halfedge.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 

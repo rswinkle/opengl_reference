@@ -20,9 +20,9 @@ ifndef AR
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/Debug/grass
+  OBJDIR     = obj/Debug/glm_sphereworld_color
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/grass
+  TARGET     = $(TARGETDIR)/glm_sphereworld_color
   DEFINES   += -DDEBUG
   INCLUDES  += -I../inc -I../src/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -42,9 +42,9 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/Release/grass
+  OBJDIR     = obj/Release/glm_sphereworld_color
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/grass
+  TARGET     = $(TARGETDIR)/glm_sphereworld_color
   DEFINES   += -DNDEBUG -DOptimize
   INCLUDES  += -I../inc -I../src/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -64,9 +64,11 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/grass.o \
-	$(OBJDIR)/gltools.o \
+	$(OBJDIR)/glm_sphereworld_color.o \
 	$(OBJDIR)/glm_glframe.o \
+	$(OBJDIR)/gltools.o \
+	$(OBJDIR)/glm_primitives.o \
+	$(OBJDIR)/glm_halfedge.o \
 	$(OBJDIR)/c_utils.o \
 
 RESOURCES := \
@@ -85,7 +87,7 @@ all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
 	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking grass
+	@echo Linking glm_sphereworld_color
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -106,7 +108,7 @@ else
 endif
 
 clean:
-	@echo Cleaning grass
+	@echo Cleaning glm_sphereworld_color
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -128,13 +130,19 @@ $(GCH): $(PCH)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/grass.o: ../src/grass.cpp
+$(OBJDIR)/glm_sphereworld_color.o: ../src/glm_sphereworld_color.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/glm_glframe.o: ../src/glcommon/glm_glframe.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/gltools.o: ../src/glcommon/gltools.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/glm_glframe.o: ../src/glcommon/glm_glframe.cpp
+$(OBJDIR)/glm_primitives.o: ../src/glcommon/glm_primitives.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/glm_halfedge.o: ../src/glcommon/glm_halfedge.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/c_utils.o: ../src/glcommon/c_utils.cpp

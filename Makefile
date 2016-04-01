@@ -6,7 +6,7 @@ ifndef config
 endif
 export config
 
-PROJECTS := ex1 ex2 ex3 ex4 point_sprites sphereworld_color grass flying left_handed
+PROJECTS := ex1 ex2 glm_modelviewer glm_texturing point_sprites glm_sphereworld_color glm_grass glm_flying left_handed
 
 .PHONY: all clean help $(PROJECTS)
 
@@ -20,29 +20,29 @@ ex2:
 	@echo "==== Building ex2 ($(config)) ===="
 	@${MAKE} --no-print-directory -C build -f ex2.make
 
-ex3: 
-	@echo "==== Building ex3 ($(config)) ===="
-	@${MAKE} --no-print-directory -C build -f ex3.make
+glm_modelviewer: 
+	@echo "==== Building glm_modelviewer ($(config)) ===="
+	@${MAKE} --no-print-directory -C build -f glm_modelviewer.make
 
-ex4: 
-	@echo "==== Building ex4 ($(config)) ===="
-	@${MAKE} --no-print-directory -C build -f ex4.make
+glm_texturing: 
+	@echo "==== Building glm_texturing ($(config)) ===="
+	@${MAKE} --no-print-directory -C build -f glm_texturing.make
 
 point_sprites: 
 	@echo "==== Building point_sprites ($(config)) ===="
 	@${MAKE} --no-print-directory -C build -f point_sprites.make
 
-sphereworld_color: 
-	@echo "==== Building sphereworld_color ($(config)) ===="
-	@${MAKE} --no-print-directory -C build -f sphereworld_color.make
+glm_sphereworld_color: 
+	@echo "==== Building glm_sphereworld_color ($(config)) ===="
+	@${MAKE} --no-print-directory -C build -f glm_sphereworld_color.make
 
-grass: 
-	@echo "==== Building grass ($(config)) ===="
-	@${MAKE} --no-print-directory -C build -f grass.make
+glm_grass: 
+	@echo "==== Building glm_grass ($(config)) ===="
+	@${MAKE} --no-print-directory -C build -f glm_grass.make
 
-flying: 
-	@echo "==== Building flying ($(config)) ===="
-	@${MAKE} --no-print-directory -C build -f flying.make
+glm_flying: 
+	@echo "==== Building glm_flying ($(config)) ===="
+	@${MAKE} --no-print-directory -C build -f glm_flying.make
 
 left_handed: 
 	@echo "==== Building left_handed ($(config)) ===="
@@ -51,12 +51,12 @@ left_handed:
 clean:
 	@${MAKE} --no-print-directory -C build -f ex1.make clean
 	@${MAKE} --no-print-directory -C build -f ex2.make clean
-	@${MAKE} --no-print-directory -C build -f ex3.make clean
-	@${MAKE} --no-print-directory -C build -f ex4.make clean
+	@${MAKE} --no-print-directory -C build -f glm_modelviewer.make clean
+	@${MAKE} --no-print-directory -C build -f glm_texturing.make clean
 	@${MAKE} --no-print-directory -C build -f point_sprites.make clean
-	@${MAKE} --no-print-directory -C build -f sphereworld_color.make clean
-	@${MAKE} --no-print-directory -C build -f grass.make clean
-	@${MAKE} --no-print-directory -C build -f flying.make clean
+	@${MAKE} --no-print-directory -C build -f glm_sphereworld_color.make clean
+	@${MAKE} --no-print-directory -C build -f glm_grass.make clean
+	@${MAKE} --no-print-directory -C build -f glm_flying.make clean
 	@${MAKE} --no-print-directory -C build -f left_handed.make clean
 
 help:
@@ -71,12 +71,12 @@ help:
 	@echo "   clean"
 	@echo "   ex1"
 	@echo "   ex2"
-	@echo "   ex3"
-	@echo "   ex4"
+	@echo "   glm_modelviewer"
+	@echo "   glm_texturing"
 	@echo "   point_sprites"
-	@echo "   sphereworld_color"
-	@echo "   grass"
-	@echo "   flying"
+	@echo "   glm_sphereworld_color"
+	@echo "   glm_grass"
+	@echo "   glm_flying"
 	@echo "   left_handed"
 	@echo ""
 	@echo "For more information, see http://industriousone.com/premake/quick-start"

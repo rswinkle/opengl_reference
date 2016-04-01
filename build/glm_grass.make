@@ -20,9 +20,9 @@ ifndef AR
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/Debug/ex4
+  OBJDIR     = obj/Debug/glm_grass
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/ex4
+  TARGET     = $(TARGETDIR)/glm_grass
   DEFINES   += -DDEBUG
   INCLUDES  += -I../inc -I../src/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -42,9 +42,9 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/Release/ex4
+  OBJDIR     = obj/Release/glm_grass
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/ex4
+  TARGET     = $(TARGETDIR)/glm_grass
   DEFINES   += -DNDEBUG -DOptimize
   INCLUDES  += -I../inc -I../src/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -64,9 +64,10 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/ex4.o \
-	$(OBJDIR)/c_utils.o \
+	$(OBJDIR)/glm_grass.o \
 	$(OBJDIR)/gltools.o \
+	$(OBJDIR)/glm_glframe.o \
+	$(OBJDIR)/c_utils.o \
 
 RESOURCES := \
 
@@ -84,7 +85,7 @@ all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
 	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking ex4
+	@echo Linking glm_grass
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -105,7 +106,7 @@ else
 endif
 
 clean:
-	@echo Cleaning ex4
+	@echo Cleaning glm_grass
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -127,13 +128,16 @@ $(GCH): $(PCH)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/ex4.o: ../src/ex4.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/c_utils.o: ../src/glcommon/c_utils.cpp
+$(OBJDIR)/glm_grass.o: ../src/glm_grass.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/gltools.o: ../src/glcommon/gltools.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/glm_glframe.o: ../src/glcommon/glm_glframe.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/c_utils.o: ../src/glcommon/c_utils.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
