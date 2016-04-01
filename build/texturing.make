@@ -20,9 +20,9 @@ ifndef AR
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/Debug/glm_grass
+  OBJDIR     = obj/Debug/texturing
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/glm_grass
+  TARGET     = $(TARGETDIR)/texturing
   DEFINES   += -DDEBUG
   INCLUDES  += -I../inc -I../src/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -42,9 +42,9 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/Release/glm_grass
+  OBJDIR     = obj/Release/texturing
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/glm_grass
+  TARGET     = $(TARGETDIR)/texturing
   DEFINES   += -DNDEBUG -DOptimize
   INCLUDES  += -I../inc -I../src/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -64,9 +64,9 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/glm_grass.o \
+	$(OBJDIR)/texturing.o \
+	$(OBJDIR)/rsw_math.o \
 	$(OBJDIR)/gltools.o \
-	$(OBJDIR)/glm_glframe.o \
 
 RESOURCES := \
 
@@ -84,7 +84,7 @@ all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
 	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking glm_grass
+	@echo Linking texturing
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -105,7 +105,7 @@ else
 endif
 
 clean:
-	@echo Cleaning glm_grass
+	@echo Cleaning texturing
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -127,13 +127,13 @@ $(GCH): $(PCH)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/glm_grass.o: ../src/glm_grass.cpp
+$(OBJDIR)/texturing.o: ../src/texturing.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/rsw_math.o: ../src/glcommon/rsw_math.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/gltools.o: ../src/glcommon/gltools.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/glm_glframe.o: ../src/glcommon/glm_glframe.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 

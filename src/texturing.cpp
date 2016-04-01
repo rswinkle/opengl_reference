@@ -1,8 +1,6 @@
 #include <gltools.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <rsw_math.h>
 
 #include <SDL2/SDL.h>
 
@@ -12,8 +10,8 @@
 #define WIDTH 640
 #define HEIGHT 480
 
-using glm::mat4;
-using glm::vec3;
+using rsw::mat4;
+using rsw::vec3;
 
 
 
@@ -138,7 +136,7 @@ int main()
 			counter = 0;
 		}
 
-		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp_mat));
+		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mvp_mat);
 		
 		glClear(GL_COLOR_BUFFER_BIT);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -255,21 +253,21 @@ int handle_events(unsigned int last_time, unsigned int cur_time, mat4& mvp_mat)
 
 	float time = (cur_time - last_time)/1000.0f;
 
-#define MOVE_SPEED 3.14159f/6.0f
+#define MOVE_SPEED DEG_TO_RAD(30)
 
 	mat4 tmp(1);
 	
 	if (state[SDL_SCANCODE_LEFT]) {
-		tmp = glm::rotate(tmp, time*MOVE_SPEED, vec3(0, 0, 1));
+		rsw::load_rotation_mat4(tmp, vec3(0, 0, 1), time * MOVE_SPEED);
 	}
 	if (state[SDL_SCANCODE_RIGHT]) {
-		tmp = glm::rotate(tmp, -time*MOVE_SPEED, vec3(0, 0, 1));
+		rsw::load_rotation_mat4(tmp, vec3(0, 0, 1), -time * MOVE_SPEED);
 	}
 	if (state[SDL_SCANCODE_UP]) {
-		tmp = glm::scale(tmp, vec3(1.01f, 1.01f, 1));
+		tmp = rsw::scale_mat4(1.01f, 1.01f, 1);
 	}
 	if (state[SDL_SCANCODE_DOWN]) {
-		tmp = glm::scale(tmp, vec3(0.99f, 0.99f, 1));
+		tmp = rsw::scale_mat4(0.99f, 0.99f, 1);
 	}
 
 	mvp_mat = mvp_mat * tmp;
@@ -277,6 +275,7 @@ int handle_events(unsigned int last_time, unsigned int cur_time, mat4& mvp_mat)
 
 	return 0;
 }
+
 
 
 

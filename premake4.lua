@@ -39,6 +39,21 @@ solution "opengl_reference"
 		configuration { "linux", "gmake" }
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
+
+	project "texturing"
+		location "build"
+		kind "ConsoleApp"
+		language "C++"
+		files {
+			"src/texturing.cpp",
+			"src/glcommon/rsw_math.cpp",
+			"src/glcommon/gltools.cpp"
+		}
+		targetdir "build"
+		
+		configuration { "linux", "gmake" }
+			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+
 	project "modelviewer"
 		location "build"
 		kind "ConsoleApp"
@@ -54,6 +69,23 @@ solution "opengl_reference"
 		
 		configuration { "linux", "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+
+
+	project "grass"
+		location "build"
+		kind "ConsoleApp"
+		language "C++"
+		files {
+			"src/grass.cpp",
+			"src/glcommon/gltools.cpp",
+			"src/glcommon/rsw_math.cpp",
+			"src/glcommon/rsw_glframe.cpp",
+		}
+		targetdir "build"
+		
+		configuration { "linux", "gmake" }
+			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+
 	
 	project "glm_modelviewer"
 		location "build"
@@ -123,7 +155,6 @@ solution "opengl_reference"
 			"src/glm_grass.cpp",
 			"src/glcommon/gltools.cpp",
 			"src/glcommon/glm_glframe.cpp",
-			"src/glcommon/c_utils.cpp",
 		}
 		targetdir "build"
 		

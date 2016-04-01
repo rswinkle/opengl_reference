@@ -1,48 +1,26 @@
 
-#include <glm_glframe.h>
-
+#include <rsw_glframe.h>
 #include <gltools.h>
 
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/constants.hpp>
-#include <glm/gtx/string_cast.hpp>
 
 #include <GL/glew.h>
-
-//included in SDL.h?
-//#include <GL/gl.h>
 
 #include <SDL2/SDL.h>
 
 #include <stdio.h>
-
 #include <iostream>
 #include <vector>
 
 #define WIDTH 640
 #define HEIGHT 480
 
-//TODO
-#define RM_PI (3.14159265358979323846)
-#define RM_2PI (2.0 * RM_PI)
-#define PI_DIV_180 (0.017453292519943296)
-#define INV_PI_DIV_180 (57.2957795130823229)
-
-#define DEG_TO_RAD(x)  ((x)*PI_DIV_180)
-#define RAD_TO_DEG(x)  ((x)*INV_PI_DIV_180)
-
-#define MAX(a, b)  ((a) > (b)) ? (a) : (b)
-#define MIN(a, b)  ((a) < (b)) ? (a) : (b)
-
 using namespace std;
 
-using glm::vec3;
-using glm::vec4;
-using glm::mat3;
-using glm::mat4;
+using rsw::vec3;
+using rsw::vec4;
+using rsw::mat3;
+using rsw::mat4;
 
 
 SDL_Window* window;
@@ -134,8 +112,10 @@ int main(int argc, char** argv)
 
 	glUseProgram(prog);
 
-	mat4 proj_mat = glm::perspective(glm::quarter_pi<float>(), WIDTH/(float)HEIGHT, 0.1f, 1000.0f);
+	mat4 proj_mat;
 	mat4 view_mat;
+
+	rsw::make_perspective_matrix(proj_mat, DEG_TO_RAD(45), WIDTH/(float)HEIGHT, 0.1f, 1000.0f);
 
 	mat4 mvp_mat;
 
@@ -147,7 +127,7 @@ int main(int argc, char** argv)
 	vec4 Green(0, 1, 0, 1);
 	vec4 Blue(0, 0, 1, 1);
 
-	glUniform4fv(color_loc, 1, glm::value_ptr(Green));
+	glUniform4fv(color_loc, 1, (float*)&Green);
 
 
 	GLFrame camera(true);
@@ -174,13 +154,10 @@ int main(int argc, char** argv)
 
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-
-		//these are the same barring -0 vs 0 in a few positions which doesn't affect it
-		//view_mat = glm::lookAt(camera.origin, camera.origin+camera.forward, camera.up);
 		view_mat = camera.get_camera_matrix();
 
 		mvp_mat = proj_mat * view_mat;
-		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp_mat));
+		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mvp_mat);
 
 		
 		glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 6, 256*256);
@@ -329,6 +306,7 @@ int handle_events(GLFrame& camera_frame, unsigned int last_time, unsigned int cu
 
 	return 0;
 }
+
 
 
 
