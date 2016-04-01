@@ -1,4 +1,3 @@
-#include <c_utils.h>
 #include <gltools.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -46,7 +45,52 @@ void check_errors(int n, const char* str)
 
 
 
+int file_read(FILE* file, char** out)
+{
+	char* data;
+	long size;
 
+	//assert(out);
+
+	fseek(file, 0, SEEK_END);
+	size = ftell(file);
+	if (size <= 0) {
+		if (size == -1)
+			perror("ftell failure");
+		fclose(file);
+		return 0;
+	}
+
+	data = (char*)malloc(size+1);
+	if (!data) {
+		fclose(file);
+		return 0;
+	}
+
+	rewind(file);
+	if (!fread(data, size, 1, file)) {
+		perror("fread failure");
+		fclose(file);
+		free(data);
+		return 0;
+	}
+
+	data[size] = 0; /* null terminate in all cases even if reading binary data */
+
+	*out = data;
+
+	fclose(file);
+	return size;
+}
+
+int file_open_read(const char* filename, const char* mode, char** out)
+{
+	FILE *file = fopen(filename, mode);
+	if (!file)
+		return 0;
+
+	return file_read(file, out);
+}
 
 
 #define BUF_SIZE 1000
@@ -120,16 +164,16 @@ GLuint load_shader_pair(const char* vert_shader_src, const char* frag_shader_src
 
 GLuint load_shader_file_pair(const char* vert_file, const char* frag_file)
 {
-	c_array vs_str, fs_str;
+	char *vs_str, *fs_str;
 
 	if (!file_open_read(vert_file, "r", &vs_str))
 		return 0;
 	if (!file_open_read(frag_file, "r", &fs_str)) {
-		free(vs_str.data);
+		free(vs_str);
 		return 0;
 	}
 
-	return load_shader_pair((char*)vs_str.data, (char*)fs_str.data);
+	return load_shader_pair(vs_str, fs_str);
 }
 
 void set_uniform1i(GLuint program, const char* name, int val)
@@ -253,7 +297,6 @@ void set_uniform_mat3f(GLuint program, const char* name, GLfloat* mat)
 		printf("Uniform: %s not found.\n", name);
 	}
 }
-
 
 
 

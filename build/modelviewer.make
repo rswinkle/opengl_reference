@@ -20,19 +20,19 @@ ifndef AR
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/Debug/point_sprites
+  OBJDIR     = obj/Debug/modelviewer
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/point_sprites
+  TARGET     = $(TARGETDIR)/modelviewer
   DEFINES   += -DDEBUG
   INCLUDES  += -I../inc -I../src/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -ansi -fno-strict-aliasing -Wunused-variable -Wreturn-type
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += 
   LIBS      += -lSDL2 -lGLEW -lGL -lm
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
+  LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -42,19 +42,19 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/Release/point_sprites
+  OBJDIR     = obj/Release/modelviewer
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/point_sprites
+  TARGET     = $(TARGETDIR)/modelviewer
   DEFINES   += -DNDEBUG -DOptimize
   INCLUDES  += -I../inc -I../src/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -ansi -fno-strict-aliasing -Wunused-variable -Wreturn-type
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -s
   LIBS      += -lSDL2 -lGLEW -lGL -lm
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
+  LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -64,8 +64,11 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/point_sprites.o \
+	$(OBJDIR)/modelviewer.o \
 	$(OBJDIR)/gltools.o \
+	$(OBJDIR)/rsw_math.o \
+	$(OBJDIR)/rsw_primitives.o \
+	$(OBJDIR)/rsw_halfedge.o \
 
 RESOURCES := \
 
@@ -83,7 +86,7 @@ all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
 	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking point_sprites
+	@echo Linking modelviewer
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -104,7 +107,7 @@ else
 endif
 
 clean:
-	@echo Cleaning point_sprites
+	@echo Cleaning modelviewer
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -123,14 +126,23 @@ ifneq (,$(PCH))
 $(GCH): $(PCH)
 	@echo $(notdir $<)
 	-$(SILENT) cp $< $(OBJDIR)
-	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/point_sprites.o: ../src/point_sprites.c
+$(OBJDIR)/modelviewer.o: ../src/modelviewer.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/gltools.o: ../src/glcommon/gltools.c
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/gltools.o: ../src/glcommon/gltools.cpp
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/rsw_math.o: ../src/glcommon/rsw_math.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/rsw_primitives.o: ../src/glcommon/rsw_primitives.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/rsw_halfedge.o: ../src/glcommon/rsw_halfedge.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)

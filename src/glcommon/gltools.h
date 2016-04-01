@@ -16,6 +16,9 @@ void check_errors(int n, const char* str);
 
 
 //shaders
+int file_read(FILE* file, char** out);
+int file_open_read(const char* filename, const char* mode, char** out);
+
 int compile_shader_str(GLuint shader, const char* shader_str);
 int link_program(GLuint program);
 GLuint load_shader_pair(const char* vert_shader_src, const char* frag_shader_src);
@@ -46,6 +49,5 @@ void set_uniform_mat3f(GLuint program, const char* name, GLfloat* mat);
 //textures
 GLboolean load_texture2D(const char* filename, GLenum min_filter, GLenum mag_filter, GLenum wrap_mode, GLboolean flip);
 GLboolean load_texture_cubemap(const char* filename[], GLenum min_filter, GLenum mag_filter, GLboolean flip);
-
 
 #endif

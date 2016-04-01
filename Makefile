@@ -6,7 +6,7 @@ ifndef config
 endif
 export config
 
-PROJECTS := ex1 ex2 glm_modelviewer glm_texturing point_sprites glm_sphereworld_color glm_grass glm_flying left_handed
+PROJECTS := ex1 ex2 modelviewer glm_modelviewer glm_texturing point_sprites glm_sphereworld_color glm_grass glm_flying left_handed
 
 .PHONY: all clean help $(PROJECTS)
 
@@ -19,6 +19,10 @@ ex1:
 ex2: 
 	@echo "==== Building ex2 ($(config)) ===="
 	@${MAKE} --no-print-directory -C build -f ex2.make
+
+modelviewer: 
+	@echo "==== Building modelviewer ($(config)) ===="
+	@${MAKE} --no-print-directory -C build -f modelviewer.make
 
 glm_modelviewer: 
 	@echo "==== Building glm_modelviewer ($(config)) ===="
@@ -51,6 +55,7 @@ left_handed:
 clean:
 	@${MAKE} --no-print-directory -C build -f ex1.make clean
 	@${MAKE} --no-print-directory -C build -f ex2.make clean
+	@${MAKE} --no-print-directory -C build -f modelviewer.make clean
 	@${MAKE} --no-print-directory -C build -f glm_modelviewer.make clean
 	@${MAKE} --no-print-directory -C build -f glm_texturing.make clean
 	@${MAKE} --no-print-directory -C build -f point_sprites.make clean
@@ -71,6 +76,7 @@ help:
 	@echo "   clean"
 	@echo "   ex1"
 	@echo "   ex2"
+	@echo "   modelviewer"
 	@echo "   glm_modelviewer"
 	@echo "   glm_texturing"
 	@echo "   point_sprites"
