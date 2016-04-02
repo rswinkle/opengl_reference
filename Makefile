@@ -6,7 +6,7 @@ ifndef config
 endif
 export config
 
-PROJECTS := ex1 ex2 texturing modelviewer grass glm_modelviewer glm_texturing point_sprites glm_sphereworld_color glm_grass glm_flying left_handed
+PROJECTS := ex1 ex2 texturing modelviewer grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites glm_sphereworld_color glm_grass glm_flying left_handed
 
 .PHONY: all clean help $(PROJECTS)
 
@@ -31,6 +31,14 @@ modelviewer:
 grass: 
 	@echo "==== Building grass ($(config)) ===="
 	@${MAKE} --no-print-directory -C build -f grass.make
+
+sphereworld_color: 
+	@echo "==== Building sphereworld_color ($(config)) ===="
+	@${MAKE} --no-print-directory -C build -f sphereworld_color.make
+
+flying: 
+	@echo "==== Building flying ($(config)) ===="
+	@${MAKE} --no-print-directory -C build -f flying.make
 
 glm_modelviewer: 
 	@echo "==== Building glm_modelviewer ($(config)) ===="
@@ -66,6 +74,8 @@ clean:
 	@${MAKE} --no-print-directory -C build -f texturing.make clean
 	@${MAKE} --no-print-directory -C build -f modelviewer.make clean
 	@${MAKE} --no-print-directory -C build -f grass.make clean
+	@${MAKE} --no-print-directory -C build -f sphereworld_color.make clean
+	@${MAKE} --no-print-directory -C build -f flying.make clean
 	@${MAKE} --no-print-directory -C build -f glm_modelviewer.make clean
 	@${MAKE} --no-print-directory -C build -f glm_texturing.make clean
 	@${MAKE} --no-print-directory -C build -f point_sprites.make clean
@@ -89,6 +99,8 @@ help:
 	@echo "   texturing"
 	@echo "   modelviewer"
 	@echo "   grass"
+	@echo "   sphereworld_color"
+	@echo "   flying"
 	@echo "   glm_modelviewer"
 	@echo "   glm_texturing"
 	@echo "   point_sprites"

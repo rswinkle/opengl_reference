@@ -20,9 +20,9 @@ ifndef AR
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/Debug/glm_flying
+  OBJDIR     = obj/Debug/flying
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/glm_flying
+  TARGET     = $(TARGETDIR)/flying
   DEFINES   += -DDEBUG
   INCLUDES  += -I../inc -I../src/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -42,9 +42,9 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/Release/glm_flying
+  OBJDIR     = obj/Release/flying
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/glm_flying
+  TARGET     = $(TARGETDIR)/flying
   DEFINES   += -DNDEBUG -DOptimize
   INCLUDES  += -I../inc -I../src/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -64,9 +64,10 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/glm_flying.o \
-	$(OBJDIR)/glm_glframe.o \
+	$(OBJDIR)/flying.o \
 	$(OBJDIR)/gltools.o \
+	$(OBJDIR)/rsw_math.o \
+	$(OBJDIR)/rsw_glframe.o \
 
 RESOURCES := \
 
@@ -84,7 +85,7 @@ all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
 	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking glm_flying
+	@echo Linking flying
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -105,7 +106,7 @@ else
 endif
 
 clean:
-	@echo Cleaning glm_flying
+	@echo Cleaning flying
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -127,13 +128,16 @@ $(GCH): $(PCH)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/glm_flying.o: ../src/glm_flying.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/glm_glframe.o: ../src/glcommon/glm_glframe.cpp
+$(OBJDIR)/flying.o: ../src/flying.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/gltools.o: ../src/glcommon/gltools.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/rsw_math.o: ../src/glcommon/rsw_math.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/rsw_glframe.o: ../src/glcommon/rsw_glframe.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 

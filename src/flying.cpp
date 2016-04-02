@@ -1,12 +1,5 @@
 #include <gltools.h>
-#include <glm_glframe.h>
-
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/constants.hpp>
-#include <glm/gtx/string_cast.hpp>
+#include <rsw_glframe.h>
 
 
 #include <SDL2/SDL.h>
@@ -19,24 +12,13 @@
 #define WIDTH 640
 #define HEIGHT 480
 
-//TODO
-#define RM_PI (3.14159265358979323846)
-#define RM_2PI (2.0 * RM_PI)
-#define PI_DIV_180 (0.017453292519943296)
-#define INV_PI_DIV_180 (57.2957795130823229)
-
-#define DEG_TO_RAD(x)  ((x)*PI_DIV_180)
-#define RAD_TO_DEG(x)  ((x)*INV_PI_DIV_180)
-
-#define MAX(a, b)  ((a) > (b)) ? (a) : (b)
-#define MIN(a, b)  ((a) < (b)) ? (a) : (b)
 
 using namespace std;
 
-using glm::vec3;
-using glm::vec4;
-using glm::mat3;
-using glm::mat4;
+using rsw::vec3;
+using rsw::vec4;
+using rsw::mat3;
+using rsw::mat4;
 
 
 SDL_Window* window;
@@ -130,17 +112,15 @@ int main(int argc, char** argv)
 	GLuint prog = load_shader_file_pair("../media/shaders/basic_transform.vp", "../media/shaders/simple_color.fp");
 
 
-
-
 	glUseProgram(prog);
 
-	mat4 proj_mat = glm::perspective(glm::quarter_pi<float>(), WIDTH/(float)HEIGHT, 0.1f, 300.0f);
+	mat4 proj_mat;
 	mat4 view_mat;
-
 	mat4 mvp_mat;
 
-	int mvp_loc = glGetUniformLocation(prog, "mvp_mat");
+	rsw::make_perspective_matrix(proj_mat, DEG_TO_RAD(45.0f), WIDTH/(float)HEIGHT, 0.1f, 300.0f);
 
+	int mvp_loc = glGetUniformLocation(prog, "mvp_mat");
 	int color_loc = glGetUniformLocation(prog, "color");
 
 	vec4 Red(1, 0, 0, 1);
@@ -171,21 +151,16 @@ int main(int argc, char** argv)
 
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-
-		view_mat = glm::lookAt(camera.origin, camera.forward, camera.up);
-		//cout << glm::to_string(view_mat) << "\n";
 		view_mat = camera.get_camera_matrix();
-		//cout << glm::to_string(view_mat) << "\n\n";
 
 		mvp_mat = proj_mat * view_mat;
-		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp_mat));
-
+		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mvp_mat);
 		
 
-		glUniform4fv(color_loc, 1, glm::value_ptr(Red));
+		glUniform4fv(color_loc, 1, (float*)&Red);
 		glDrawArrays(GL_LINES, 0, line_verts.size() - 6);
 
-		glUniform4fv(color_loc, 1, glm::value_ptr(Blue));
+		glUniform4fv(color_loc, 1, (float*)&Blue);
 		glDrawArrays(GL_LINES, line_verts.size()-6, 6);
 
 		SDL_GL_SwapWindow(window);
@@ -336,6 +311,7 @@ int handle_events(GLFrame& camera_frame, unsigned int last_time, unsigned int cu
 
 	return 0;
 }
+
 
 
 

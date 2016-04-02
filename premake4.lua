@@ -86,6 +86,39 @@ solution "opengl_reference"
 		configuration { "linux", "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
+
+	project "sphereworld_color"
+		location "build"
+		kind "ConsoleApp"
+		language "C++"
+		files {
+			"src/sphereworld_color.cpp",
+			"src/glcommon/gltools.cpp",
+			"src/glcommon/rsw_math.cpp",
+			"src/glcommon/rsw_glframe.cpp",
+			"src/glcommon/rsw_primitives.cpp",
+			"src/glcommon/rsw_halfedge.cpp",
+		}
+		targetdir "build"
+		
+		configuration { "linux", "gmake" }
+			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+
+	project "flying"
+		location "build"
+		kind "ConsoleApp"
+		language "C++"
+		files {
+			"src/flying.cpp",
+			"src/glcommon/gltools.cpp",
+			"src/glcommon/rsw_math.cpp",
+			"src/glcommon/rsw_glframe.cpp",
+		}
+		targetdir "build"
+		
+		configuration { "linux", "gmake" }
+			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+
 	
 	project "glm_modelviewer"
 		location "build"
@@ -170,7 +203,6 @@ solution "opengl_reference"
 			"src/glm_flying.cpp",
 			"src/glcommon/glm_glframe.cpp",
 			"src/glcommon/gltools.cpp",
-			"src/glcommon/c_utils.cpp",
 		}
 		targetdir "build"
 		

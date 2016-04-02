@@ -21,7 +21,7 @@
 #define HR_TO_DEG(x)    ((x) * (1.0 / 15.0))
 #define HR_TO_RAD(x)    DEG_TO_RAD(HR_TO_DEG(x))
 
-#define DEG_TO_HR(x)    ((x) * 15.0))
+#define DEG_TO_HR(x)    ((x) * 15.0)
 #define RAD_TO_HR(x)    DEG_TO_HR(RAD_TO_DEG(x))
 
 
@@ -44,10 +44,10 @@ inline float rand_float(float min, float max)
  * vectors
  *
  *  Matches GLSL behavior for operators
- *  
- *  
- * 	
- * 	
+ *
+ *
+ *
+ *
  */
 
 struct vec2

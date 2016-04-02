@@ -1,17 +1,9 @@
-#include <glm_primitives.h>
-#include <gltools.h> //brings in glew.h and gl.h
+#include <rsw_primitives.h>
+#include <gltools.h>
 
-#include <glm_halfedge.h>
+#include <rsw_halfedge.h>
+#include <rsw_glframe.h>
 
-#include <glm_glframe.h>
-
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/random.hpp>
-#include <glm/gtc/constants.hpp>
-#include <glm/gtx/string_cast.hpp>
 
 
 #include <SDL2/SDL.h>
@@ -24,25 +16,14 @@
 #define WIDTH 640
 #define HEIGHT 480
 
-//TODO
-#define RM_PI (3.14159265358979323846)
-#define RM_2PI (2.0 * RM_PI)
-#define PI_DIV_180 (0.017453292519943296f)
-#define INV_PI_DIV_180 (57.2957795130823229)
-
-#define DEG_TO_RAD(x)  ((x)*PI_DIV_180)
-#define RAD_TO_DEG(x)  ((x)*INV_PI_DIV_180)
-
-#define MAX(a, b)  ((a) > (b)) ? (a) : (b)
-#define MIN(a, b)  ((a) < (b)) ? (a) : (b)
 
 using namespace std;
 
-using glm::vec2;
-using glm::vec3;
-using glm::vec4;
-using glm::mat3;
-using glm::mat4;
+using rsw::vec2;
+using rsw::vec3;
+using rsw::vec4;
+using rsw::mat3;
+using rsw::mat4;
 
 
 SDL_Window* window;
@@ -187,7 +168,7 @@ int main(int argc, char** argv)
 	vector<vec3> instance_pos;
 	vec2 rand_pos;
 	for (int i=0; i<NUM_SPHERES+1; ++i) {
-		rand_pos = glm::diskRand(FLOOR_SIZE/2.0f);
+		rand_pos = vec2(rsw::rand_float(-FLOOR_SIZE/2.0f, FLOOR_SIZE/2.0f), rsw::rand_float(-FLOOR_SIZE/2.0f, FLOOR_SIZE/2.0f));
 		if (i)
 			instance_pos.push_back(vec3(rand_pos.x, 0.4, rand_pos.y));
 		else
@@ -234,11 +215,14 @@ int main(int argc, char** argv)
 
 
 
-	mat4 proj_mat = glm::perspective(DEG_TO_RAD(35.0f), WIDTH/(float)HEIGHT, 0.3f, 100.0f);
+	mat4 proj_mat;
 	mat4 view_mat;
 	mat4 mvp_mat;
 	mat3 normal_mat;
-	mat4 translate_sphere = glm::translate(mat4(1), vec3(0.8f, 0.4f, 0.0f));
+	mat4 translate_sphere = rsw::translation_mat4(vec3(0.8f, 0.4f, 0.0f));
+
+	rsw::make_perspective_matrix(proj_mat, DEG_TO_RAD(35.0f), WIDTH/(float)HEIGHT, 0.3f, 100.0f);
+
 
 
 	vec4 floor_color(0, 1, 0, 1);
@@ -253,7 +237,7 @@ int main(int argc, char** argv)
 
 
 	glUseProgram(basic_shader);
-	set_uniform4fv(basic_shader, "color", glm::value_ptr(floor_color));
+	set_uniform4fv(basic_shader, "color", (float*)&floor_color);
 
 	glUseProgram(gouraud_shader);
 
@@ -296,7 +280,7 @@ int main(int argc, char** argv)
 
 
 		glUseProgram(basic_shader);
-		set_uniform_mat4f(basic_shader, "mvp_mat", glm::value_ptr(mvp_mat));
+		set_uniform_mat4f(basic_shader, "mvp_mat", (float*)&mvp_mat);
 		glBindVertexArray(line_vao);
 		glDrawArrays(GL_LINES, 0, line_verts.size());
 
@@ -308,38 +292,41 @@ int main(int argc, char** argv)
 
 
 		vec3 light_dir = mat3(view_mat)*light_direction;
-		set_uniform3fv(phong_shader, "light_direction", glm::value_ptr(light_dir));
+		set_uniform3fv(phong_shader, "light_direction", (float*)&light_dir);
 
-		set_uniform_mat4f(phong_shader, "mvp_mat", glm::value_ptr(mvp_mat));
+		set_uniform_mat4f(phong_shader, "mvp_mat", (float*)&mvp_mat);
 		normal_mat = mat3(view_mat);
-		set_uniform_mat3f(phong_shader, "normal_mat", glm::value_ptr(normal_mat));
+		set_uniform_mat3f(phong_shader, "normal_mat", (float*)&normal_mat);
 
-		set_uniform3fv(phong_shader, "ambient_color", glm::value_ptr(sphere_ambient));
-		set_uniform3fv(phong_shader, "diffuse_color", glm::value_ptr(sphere_diffuse));
-		set_uniform3fv(phong_shader, "spec_color", glm::value_ptr(sphere_specular));
+		set_uniform3fv(phong_shader, "ambient_color", (float*)&sphere_ambient);
+		set_uniform3fv(phong_shader, "diffuse_color", (float*)&sphere_diffuse);
+		set_uniform3fv(phong_shader, "spec_color", (float*)&sphere_specular);
 
 		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, torus.tris.size()*3, sphere.tris.size()*3, NUM_SPHERES, 1);
 
-		mat4 rot_mat = glm::rotate(mat4(1), -1*total_time*DEG_TO_RAD(60.0f), vec3(0, 1, 0));
+		mat4 rot_mat;
+		rsw::load_rotation_mat4(rot_mat, vec3(0, 1, 0), -1*total_time*DEG_TO_RAD(60.0f));
+
 		mvp_mat = mvp_mat * rot_mat * translate_sphere;
 		normal_mat = mat3(view_mat*rot_mat);
-		set_uniform_mat3f(phong_shader, "normal_mat", glm::value_ptr(normal_mat));
+		set_uniform_mat3f(phong_shader, "normal_mat", (float*)&normal_mat);
 
-		set_uniform_mat4f(phong_shader, "mvp_mat", glm::value_ptr(mvp_mat));
+		set_uniform_mat4f(phong_shader, "mvp_mat", (float*)&mvp_mat);
 		glDrawArrays(GL_TRIANGLES, torus.tris.size()*3, sphere.tris.size()*3);
 
 
 		//draw rotating torus
 		mvp_mat = proj_mat * view_mat;
-		rot_mat = glm::rotate(mat4(1), total_time*DEG_TO_RAD(60.0f), vec3(0, 1, 0));
+		rot_mat;
+		rsw::load_rotation_mat4(rot_mat, vec3(0, 1, 0), total_time*DEG_TO_RAD(60.0f));
 		mvp_mat = mvp_mat * rot_mat;
-		set_uniform_mat4f(phong_shader, "mvp_mat", glm::value_ptr(mvp_mat));
+		set_uniform_mat4f(phong_shader, "mvp_mat", (float*)&mvp_mat);
 		normal_mat = mat3(view_mat*rot_mat);
-		set_uniform_mat3f(phong_shader, "normal_mat", glm::value_ptr(normal_mat));
+		set_uniform_mat3f(phong_shader, "normal_mat", (float*)&normal_mat);
 
-		set_uniform3fv(phong_shader, "ambient_color", glm::value_ptr(torus_ambient));
-		set_uniform3fv(phong_shader, "diffuse_color", glm::value_ptr(torus_diffuse));
-		set_uniform3fv(phong_shader, "spec_color", glm::value_ptr(torus_specular));
+		set_uniform3fv(phong_shader, "ambient_color", (float*)&torus_ambient);
+		set_uniform3fv(phong_shader, "diffuse_color", (float*)&torus_diffuse);
+		set_uniform3fv(phong_shader, "spec_color", (float*)&torus_specular);
 
 		glDrawArrays(GL_TRIANGLES, 0, torus.tris.size()*3);
 
@@ -492,6 +479,7 @@ int handle_events(GLFrame& camera_frame, unsigned int last_time, unsigned int cu
 
 	return 0;
 }
+
 
 
 
