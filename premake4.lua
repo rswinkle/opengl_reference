@@ -228,7 +228,7 @@ solution "opengl_reference"
 		kind "ConsoleApp"
 		language "C"
 		files {
-			"src/es2gears.c"
+			"src/gears.c"
 		}
 		targetdir "build"
 		

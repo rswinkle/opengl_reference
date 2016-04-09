@@ -64,7 +64,7 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/es2gears.o \
+	$(OBJDIR)/gears.o \
 
 RESOURCES := \
 
@@ -125,7 +125,7 @@ $(GCH): $(PCH)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/es2gears.o: ../src/es2gears.c
+$(OBJDIR)/gears.o: ../src/gears.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 

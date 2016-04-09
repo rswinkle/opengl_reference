@@ -33,12 +33,20 @@
  *   * Add comments.
  * Alexandros Frantzis <alexandros.frantzis@linaro.org>
  * Jul 13, 2010
+ *
+ * Ported to SDL2 and OpenGL 3.3 core
+ *   * Fix up shaders
+ *   * Add a VAO
+ *   * Remove all glut/egl code replace with SDL2
+ *   * Add polygon_mode toggle for fun
+ *   * TODO: refactor/clean up more
+ *   * repo at:         https://github.com/rswinkle/opengl_reference
+ *   * original source: https://cgit.freedesktop.org/mesa/demos/tree/src/egl/opengles2/es2gears.c
+ * Robert Winkler
+ * April 9, 2016
  */
 
-#define GL_GLEXT_PROTOTYPES
-#define EGL_EGLEXT_PROTOTYPES
 
-#define _GNU_SOURCE
 
 #include <math.h>
 #include <stdlib.h>
@@ -52,7 +60,13 @@
 
 #include <SDL2/SDL.h>
 
-#define WIDTH 480
+
+#ifndef M_PI
+#define M_PI 3.14159265
+#endif
+
+
+#define WIDTH 640
 #define HEIGHT 480
 
 

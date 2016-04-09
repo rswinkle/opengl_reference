@@ -21,6 +21,7 @@ Those listed use my own math library, rsw_math, but there are glm versions as we
 | --- | --- | --- |
 | ex1.c | Hello Triangle                                            | ![ex1](./media/screenshots/ex_1.png) |
 | ex2.c | Hello Interpolation                                       | ![ex2](./media/screenshots/ex_2.png) |
+| gears.c | Classic gears demo.  Switch between polygon modes with p.  | ![gears](./media/screenshots/gears.png) |
 | modelviewer.cpp | Load a model from ./media/models.  Switch between Gouraud and Phong shading with s.  Switch between polygon modes with p. | ![ex3](./media/screenshots/ex_3.png) |
 | texturing.cpp | Switch between textures with 1, filtering modes with f, zoom/rotate with arrow keys | ![ex4](./media/screenshots/ex_4.png) |
 | grass.cpp | Based on example in superbible, uses flying controls, WIP | ![grass](./media/screenshots/grass.png) |
