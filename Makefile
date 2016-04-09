@@ -6,7 +6,7 @@ ifndef config
 endif
 export config
 
-PROJECTS := ex1 ex2 texturing modelviewer grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites glm_sphereworld_color glm_grass glm_flying left_handed
+PROJECTS := ex1 ex2 texturing modelviewer grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites glm_sphereworld_color glm_grass glm_flying left_handed gears
 
 .PHONY: all clean help $(PROJECTS)
 
@@ -68,6 +68,10 @@ left_handed:
 	@echo "==== Building left_handed ($(config)) ===="
 	@${MAKE} --no-print-directory -C build -f left_handed.make
 
+gears: 
+	@echo "==== Building gears ($(config)) ===="
+	@${MAKE} --no-print-directory -C build -f gears.make
+
 clean:
 	@${MAKE} --no-print-directory -C build -f ex1.make clean
 	@${MAKE} --no-print-directory -C build -f ex2.make clean
@@ -83,6 +87,7 @@ clean:
 	@${MAKE} --no-print-directory -C build -f glm_grass.make clean
 	@${MAKE} --no-print-directory -C build -f glm_flying.make clean
 	@${MAKE} --no-print-directory -C build -f left_handed.make clean
+	@${MAKE} --no-print-directory -C build -f gears.make clean
 
 help:
 	@echo "Usage: make [config=name] [target]"
@@ -108,5 +113,6 @@ help:
 	@echo "   glm_grass"
 	@echo "   glm_flying"
 	@echo "   left_handed"
+	@echo "   gears"
 	@echo ""
 	@echo "For more information, see http://industriousone.com/premake/quick-start"

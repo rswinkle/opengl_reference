@@ -221,3 +221,16 @@ solution "opengl_reference"
 		
 		configuration { "linux", "gmake" }
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+
+
+	project "gears"
+		location "build"
+		kind "ConsoleApp"
+		language "C"
+		files {
+			"src/es2gears.c"
+		}
+		targetdir "build"
+		
+		configuration { "linux", "gmake" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
