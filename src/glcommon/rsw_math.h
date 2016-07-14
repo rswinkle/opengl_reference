@@ -642,7 +642,7 @@ struct dvec4
 //	dvec3& operator-=(dvec3);
 //	dvec3& operator+=(dvec3);
 //	dvec3& operator*=(double);
-//	dvec3& operator/=(double);\
+//	dvec3& operator/=(double);
 
 	//swizzles
 	dvec2 xx() { return dvec2(x,x); }
