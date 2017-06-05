@@ -31,7 +31,7 @@ int compile_shader_str(GLuint shader, const char* shader_str);
 GLuint load_shader_pair(const char* vert_shader_src, const char* frag_shader_src);
 
 
-int main()
+int main(int argc, char** argv)
 {
 	setup_context();
 

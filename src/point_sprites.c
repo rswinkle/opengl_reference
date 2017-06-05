@@ -17,7 +17,7 @@ int handle_events();
 
 
 
-int main()
+int main(int argc, char** argv)
 {
 	setup_context();
 

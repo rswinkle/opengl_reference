@@ -33,7 +33,7 @@ int tex_filter;
 
 
 
-int main()
+int main(int argc, char** argv)
 {
 	setup_context();
 

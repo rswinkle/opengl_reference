@@ -45,7 +45,7 @@ static const char fs_shader_str[] =
 "	frag_color = color;                \n"
 "}";
 
-int main()
+int main(int argc, char** argv)
 {
 	setup_context();
 

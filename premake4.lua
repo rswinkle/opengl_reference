@@ -3,6 +3,8 @@ solution "opengl_reference"
 	configurations { "Debug", "Release" }
 	--location "build"
 	includedirs { "inc", "src/glcommon" }
+
+	configuration "linux"
 	links { "SDL2", "GLEW", "GL", "m" }
 
 	configuration "Debug"
@@ -23,7 +25,7 @@ solution "opengl_reference"
 		}
 		targetdir "build"
 		
-		configuration { "linux", "gmake" }
+		configuration { "gmake" }
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 
@@ -36,7 +38,7 @@ solution "opengl_reference"
 		}
 		targetdir "build"
 		
-		configuration { "linux", "gmake" }
+		configuration { "gmake" }
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 
@@ -51,7 +53,7 @@ solution "opengl_reference"
 		}
 		targetdir "build"
 		
-		configuration { "linux", "gmake" }
+		configuration { "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "modelviewer"
@@ -67,7 +69,7 @@ solution "opengl_reference"
 		}
 		targetdir "build"
 		
-		configuration { "linux", "gmake" }
+		configuration { "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 
@@ -83,7 +85,7 @@ solution "opengl_reference"
 		}
 		targetdir "build"
 		
-		configuration { "linux", "gmake" }
+		configuration { "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 
@@ -101,7 +103,7 @@ solution "opengl_reference"
 		}
 		targetdir "build"
 		
-		configuration { "linux", "gmake" }
+		configuration { "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "flying"
@@ -116,7 +118,7 @@ solution "opengl_reference"
 		}
 		targetdir "build"
 		
-		configuration { "linux", "gmake" }
+		configuration { "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	
@@ -132,7 +134,7 @@ solution "opengl_reference"
 		}
 		targetdir "build"
 		
-		configuration { "linux", "gmake" }
+		configuration { "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 
@@ -147,7 +149,7 @@ solution "opengl_reference"
 		}
 		targetdir "build"
 		
-		configuration { "linux", "gmake" }
+		configuration { "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "point_sprites"
@@ -160,7 +162,7 @@ solution "opengl_reference"
 		}
 		targetdir "build"
 		
-		configuration { "linux", "gmake" }
+		configuration { "gmake" }
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "glm_sphereworld_color"
@@ -177,7 +179,7 @@ solution "opengl_reference"
 		}
 		targetdir "build"
 		
-		configuration { "linux", "gmake" }
+		configuration { "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "glm_grass"
@@ -191,7 +193,7 @@ solution "opengl_reference"
 		}
 		targetdir "build"
 		
-		configuration { "linux", "gmake" }
+		configuration { "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 
@@ -206,7 +208,7 @@ solution "opengl_reference"
 		}
 		targetdir "build"
 		
-		configuration { "linux", "gmake" }
+		configuration { "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 
@@ -219,7 +221,7 @@ solution "opengl_reference"
 		}
 		targetdir "build"
 		
-		configuration { "linux", "gmake" }
+		configuration { "gmake" }
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 
@@ -232,5 +234,5 @@ solution "opengl_reference"
 		}
 		targetdir "build"
 		
-		configuration { "linux", "gmake" }
+		configuration { "gmake" }
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
