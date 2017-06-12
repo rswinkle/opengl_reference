@@ -5,7 +5,10 @@ solution "opengl_reference"
 	includedirs { "inc", "src/glcommon" }
 
 	configuration "linux"
-	links { "SDL2", "GLEW", "GL", "m" }
+		links { "SDL2", "GLEW", "GL", "m" }
+	
+	configuration "windows"
+		links { "mingw32", "SDL2main", "SDL2", "glew32", "opengl32" }
 
 	configuration "Debug"
 		defines { "DEBUG" }

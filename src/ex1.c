@@ -89,6 +89,7 @@ int main(int argc, char** argv)
 		new_time = SDL_GetTicks();
 		if (new_time - old_time > 3000) {
 			printf("%f FPS\n", counter*1000.f/(new_time-old_time));
+			fflush(stdout); //stupid windows doesn't flush with \n >:-/
 			old_time = new_time;
 			counter = 0;
 		}
