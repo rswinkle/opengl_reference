@@ -88,7 +88,11 @@ int main(int argc, char** argv)
 		printf("usage: %s [model_file]\n", argv[0]);
 		printf("No model given, so generating a sphere...\n");
 		generate_sphere(verts, tris, tex, 5.0f, 14, 7);
-		//generate_sphere(verts, tris, tex, 2.0f, 30, 15);
+		//
+		// translate so it's in the same position as the models
+		// couuld also change the camera but meh
+		for (int i=0; i<verts.size(); ++i)
+			verts[i] += vec3(0, 5, -1);
 	} else {
 		ret = load_model(argv[1], verts, tris);
 		if (!ret) {
@@ -137,9 +141,9 @@ int main(int argc, char** argv)
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
 	glBufferData(GL_ARRAY_BUFFER, vert_data.size()*sizeof(vert_attribs), &vert_data[0], GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2*sizeof(vec3), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vert_attribs), 0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2*sizeof(vec3), (void*)sizeof(vec3));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vert_attribs), (void*)sizeof(vec3));
 
 
 	

@@ -22,14 +22,14 @@ endif
 ifeq ($(config),debug)
   OBJDIR     = obj/Debug/grass
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/grass.exe
+  TARGET     = $(TARGETDIR)/grass
   DEFINES   += -DDEBUG
   INCLUDES  += -I../inc -I../src/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -ansi -fno-strict-aliasing -Wunused-variable -Wreturn-type
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += 
-  LIBS      += -lmingw32 -lSDL2main -lSDL2 -lglew32 -lopengl32
+  LIBS      += -lSDL2 -lGLEW -lGL -lm
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
@@ -44,14 +44,14 @@ endif
 ifeq ($(config),release)
   OBJDIR     = obj/Release/grass
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/grass.exe
+  TARGET     = $(TARGETDIR)/grass
   DEFINES   += -DNDEBUG -DOptimize
   INCLUDES  += -I../inc -I../src/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -ansi -fno-strict-aliasing -Wunused-variable -Wreturn-type
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -s
-  LIBS      += -lmingw32 -lSDL2main -lSDL2 -lglew32 -lopengl32
+  LIBS      += -lSDL2 -lGLEW -lGL -lm
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)

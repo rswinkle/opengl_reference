@@ -34,26 +34,15 @@ int load_model(const char* filename, vector<vec3>& verts, vector<ivec3>&tris);
 struct vert_attribs
 {
 	vec3 pos;
-	vec3 normal;
+	vec2 tex;
 
-	vert_attribs(vec3 p, vec3 n) : pos(p), normal(n) {}
+	vert_attribs(vec3 p, vec2 t) : pos(p), tex(t) {}
 };
 
 int polygon_mode;
 int cur_prog;
 
-#define NUM_PROGRAMS 2
-int programs[NUM_PROGRAMS];
-
-const char* shader_files[] =
-{
-"../media/shaders/gouraud_ads_grayscale.vp",
-"../media/shaders/gouraud_ads.fp",
-"../media/shaders/phong_ads.vp",
-"../media/shaders/phong_ads_grayscale.fp"
-};
-
-int mvp_loc, normal_loc;
+int mvp_loc;
 
 int main(int argc, char** argv)
 {
@@ -69,48 +58,28 @@ int main(int argc, char** argv)
 	int ret;
 	vec3 tmp;
 
-	if (argc == 1) {
-		printf("usage: %s [model_file]\n", argv[0]);
-		printf("No model given, so generating a sphere...\n");
-		generate_sphere(verts, tris, tex, 5.0f, 14, 7);
 
-		// translate so it's in the same position as the models
-		// couuld also change the camera but meh
-		for (int i=0; i<verts.size(); ++i)
-			verts[i] += vec3(0, 5, -1);
-	} else {
-		ret = load_model(argv[1], verts, tris);
-		if (!ret) {
-			printf("Failed to load %s!\nGenerating a sphere instead.\n", argv[1]);
-			verts.clear();
-			tris.clear();
-			generate_sphere(verts, tris, tex, 5.0f, 14, 7);
-		}
-	}
-
-	vector<vec3> normals;
-	compute_normals(verts, tris, NULL, 3.14159f/2, normals);
-	//compute_face_normals(verts, tris, normals);
+	generate_box(verts, tris, tex, 6, 3, 1.5);
 
 	int v;
-	vector<vec3> normal_lines;
 	for (int i=0, j=0; i<tris.size(); ++i, j=i*3) {
 		v = tris[i].x;
-		vert_data.push_back(vert_attribs(verts[v], normals[j]));
-		normal_lines.push_back(verts[v]);
-		normal_lines.push_back(verts[v] + normals[j]*0.5f);
+		vert_data.push_back(vert_attribs(verts[v], tex[j]));
 
 		v = tris[i].y;
-		vert_data.push_back(vert_attribs(verts[v], normals[j+1]));
-		normal_lines.push_back(verts[v]);
-		normal_lines.push_back(verts[v] + normals[j+1]*0.5f);
+		vert_data.push_back(vert_attribs(verts[v], tex[j+1]));
 
 		v = tris[i].z;
-		vert_data.push_back(vert_attribs(verts[v], normals[j+2]));
-		normal_lines.push_back(verts[v]);
-		normal_lines.push_back(verts[v] + normals[j+2]*0.5f);
+		vert_data.push_back(vert_attribs(verts[v], tex[j+2]));
 	}
 
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	if (!load_texture2D("../media/textures/test1.jpg", GL_NEAREST, GL_NEAREST, GL_MIRRORED_REPEAT, GL_FALSE)) {
+		printf("failed to load texture\n");
+		return 0;
+	}
 
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
@@ -122,63 +91,33 @@ int main(int argc, char** argv)
 	glBufferData(GL_ARRAY_BUFFER, vert_data.size()*sizeof(vert_attribs), &vert_data[0], GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vert_attribs), 0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vert_attribs), (void*)sizeof(vec3));
-
-
-	
-	GLuint normal_vao, norm_buf;
-	glGenVertexArrays(1, &normal_vao);
-	glBindVertexArray(normal_vao);
-	glGenBuffers(1, &norm_buf);
-	glBindBuffer(GL_ARRAY_BUFFER, norm_buf);
-	glBufferData(GL_ARRAY_BUFFER, normal_lines.size()*sizeof(vec3), &normal_lines[0], GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(vert_attribs), (void*)sizeof(vec3));
 
 
 	glBindVertexArray(0);
 
+	const char vs_file[] = "../media/shaders/texturing.vp";
+	const char fs_file[] = "../media/shaders/texturing.fp";
 
-	int loc;
-	GLuint normal_prog = load_shader_file_pair("../media/shaders/basic_transform.vp", "../media/shaders/simple_color.fp");
-	glUseProgram(normal_prog);
-
-	vec4 Red(1.0, 0.0, 0.0, 1.0);
-	loc = glGetUniformLocation(normal_prog, "color");
-	glUniform4fv(loc, 1, (float*)&Red);
-
-
-
-	vec4 material(0.2, 0.6, 1.0, 128.0);
-	//no error checking done for any of this except shader compilation
-	for (int i=0; i<NUM_PROGRAMS; ++i) {
-		programs[i] = load_shader_file_pair(shader_files[i*2], shader_files[i*2+1]);
-		if (!programs[i]) {
-			printf("failed to compile/link shaders\n");
-			exit(0);
-		}
-
-		glUseProgram(programs[i]);
-		loc = glGetUniformLocation(programs[i], "material");
-		glUniform4fv(loc, 1, (float*)&material);
+	GLuint program = load_shader_file_pair(vs_file, fs_file);
+	if (!program) {
+		printf("failed to compile/link shaders\n");
+		exit(0);
 	}
-
-	glUseProgram(programs[cur_prog]);
+	glUseProgram(program);
 
 	mat4 proj_mat;
 	mat4 view_mat;
 
 	rsw::make_perspective_matrix(proj_mat, DEG_TO_RAD(45), WIDTH/(float)HEIGHT, 1.0f, 100.0f);
-	rsw::lookAt(view_mat, vec3(0, 5, 20), vec3(0, 5, -1), vec3(0, 1, 0));
+	rsw::lookAt(view_mat, vec3(0, 5, 14), vec3(0, 0, 0), vec3(0, 1, 0));
 
 	mat4 mvp_mat;
 	mat4 vp_mat = proj_mat * view_mat;
-	mat3 normal_mat;
 	mat4 rot_mat(1);
 
-	mvp_loc = glGetUniformLocation(programs[cur_prog], "mvp_mat");
-	normal_loc = glGetUniformLocation(programs[cur_prog], "normal_mat");
+	mvp_loc = glGetUniformLocation(program, "mvp_mat");
 
 
 	glEnable(GL_CULL_FACE);
@@ -197,14 +136,7 @@ int main(int argc, char** argv)
 			counter = 0;
 		}
 
-
-		glUseProgram(programs[cur_prog]);
-
-
 		rsw::load_rotation_mat4(rot_mat, vec3(0, 1, 0), 0.5f*new_time/1000.0f);
-
-		normal_mat = mat3(view_mat*rot_mat);
-		glUniformMatrix3fv(normal_loc, 1, GL_FALSE, (float*)&normal_mat);
 
 		mvp_mat = vp_mat * rot_mat;
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mvp_mat);
@@ -214,21 +146,12 @@ int main(int argc, char** argv)
 		glBindVertexArray(vao);
 		glDrawArrays(GL_TRIANGLES, 0, vert_data.size());
 
-		/*
-		glUseProgram(normal_prog);
-		loc = glGetUniformLocation(normal_prog, "mvp_mat");
-		glUniformMatrix4fv(loc, 1, GL_FALSE, (float*)&mvp_mat);
-
-		glBindVertexArray(normal_vao);
-		glDrawArrays(GL_LINES, 0, normal_lines.size());
-		*/
-
 		SDL_GL_SwapWindow(window);
 	}
 
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &buffer);
-	glDeleteProgram(programs[cur_prog]);
+	glDeleteProgram(program);
 
 	cleanup();
 
@@ -301,12 +224,6 @@ int handle_events()
 					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 				else
 					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			} else if (sc == SDL_SCANCODE_S) {
-				cur_prog = (cur_prog + 1) % NUM_PROGRAMS;
-
-				glUseProgram(programs[cur_prog]);
-				mvp_loc = glGetUniformLocation(programs[cur_prog], "mvp_mat");
-				normal_loc = glGetUniformLocation(programs[cur_prog], "normal_mat");
 			}
 		}
 	}

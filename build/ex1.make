@@ -22,14 +22,14 @@ endif
 ifeq ($(config),debug)
   OBJDIR     = obj/Debug/ex1
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/ex1.exe
+  TARGET     = $(TARGETDIR)/ex1
   DEFINES   += -DDEBUG
   INCLUDES  += -I../inc -I../src/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += 
-  LIBS      += -lmingw32 -lSDL2main -lSDL2 -lglew32 -lopengl32
+  LIBS      += -lSDL2 -lGLEW -lGL -lm
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
@@ -44,14 +44,14 @@ endif
 ifeq ($(config),release)
   OBJDIR     = obj/Release/ex1
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/ex1.exe
+  TARGET     = $(TARGETDIR)/ex1
   DEFINES   += -DNDEBUG -DOptimize
   INCLUDES  += -I../inc -I../src/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -s
-  LIBS      += -lmingw32 -lSDL2main -lSDL2 -lglew32 -lopengl32
+  LIBS      += -lSDL2 -lGLEW -lGL -lm
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)

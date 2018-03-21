@@ -33,7 +33,7 @@ void generate_box(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, f
 
 		tris.push_back(ivec3(0, 3, 1));
 		tex.push_back(vec2(1, 1));
-		tex.push_back(vec2(1, 0));
+		tex.push_back(vec2(0, 0));
 		tex.push_back(vec2(0, 1));
 
 		//left face

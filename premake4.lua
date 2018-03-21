@@ -44,6 +44,20 @@ solution "opengl_reference"
 		configuration { "gmake" }
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
+	project "ex3"
+		location "build"
+		kind "ConsoleApp"
+		language "C++"
+		files {
+			"src/ex3.cpp",
+			"src/glcommon/gltools.cpp",
+			"src/glcommon/rsw_math.cpp",
+			"src/glcommon/rsw_primitives.cpp",
+		}
+		targetdir "build"
+		
+		configuration { "gmake" }
+			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "texturing"
 		location "build"
