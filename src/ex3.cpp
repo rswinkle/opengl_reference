@@ -5,6 +5,7 @@
 
 #include <SDL2/SDL.h>
 
+#include <iostream>
 #include <stdio.h>
 #include <vector>
 
@@ -40,7 +41,12 @@ struct vert_attribs
 };
 
 int polygon_mode;
-int cur_prog;
+int cur_tex;
+GLuint textures[3];
+
+float z;
+mat4 proj_mat;
+mat4 vp_mat;
 
 int mvp_loc;
 
@@ -49,17 +55,18 @@ int main(int argc, char** argv)
 	setup_context();
 
 	polygon_mode = 2;
-	cur_prog = 0;
 
 	vector<vec3> verts;
 	vector<ivec3> tris;
 	vector<vec2> tex;
 	vector<vert_attribs> vert_data;
-	int ret;
 	vec3 tmp;
 
 
-	generate_box(verts, tris, tex, 6, 3, 1.5);
+	generate_box(verts, tris, tex, 2, 2, 2);
+
+	for (int i=0; i<verts.size(); ++i)
+		verts[i] += vec3(-1);
 
 	int v;
 	for (int i=0, j=0; i<tris.size(); ++i, j=i*3) {
@@ -73,13 +80,24 @@ int main(int argc, char** argv)
 		vert_data.push_back(vert_attribs(verts[v], tex[j+2]));
 	}
 
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	if (!load_texture2D("../media/textures/test1.jpg", GL_NEAREST, GL_NEAREST, GL_MIRRORED_REPEAT, GL_FALSE)) {
+	glGenTextures(3, textures);
+	glBindTexture(GL_TEXTURE_2D, textures[0]);
+	if (!load_texture2D("../media/textures/crate.gif", GL_NEAREST, GL_NEAREST, GL_MIRRORED_REPEAT, GL_FALSE)) {
 		printf("failed to load texture\n");
 		return 0;
 	}
+	glBindTexture(GL_TEXTURE_2D, textures[1]);
+	if (!load_texture2D("../media/textures/crate.gif", GL_LINEAR, GL_LINEAR, GL_MIRRORED_REPEAT, GL_FALSE)) {
+		printf("failed to load texture\n");
+		return 0;
+	}
+	glBindTexture(GL_TEXTURE_2D, textures[2]);
+	if (!load_texture2D("../media/textures/crate.gif", GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, GL_MIRRORED_REPEAT, GL_FALSE)) {
+		printf("failed to load texture\n");
+		return 0;
+	}
+
+	glBindTexture(GL_TEXTURE_2D, textures[0]);
 
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
@@ -107,14 +125,13 @@ int main(int argc, char** argv)
 	}
 	glUseProgram(program);
 
-	mat4 proj_mat;
-	mat4 view_mat;
 
-	rsw::make_perspective_matrix(proj_mat, DEG_TO_RAD(45), WIDTH/(float)HEIGHT, 1.0f, 100.0f);
-	rsw::lookAt(view_mat, vec3(0, 5, 14), vec3(0, 0, 0), vec3(0, 1, 0));
+	rsw::make_perspective_matrix(proj_mat, DEG_TO_RAD(45), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
+
+	z = -5;
+	vp_mat = proj_mat * rsw::translation_mat4(0, 0, z);
 
 	mat4 mvp_mat;
-	mat4 vp_mat = proj_mat * view_mat;
 	mat4 rot_mat(1);
 
 	mvp_loc = glGetUniformLocation(program, "mvp_mat");
@@ -224,6 +241,33 @@ int handle_events()
 					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 				else
 					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			} else if (sc == SDL_SCANCODE_F) {
+				
+				cur_tex = (cur_tex + 1) % 3;
+				if (cur_tex == 0) {
+					puts("GL_NEAREST\n");
+				} else if (cur_tex == 1 ) {
+					puts("GL_LINEAR\n");
+				} else {
+					puts("GL_LINEAR_MIPMAP_NEAREST");
+				}
+				glBindTexture(GL_TEXTURE_2D, textures[cur_tex]);
+
+			// if I decide to let the user control rotation
+			} else if (sc == SDL_SCANCODE_LEFT) {
+
+			} else if (sc == SDL_SCANCODE_RIGHT) {
+
+			} else if (sc == SDL_SCANCODE_UP) {
+
+			} else if (sc == SDL_SCANCODE_DOWN) {
+
+			} else if (sc == SDL_SCANCODE_EQUALS) {
+				z += 0.05;
+				vp_mat = proj_mat * rsw::translation_mat4(0, 0, z);
+			} else if (sc == SDL_SCANCODE_MINUS) {
+				z -= 0.05;
+				vp_mat = proj_mat * rsw::translation_mat4(0, 0, z);
 			}
 		}
 	}
@@ -232,46 +276,6 @@ int handle_events()
 
 
 
-
-int load_model(const char* filename, vector<vec3>& verts, vector<ivec3>&tris)
-{
-	FILE* file = NULL;
-	unsigned int num = 0;
-	vec3 vec;
-	ivec3 ivec;
-
-	if (!(file = fopen(filename, "r")))
-		return 0;
-
-	fscanf(file, "%u", &num);
-	if (!num)
-		return 0;
-
-	printf("%u vertices\n", num);
-	
-	verts.reserve(num);
-	for (int i=0; i<num; ++i) {
-		fscanf(file, " (%f, %f, %f)", &vec.x, &vec.y, &vec.z);
-		verts.push_back(vec);
-	}
-
-	fscanf(file, "%u", &num);
-	if (!num)
-		return 0;
-
-	printf("%u triangles\n", num);
-	
-	tris.reserve(num);
-
-	for (int i=0; i<num; ++i) {
-		fscanf(file, " (%d, %d, %d)", &ivec.x, &ivec.y, &ivec.z);
-		tris.push_back(ivec);
-	}
-
-	fclose(file);
-
-	return 1;
-}
 
 
 

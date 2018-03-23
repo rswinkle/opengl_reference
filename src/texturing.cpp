@@ -222,10 +222,10 @@ int handle_events(unsigned int last_time, unsigned int cur_time, mat4& mvp_mat)
 				int filter;
 				if (tex_filter == 0) {
 					filter = GL_LINEAR;
-					printf("GL_LINEAR\n");
+					puts("GL_LINEAR");
 				} else {
 					filter = GL_NEAREST;
-					printf("GL_NEAREST\n");
+					puts("GL_NEAREST");
 				}
 				for (int i=0; i<NUM_TEXTURES; ++i) {
 					glBindTexture(GL_TEXTURE_2D, textures[i]);

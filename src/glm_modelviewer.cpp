@@ -81,7 +81,6 @@ int main(int argc, char** argv)
 	vector<ivec3> tris;
 	vector<vec2> tex;
 	vector<vert_attribs> vert_data;
-	int ret;
 	vec3 tmp;
 
 	if (argc == 1) {
@@ -94,8 +93,7 @@ int main(int argc, char** argv)
 		for (int i=0; i<verts.size(); ++i)
 			verts[i] += vec3(0, 5, -1);
 	} else {
-		ret = load_model(argv[1], verts, tris);
-		if (!ret) {
+		if (!load_model(argv[1], verts, tris)) {
 			printf("Failed to load %s!\nGenerating a sphere instead.\n", argv[1]);
 			verts.clear();
 			tris.clear();
