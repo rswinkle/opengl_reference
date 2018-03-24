@@ -1,0 +1,65 @@
+// Gouraud textured
+#version 330 core
+
+//w is filled with 1 automatically for vertex
+//since I only passed x,y,z
+layout (location = 0) in vec4 vertex;
+layout (location = 1) in vec3 normal;
+layout (location = 2) in vec2 vtexcoords;
+
+uniform vec3 light_dir;
+uniform mat4 mvp_mat;
+uniform mat3 normal_mat;
+
+
+//aka ambient
+uniform vec3 material_color;
+
+// d, s, shininess
+uniform float diff_intensity;
+uniform float spec_intensity;
+uniform float shininess;
+
+
+// out to fragment program
+out vec3 light_intensity;
+out vec2 texcoords;
+
+void main(void) 
+{ 
+	// Get surface normal in eye coordinates
+	//make sure normalMatrix and normal are normalized before drawing
+	vec3 eye_normal = normal_mat * normal;
+	
+	//non-local viewer and constant directional light
+	vec3 light_dir = normalize(vec3(-1, 1, 0.5));
+	vec3 eye_dir = vec3(0, 0, 1);	
+	
+	//as if all lights are white
+	vec3 out_light = material_color;
+	
+	// Dot product gives us diffuse intensity
+	float diff = max(0.0, dot(eye_normal, light_dir));
+
+	// add diffuse light
+	out_light += diff * diff_intensity;
+
+
+	// Specular Light
+	vec3 r = reflect(-light_dir, eye_normal);
+	float spec = max(0.0, dot(eye_dir, r));
+	if(diff > 0) {
+		float fSpec = pow(spec, shininess);
+		
+		out_light += spec_intensity * fSpec;
+	}
+	
+	
+	light_intensity = out_light;
+	texcoords = vtexcoords;
+	
+
+	// Don't forget to transform the geometry!
+	gl_Position = mvp_mat * vertex;
+}
+

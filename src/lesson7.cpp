@@ -7,7 +7,6 @@
 
 #include <iostream>
 #include <stdio.h>
-#include <vector>
 
 #define WIDTH 640
 #define HEIGHT 480
@@ -29,9 +28,6 @@ int handle_events();
 
 
 
-int load_model(const char* filename, vector<vec3>& verts, vector<ivec3>&tris);
-
-
 struct vert_attribs
 {
 	vec3 pos;
@@ -41,14 +37,12 @@ struct vert_attribs
 };
 
 int polygon_mode;
-int cur_tex;
-GLuint textures[3];
 
 float z;
 mat4 proj_mat;
 mat4 vp_mat;
 
-int mvp_loc;
+int mvp_loc, normal_loc;
 
 int main(int argc, char** argv)
 {
@@ -56,62 +50,151 @@ int main(int argc, char** argv)
 
 	polygon_mode = 2;
 
-	vector<vec3> verts;
-	vector<ivec3> tris;
-	vector<vec2> tex;
-	vector<vert_attribs> vert_data;
-	vec3 tmp;
+	float vertices[] = {
+		// Front face
+		-1.0, -1.0,  1.0,
+ 	 	 1.0, -1.0,  1.0,
+ 	 	 1.0,  1.0,  1.0,
+		-1.0,  1.0,  1.0,
+		// Back face
+		-1.0, -1.0, -1.0,
+		-1.0,  1.0, -1.0,
+ 	 	 1.0,  1.0, -1.0,
+ 	 	 1.0, -1.0, -1.0,
+		// Top face
+		-1.0,  1.0, -1.0,
+		-1.0,  1.0,  1.0,
+ 	 	 1.0,  1.0,  1.0,
+ 	 	 1.0,  1.0, -1.0,
+		// Bottom face
+		-1.0, -1.0, -1.0,
+ 	 	 1.0, -1.0, -1.0,
+ 	 	 1.0, -1.0,  1.0,
+		-1.0, -1.0,  1.0,
+		// Right face
+ 	 	 1.0, -1.0, -1.0,
+ 	 	 1.0,  1.0, -1.0,
+ 	 	 1.0,  1.0,  1.0,
+ 	 	 1.0, -1.0,  1.0,
+		// Left face
+		-1.0, -1.0, -1.0,
+		-1.0, -1.0,  1.0,
+		-1.0,  1.0,  1.0,
+		-1.0,  1.0, -1.0
+	};
 
+	float normals[] = {
+		// Front face
+ 	 	 0.0,  0.0,  1.0,
+ 	 	 0.0,  0.0,  1.0,
+ 	 	 0.0,  0.0,  1.0,
+ 	 	 0.0,  0.0,  1.0,
+		// Back face
+ 	 	 0.0,  0.0, -1.0,
+ 	 	 0.0,  0.0, -1.0,
+ 	 	 0.0,  0.0, -1.0,
+ 	 	 0.0,  0.0, -1.0,
+		// Top face
+ 	 	 0.0,  1.0,  0.0,
+ 	 	 0.0,  1.0,  0.0,
+ 	 	 0.0,  1.0,  0.0,
+ 	 	 0.0,  1.0,  0.0,
+		// Bottom face
+ 	 	 0.0, -1.0,  0.0,
+ 	 	 0.0, -1.0,  0.0,
+ 	 	 0.0, -1.0,  0.0,
+ 	 	 0.0, -1.0,  0.0,
+		// Right face
+ 	 	 1.0,  0.0,  0.0,
+ 	 	 1.0,  0.0,  0.0,
+ 	 	 1.0,  0.0,  0.0,
+ 	 	 1.0,  0.0,  0.0,
+		// Left face
+		-1.0,  0.0,  0.0,
+		-1.0,  0.0,  0.0,
+		-1.0,  0.0,  0.0,
+		-1.0,  0.0,  0.0
+	};
 
-	generate_box(verts, tris, tex, 2, 2, 2);
+	float texcoords[] = {
+		// Front face
+		0.0, 0.0,
+		1.0, 0.0,
+		1.0, 1.0,
+		0.0, 1.0,
+		// Back face
+		1.0, 0.0,
+		1.0, 1.0,
+		0.0, 1.0,
+		0.0, 0.0,
+		// Top face
+		0.0, 1.0,
+		0.0, 0.0,
+		1.0, 0.0,
+		1.0, 1.0,
+		// Bottom face
+		1.0, 1.0,
+		0.0, 1.0,
+		0.0, 0.0,
+		1.0, 0.0,
+		// Right face
+		1.0, 0.0,
+		1.0, 1.0,
+		0.0, 1.0,
+		0.0, 0.0,
+		// Left face
+		0.0, 0.0,
+		1.0, 0.0,
+		1.0, 1.0,
+		0.0, 1.0
+	};
 
-	for (int i=0; i<verts.size(); ++i)
-		verts[i] += vec3(-1);
+	GLuint triangles[] = {
+		0, 1, 2,      0, 2, 3,    // Front face
+		4, 5, 6,      4, 6, 7,    // Back face
+		8, 9, 10,     8, 10, 11,  // Top face
+		12, 13, 14,   12, 14, 15, // Bottom face
+		16, 17, 18,   16, 18, 19, // Right face
+		20, 21, 22,   20, 22, 23  // Left face
+	};
 
-	int v;
-	for (int i=0, j=0; i<tris.size(); ++i, j=i*3) {
-		v = tris[i].x;
-		vert_data.push_back(vert_attribs(verts[v], tex[j]));
-
-		v = tris[i].y;
-		vert_data.push_back(vert_attribs(verts[v], tex[j+1]));
-
-		v = tris[i].z;
-		vert_data.push_back(vert_attribs(verts[v], tex[j+2]));
-	}
-
-	glGenTextures(3, textures);
-	glBindTexture(GL_TEXTURE_2D, textures[0]);
-	if (!load_texture2D("../media/textures/crate.gif", GL_NEAREST, GL_NEAREST, GL_MIRRORED_REPEAT, GL_FALSE)) {
-		printf("failed to load texture\n");
-		return 0;
-	}
-	glBindTexture(GL_TEXTURE_2D, textures[1]);
-	if (!load_texture2D("../media/textures/crate.gif", GL_LINEAR, GL_LINEAR, GL_MIRRORED_REPEAT, GL_FALSE)) {
-		printf("failed to load texture\n");
-		return 0;
-	}
-	glBindTexture(GL_TEXTURE_2D, textures[2]);
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
 	if (!load_texture2D("../media/textures/crate.gif", GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, GL_MIRRORED_REPEAT, GL_FALSE)) {
 		printf("failed to load texture\n");
 		return 0;
 	}
 
-	glBindTexture(GL_TEXTURE_2D, textures[0]);
-
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	GLuint buffer;
-	glGenBuffers(1, &buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, vert_data.size()*sizeof(vert_attribs), &vert_data[0], GL_STATIC_DRAW);
+	GLuint vert_buf;
+	glGenBuffers(1, &vert_buf);
+	glBindBuffer(GL_ARRAY_BUFFER, vert_buf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vert_attribs), 0);
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(vert_attribs), (void*)sizeof(vec3));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
+	GLuint normal_buf;
+	glGenBuffers(1, &normal_buf);
+	glBindBuffer(GL_ARRAY_BUFFER, normal_buf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW);
+//	glEnableVertexAttribArray(1);
+//	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	GLuint tex_buf;
+	glGenBuffers(1, &tex_buf);
+	glBindBuffer(GL_ARRAY_BUFFER, tex_buf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(texcoords), texcoords, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	GLuint elem_buf;
+	glGenBuffers(1, &elem_buf);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elem_buf);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangles), triangles, GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
 
@@ -161,13 +244,16 @@ int main(int argc, char** argv)
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, vert_data.size());
+		glDrawElements(GL_TRIANGLES, sizeof(triangles), GL_UNSIGNED_INT, 0);
 
 		SDL_GL_SwapWindow(window);
 	}
 
 	glDeleteVertexArrays(1, &vao);
-	glDeleteBuffers(1, &buffer);
+	glDeleteBuffers(1, &vert_buf);
+	glDeleteBuffers(1, &normal_buf);
+	glDeleteBuffers(1, &tex_buf);
+	glDeleteBuffers(1, &elem_buf);
 	glDeleteProgram(program);
 
 	cleanup();
@@ -241,17 +327,8 @@ int handle_events()
 					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 				else
 					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			} else if (sc == SDL_SCANCODE_F) {
+			} else if (sc == SDL_SCANCODE_L) {
 				
-				cur_tex = (cur_tex + 1) % 3;
-				if (cur_tex == 0) {
-					puts("GL_NEAREST\n");
-				} else if (cur_tex == 1 ) {
-					puts("GL_LINEAR\n");
-				} else {
-					puts("GL_LINEAR_MIPMAP_NEAREST");
-				}
-				glBindTexture(GL_TEXTURE_2D, textures[cur_tex]);
 
 			// if I decide to let the user control rotation
 			} else if (sc == SDL_SCANCODE_LEFT) {
