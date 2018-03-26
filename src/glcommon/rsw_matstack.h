@@ -3,7 +3,10 @@
 #define RSW_MATSTACK
 
 #include "rsw_math.h"
-#include "rsw_glframe.h"
+
+// Not sure I want to make this a dependency
+// they just wrap a call to frame.get_matrix() anyway
+//#include "rsw_glframe.h"
 
 using rsw::vec3;
 using rsw::vec4;
@@ -18,6 +21,7 @@ struct matrix_stack
 	int capacity;
 	mat4* stack;
 	int top;
+	MATSTACK_ERROR last_error;
 
 	matrix_stack(int cap = 64)
 	{
@@ -39,10 +43,12 @@ struct matrix_stack
 		stack[top] = m; 
 	}
         
+    /*
     void load_mat(GLFrame& frame)
 	{
         load_mat(frame.get_matrix());
 	}
+	*/
     
 	//one of these days I should really try restrict keyword and see if it makes a significant difference
 	void mult_mat(const mat4 m)
@@ -51,18 +57,20 @@ struct matrix_stack
 
 	}
         
+    /*
     void mult_mat(GLFrame& frame)
 	{
         mult_mat(frame.get_matrix());
 	}
+	*/
         				
-	void push_mat(void)
+	void push(void)
 	{
 		if (top < (capacity-1)) {
 			top++;
 			stack[top] = stack[top-1];
 		} else {
-			last_error = MAT_STACK_OVERFLOW;
+			last_error = MATSTACK_OVERFLOW;
 		}
 	}
 	
@@ -71,7 +79,7 @@ struct matrix_stack
 		if(top > 0)
 			top--;
 		else
-			last_error = MAT_STACK_UNDERFLOW;
+			last_error = MATSTACK_UNDERFLOW;
 	}
 		
 	void scale(float x, float y, float z)
@@ -80,40 +88,39 @@ struct matrix_stack
 	}
 		
 		
-	void Translate(float x, float y, float z)
+	void translate(float x, float y, float z)
 	{
-		stack[top] = stack[top]*rsw::TranslationMatrix44(x, y, z);		
+		stack[top] = stack[top] * rsw::translation_mat4(x, y, z);		
 	}
         			
-	void Rotate(float angle, float x, float y, float z)
+	void rotate(float angle, float x, float y, float z)
 	{
 		mat4 rotate;
-		rotmat44f(rotate, vec3(x, y, z), angle);
-		stack[top] = stack[top]*rotate;
+		rsw::load_rotation_mat4(rotate, vec3(x, y, z), angle);
+		stack[top] = stack[top] * rotate;
 	}
 	
 	
 	// I've always wanted vector versions of these
-	void Scalev(const vec3 vScale)
+	void scale(const vec3 v)
 	{
-		stack[top] = stack[top]*rsw::ScaleMatrix44(vScale);
+		stack[top] = stack[top] * rsw::scale_mat4(v);
 	}
 		
-	void Translatev(const vec3 vTranslate)
+	void translate(const vec3 v)
 	{
-		stack[top] = stack[top]*rsw::TranslationMatrix44(vTranslate);	
+		stack[top] = stack[top] * rsw::translation_mat4(v);		
 	}
     
 		
-	void Rotatev(float angle, vec3 vAxis)
+	void rotate(float angle, vec3 v)
 	{
 		mat4 rotate;
-		rotmat44f(rotate, vAxis, angle);
-		stack[top] = stack[top]*rotate;
+		rsw::load_rotation_mat4(rotate, v, angle);
+		stack[top] = stack[top] * rotate;
 	}
 		
-	
-	// I've also always wanted to be able to do this
+	// TODO make stack a vector?  resizable?
 	void push_mat(const mat4 m)
 	{
 	 	if(top < (capacity-1)) {
@@ -124,17 +131,19 @@ struct matrix_stack
 		}
 	}
 		
+	/*
     void push_mat(GLFrame& frame)
 	{
 		push_mat(frame.get_matrix());
 	}
+	*/
         
 	// Two different ways to get the matrix
 	const mat4& get_matrix(void) { return stack[top]; }	//const!
 	void get_matrix(mat4 m) { m = stack[top]; }	//copy
 
 
-	MAT_STACK_ERROR GetLastError(void)
+	MATSTACK_ERROR GetLastError(void)
 	{
 		MATSTACK_ERROR ret = last_error;
 		last_error = MATSTACK_NOERROR;

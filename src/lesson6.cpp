@@ -1,6 +1,4 @@
 #include <gltools.h>
-#include <rsw_primitives.h>
-#include <rsw_halfedge.h>
 
 
 #include <SDL2/SDL.h>
@@ -13,8 +11,6 @@
 using namespace std;
 
 using rsw::vec3;
-using rsw::vec4;
-using rsw::mat3;
 using rsw::mat4;
 
 

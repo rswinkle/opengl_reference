@@ -1,6 +1,4 @@
 #include <gltools.h>
-#include <rsw_primitives.h>
-#include <rsw_halfedge.h>
 
 
 #include <SDL2/SDL.h>
@@ -14,8 +12,6 @@
 using namespace std;
 
 using rsw::vec3;
-using rsw::vec4;
-using rsw::mat3;
 using rsw::mat4;
 
 
@@ -27,14 +23,6 @@ void setup_context();
 int handle_events();
 
 
-
-struct vert_attribs
-{
-	vec3 pos;
-	vec2 tex;
-
-	vert_attribs(vec3 p, vec2 t) : pos(p), tex(t) {}
-};
 
 int polygon_mode;
 

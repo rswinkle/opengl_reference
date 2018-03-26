@@ -44,6 +44,20 @@ solution "opengl_reference"
 		configuration { "gmake" }
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
+	project "lesson1"
+		location "build"
+		kind "ConsoleApp"
+		language "C++"
+		files {
+			"src/lesson1.cpp",
+			"src/glcommon/gltools.cpp",
+			"src/glcommon/rsw_math.cpp",
+		}
+		targetdir "build"
+		
+		configuration { "gmake" }
+			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+
 	project "lesson6"
 		location "build"
 		kind "ConsoleApp"
@@ -52,7 +66,6 @@ solution "opengl_reference"
 			"src/lesson6.cpp",
 			"src/glcommon/gltools.cpp",
 			"src/glcommon/rsw_math.cpp",
-			"src/glcommon/rsw_primitives.cpp",
 		}
 		targetdir "build"
 		
@@ -67,7 +80,6 @@ solution "opengl_reference"
 			"src/lesson7.cpp",
 			"src/glcommon/gltools.cpp",
 			"src/glcommon/rsw_math.cpp",
-			"src/glcommon/rsw_primitives.cpp",
 		}
 		targetdir "build"
 		
