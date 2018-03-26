@@ -72,6 +72,20 @@ solution "opengl_reference"
 		configuration { "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
+	project "lesson3"
+		location "build"
+		kind "ConsoleApp"
+		language "C++"
+		files {
+			"src/lesson3.cpp",
+			"src/glcommon/gltools.cpp",
+			"src/glcommon/rsw_math.cpp",
+		}
+		targetdir "build"
+		
+		configuration { "gmake" }
+			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+
 	project "lesson6"
 		location "build"
 		kind "ConsoleApp"
