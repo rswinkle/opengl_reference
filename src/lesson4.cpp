@@ -33,51 +33,143 @@ int main(int argc, char** argv)
 
 	polygon_mode = 2;
 
-	float triangle_verts[] = {
+	float pyramid_verts[] = {
+		// Front face
  	 	 0.0,  1.0,  0.0,
-		-1.0, -1.0,  0.0,
- 	 	 1.0, -1.0,  0.0
+		-1.0, -1.0,  1.0,
+ 	 	 1.0, -1.0,  1.0,
+		// Right face
+ 	 	 0.0,  1.0,  0.0,
+ 	 	 1.0, -1.0,  1.0,
+ 	 	 1.0, -1.0, -1.0,
+		// Back face
+ 	 	 0.0,  1.0,  0.0,
+ 	 	 1.0, -1.0, -1.0,
+		-1.0, -1.0, -1.0,
+		// Left face
+ 	 	 0.0,  1.0,  0.0,
+		-1.0, -1.0, -1.0,
+		-1.0, -1.0,  1.0
 	};
 
-	float triangle_colors[] = {
+	float pyramid_colors[] = {
+		// Front face
 		1.0, 0.0, 0.0, 1.0,
 		0.0, 1.0, 0.0, 1.0,
-		0.0, 0.0, 1.0, 1.0
+		0.0, 0.0, 1.0, 1.0,
+		// Right face
+		1.0, 0.0, 0.0, 1.0,
+		0.0, 0.0, 1.0, 1.0,
+		0.0, 1.0, 0.0, 1.0,
+		// Back face
+		1.0, 0.0, 0.0, 1.0,
+		0.0, 1.0, 0.0, 1.0,
+		0.0, 0.0, 1.0, 1.0,
+		// Left face
+		1.0, 0.0, 0.0, 1.0,
+		0.0, 0.0, 1.0, 1.0,
+		0.0, 1.0, 0.0, 1.0
 	};
 
-	float square_verts[] = {
-		 1.0,  1.0,  0.0,
-		-1.0,  1.0,  0.0,
-		 1.0, -1.0,  0.0,
-		-1.0, -1.0,  0.0
+	float cube_verts[] = {
+		// Front face
+		-1.0, -1.0,  1.0,
+ 	 	 1.0, -1.0,  1.0,
+ 	 	 1.0,  1.0,  1.0,
+		-1.0,  1.0,  1.0,
+		// Back face
+		-1.0, -1.0, -1.0,
+		-1.0,  1.0, -1.0,
+ 	 	 1.0,  1.0, -1.0,
+ 	 	 1.0, -1.0, -1.0,
+		// Top face
+		-1.0,  1.0, -1.0,
+		-1.0,  1.0,  1.0,
+ 	 	 1.0,  1.0,  1.0,
+ 	 	 1.0,  1.0, -1.0,
+		// Bottom face
+		-1.0, -1.0, -1.0,
+ 	 	 1.0, -1.0, -1.0,
+ 	 	 1.0, -1.0,  1.0,
+		-1.0, -1.0,  1.0,
+		// Right face
+ 	 	 1.0, -1.0, -1.0,
+ 	 	 1.0,  1.0, -1.0,
+ 	 	 1.0,  1.0,  1.0,
+ 	 	 1.0, -1.0,  1.0,
+		// Left face
+		-1.0, -1.0, -1.0,
+		-1.0, -1.0,  1.0,
+		-1.0,  1.0,  1.0,
+		-1.0,  1.0, -1.0
 	};
 
-	float square_colors[] = {
-		0.5, 0.5, 1.0, 1.0,
-		0.5, 0.5, 1.0, 1.0,
-		0.5, 0.5, 1.0, 1.0,
-		0.5, 0.5, 1.0, 1.0
+	float cube_colors[] = {
+		1.0, 0.0, 0.0, 1.0,
+		1.0, 0.0, 0.0, 1.0,
+		1.0, 0.0, 0.0, 1.0,
+		1.0, 0.0, 0.0, 1.0,
+
+		1.0, 1.0, 0.0, 1.0,
+		1.0, 1.0, 0.0, 1.0,
+		1.0, 1.0, 0.0, 1.0,
+		1.0, 1.0, 0.0, 1.0,
+
+		0.0, 1.0, 0.0, 1.0,
+		0.0, 1.0, 0.0, 1.0,
+		0.0, 1.0, 0.0, 1.0,
+		0.0, 1.0, 0.0, 1.0,
+
+		1.0, 0.5, 0.5, 1.0,
+		1.0, 0.5, 0.5, 1.0,
+		1.0, 0.5, 0.5, 1.0,
+		1.0, 0.5, 0.5, 1.0,
+
+		1.0, 0.0, 1.0, 1.0,
+		1.0, 0.0, 1.0, 1.0,
+		1.0, 0.0, 1.0, 1.0,
+		1.0, 0.0, 1.0, 1.0,
+
+		0.0, 0.0, 1.0, 1.0,
+		0.0, 0.0, 1.0, 1.0,
+		0.0, 0.0, 1.0, 1.0, 
+		0.0, 0.0, 1.0, 1.0 
+	};
+
+	unsigned short cube_triangles[] = {
+		0, 1, 2,      0, 2, 3,    // Front face
+		4, 5, 6,      4, 6, 7,    // Back face
+		8, 9, 10,     8, 10, 11,  // Top face
+		12, 13, 14,   12, 14, 15, // Bottom face
+		16, 17, 18,   16, 18, 19, // Right face
+		20, 21, 22,   20, 22, 23  // Left face
 	};
 
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	GLuint tri_buf, tri_color_buf;
-	glGenBuffers(1, &tri_buf);
-	glGenBuffers(1, &tri_color_buf);
-	glBindBuffer(GL_ARRAY_BUFFER, tri_buf);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_verts), triangle_verts, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, tri_color_buf);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_colors), triangle_colors, GL_STATIC_DRAW);
+	GLuint pyramid_buf, pyramid_color_buf;
+	glGenBuffers(1, &pyramid_buf);
+	glGenBuffers(1, &pyramid_color_buf);
+	glBindBuffer(GL_ARRAY_BUFFER, pyramid_buf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(pyramid_verts), pyramid_verts, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, pyramid_color_buf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(pyramid_colors), pyramid_colors, GL_STATIC_DRAW);
 
-	GLuint square_buf, square_color_buf;
-	glGenBuffers(1, &square_buf);
-	glGenBuffers(1, &square_color_buf);
-	glBindBuffer(GL_ARRAY_BUFFER, square_buf);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(square_verts), square_verts, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, square_color_buf);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(square_colors), square_colors, GL_STATIC_DRAW);
+	GLuint cube_buf, cube_color_buf;
+	glGenBuffers(1, &cube_buf);
+	glGenBuffers(1, &cube_color_buf);
+	glBindBuffer(GL_ARRAY_BUFFER, cube_buf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_verts), cube_verts, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, cube_color_buf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_colors), cube_colors, GL_STATIC_DRAW);
+
+	GLuint cube_tri_buf;
+	glGenBuffers(1, &cube_tri_buf);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_tri_buf);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_triangles), cube_triangles, GL_STATIC_DRAW);
+
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -97,13 +189,16 @@ int main(int argc, char** argv)
 	rsw::make_perspective_matrix(mat_stack.stack[mat_stack.top], DEG_TO_RAD(45), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
 
 
-	float r_tri = 0, r_square = 0;
+	float r_pyramid = 0, r_cube = 0;
 	float elapsed;
 
 
 	mat4 mvp_mat;
 
 	int mvp_loc = glGetUniformLocation(program, "mvp_mat");
+
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 
 	unsigned int last_time = SDL_GetTicks();
 	unsigned int old_time = 0, new_time=0, counter = 0;
@@ -124,32 +219,32 @@ int main(int argc, char** argv)
 		
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-		r_tri += 90 * (elapsed / 1000.0f);
-		r_square += 75 * (elapsed / 1000.0f);
+		r_pyramid += 90 * (elapsed / 1000.0f);
+		r_cube -= 75 * (elapsed / 1000.0f);
 
 		mat_stack.push();
 		mat_stack.translate(-1.5, 0, -7.0);
 		mat_stack.push();
 
-		mat_stack.rotate(DEG_TO_RAD(r_tri), 0, 1, 0);
+		mat_stack.rotate(DEG_TO_RAD(r_pyramid), 0, 1, 0);
 
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mat_stack.stack[mat_stack.top]);
-		glBindBuffer(GL_ARRAY_BUFFER, tri_buf);
+		glBindBuffer(GL_ARRAY_BUFFER, pyramid_buf);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, tri_color_buf);
+		glBindBuffer(GL_ARRAY_BUFFER, pyramid_color_buf);
 		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawArrays(GL_TRIANGLES, 0, 12);
 		mat_stack.pop();
 
 		mat_stack.translate(3.0, 0.0, 0.0);
-		mat_stack.rotate(DEG_TO_RAD(r_square), 1, 0, 0);
+		mat_stack.rotate(DEG_TO_RAD(r_cube), 1, 1, 1);
 
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mat_stack.stack[mat_stack.top]);
-		glBindBuffer(GL_ARRAY_BUFFER, square_buf);
+		glBindBuffer(GL_ARRAY_BUFFER, cube_buf);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, square_color_buf);
+		glBindBuffer(GL_ARRAY_BUFFER, cube_color_buf);
 		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glDrawElements(GL_TRIANGLES, sizeof(cube_triangles), GL_UNSIGNED_SHORT, 0);
 		
 		mat_stack.pop();
 
@@ -157,10 +252,11 @@ int main(int argc, char** argv)
 	}
 
 	glDeleteVertexArrays(1, &vao);
-	glDeleteBuffers(1, &tri_buf);
-	glDeleteBuffers(1, &tri_color_buf);
-	glDeleteBuffers(1, &square_buf);
-	glDeleteBuffers(1, &square_color_buf);
+	glDeleteBuffers(1, &pyramid_buf);
+	glDeleteBuffers(1, &pyramid_color_buf);
+	glDeleteBuffers(1, &cube_buf);
+	glDeleteBuffers(1, &cube_color_buf);
+	glDeleteBuffers(1, &cube_tri_buf);
 	glDeleteProgram(program);
 
 	cleanup();
@@ -239,6 +335,7 @@ int handle_events()
 	}
 	return 0;
 }
+
 
 
 
