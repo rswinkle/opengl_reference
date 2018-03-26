@@ -1,5 +1,4 @@
-// Simple Color 
-// Fragment Shader
+// Uniform Color 
 // Robert Winkler
 #version 330 core
 

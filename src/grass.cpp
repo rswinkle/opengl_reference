@@ -103,7 +103,7 @@ int main(int argc, char** argv)
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-	GLuint prog = load_shader_file_pair("../media/shaders/grass.vp", "../media/shaders/simple_color.fp");
+	GLuint prog = load_shader_file_pair("../media/shaders/grass.vp", "../media/shaders/uniform_color.fp");
 
 
 

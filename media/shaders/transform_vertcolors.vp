@@ -1,0 +1,16 @@
+// Vertex Shader
+#version 330
+
+uniform mat4 mvp_mat;
+
+layout (location = 0) in vec4 v_vertex;
+layout (location = 1) in vec4 v_color;
+
+out vec4 vary_color;
+
+void main(void)
+{
+	vary_color = v_color;
+	gl_Position = mvp_mat * v_vertex;
+}
+

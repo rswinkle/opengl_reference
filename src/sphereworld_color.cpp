@@ -207,7 +207,7 @@ int main(int argc, char** argv)
 
 
 
-	GLuint basic_shader = load_shader_file_pair("../media/shaders/basic_transform.vp", "../media/shaders/simple_color.fp");
+	GLuint basic_shader = load_shader_file_pair("../media/shaders/basic_transform.vp", "../media/shaders/uniform_color.fp");
 
 	GLuint gouraud_shader = load_shader_file_pair("../media/shaders/gouraud_ads.vp", "../media/shaders/gouraud_ads.fp");
 

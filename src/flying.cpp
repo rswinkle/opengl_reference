@@ -109,7 +109,7 @@ int main(int argc, char** argv)
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-	GLuint prog = load_shader_file_pair("../media/shaders/basic_transform.vp", "../media/shaders/simple_color.fp");
+	GLuint prog = load_shader_file_pair("../media/shaders/basic_transform.vp", "../media/shaders/uniform_color.fp");
 
 
 	glUseProgram(prog);

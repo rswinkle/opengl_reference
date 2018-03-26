@@ -139,7 +139,7 @@ int main(int argc, char** argv)
 
 
 	int loc;
-	GLuint normal_prog = load_shader_file_pair("../media/shaders/basic_transform.vp", "../media/shaders/simple_color.fp");
+	GLuint normal_prog = load_shader_file_pair("../media/shaders/basic_transform.vp", "../media/shaders/uniform_color.fp");
 	glUseProgram(normal_prog);
 
 	vec4 Red(1.0, 0.0, 0.0, 1.0);
