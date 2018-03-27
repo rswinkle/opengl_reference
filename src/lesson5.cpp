@@ -1,5 +1,6 @@
 #include <gltools.h>
 #include <rsw_math.h>
+#include <rsw_matstack.h>
 
 
 #include <SDL2/SDL.h>
@@ -26,14 +27,7 @@ int handle_events();
 
 
 int polygon_mode;
-int cur_tex;
-GLuint textures[3];
 
-float z;
-mat4 proj_mat;
-mat4 vp_mat;
-
-int mvp_loc;
 
 int main(int argc, char** argv)
 {
@@ -42,24 +36,13 @@ int main(int argc, char** argv)
 	polygon_mode = 2;
 
 
-	glGenTextures(3, textures);
-	glBindTexture(GL_TEXTURE_2D, textures[0]);
-	if (!load_texture2D("../media/textures/crate.gif", GL_NEAREST, GL_NEAREST, GL_MIRRORED_REPEAT, GL_FALSE)) {
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	if (!load_texture2D("../media/textures/nehe.gif", GL_NEAREST, GL_NEAREST, GL_MIRRORED_REPEAT, GL_TRUE)) {
 		printf("failed to load texture\n");
 		return 0;
 	}
-	glBindTexture(GL_TEXTURE_2D, textures[1]);
-	if (!load_texture2D("../media/textures/crate.gif", GL_LINEAR, GL_LINEAR, GL_MIRRORED_REPEAT, GL_FALSE)) {
-		printf("failed to load texture\n");
-		return 0;
-	}
-	glBindTexture(GL_TEXTURE_2D, textures[2]);
-	if (!load_texture2D("../media/textures/crate.gif", GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, GL_MIRRORED_REPEAT, GL_FALSE)) {
-		printf("failed to load texture\n");
-		return 0;
-	}
-
-	glBindTexture(GL_TEXTURE_2D, textures[0]);
 
 	float vertices[] = {
 		// Front face
@@ -171,26 +154,29 @@ int main(int argc, char** argv)
 	glUseProgram(program);
 
 
-	rsw::make_perspective_matrix(proj_mat, DEG_TO_RAD(45), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
+	matrix_stack mat_stack;
+	rsw::make_perspective_matrix(mat_stack.stack[mat_stack.top], DEG_TO_RAD(45), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
 
-	z = -5;
-	vp_mat = proj_mat * rsw::translation_mat4(0, 0, z);
+	mat_stack.translate(0, 0, -5);
 
-	mat4 mvp_mat;
-	mat4 rot_mat(1);
+	int mvp_loc = glGetUniformLocation(program, "mvp_mat");
 
-	mvp_loc = glGetUniformLocation(program, "mvp_mat");
 	int tex_loc = glGetUniformLocation(program, "color_map");
 	glUniform1i(tex_loc, 0);
 
+	float x_rot = 0, y_rot = 0, z_rot = 0;
 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 
+	float elapsed;
+	unsigned int last_time = SDL_GetTicks();
 	unsigned int old_time = 0, new_time=0, counter = 0;
 	while (1) {
 		if (handle_events())
 			break;
+
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 		counter++;
 		new_time = SDL_GetTicks();
@@ -199,16 +185,26 @@ int main(int argc, char** argv)
 			old_time = new_time;
 			counter = 0;
 		}
+		elapsed = new_time - last_time;
+		last_time = new_time;
 
-		rsw::load_rotation_mat4(rot_mat, vec3(0, 1, 0), 0.5f*new_time/1000.0f);
+		mat_stack.push();
 
-		mvp_mat = vp_mat * rot_mat;
-		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mvp_mat);
+		x_rot += 90 * (elapsed / 1000.0f);
+		y_rot += 90 * (elapsed / 1000.0f);
+		z_rot += 90 * (elapsed / 1000.0f);
+
 		
-		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		mat_stack.rotate(DEG_TO_RAD(x_rot), 1, 0, 0);
+		mat_stack.rotate(DEG_TO_RAD(y_rot), 0, 1, 0);
+		mat_stack.rotate(DEG_TO_RAD(z_rot), 0, 0, 1);
+
+		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mat_stack.stack[mat_stack.top]);
 
 		glBindVertexArray(vao);
 		glDrawElements(GL_TRIANGLES, sizeof(triangles), GL_UNSIGNED_INT, 0);
+
+		mat_stack.pop();
 
 
 		SDL_GL_SwapWindow(window);
@@ -291,38 +287,12 @@ int handle_events()
 					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 				else
 					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			} else if (sc == SDL_SCANCODE_F) {
-				
-				cur_tex = (cur_tex + 1) % 3;
-				if (cur_tex == 0) {
-					puts("GL_NEAREST\n");
-				} else if (cur_tex == 1 ) {
-					puts("GL_LINEAR\n");
-				} else {
-					puts("GL_LINEAR_MIPMAP_NEAREST");
-				}
-				glBindTexture(GL_TEXTURE_2D, textures[cur_tex]);
-
-			// if I decide to let the user control rotation
-			} else if (sc == SDL_SCANCODE_LEFT) {
-
-			} else if (sc == SDL_SCANCODE_RIGHT) {
-
-			} else if (sc == SDL_SCANCODE_UP) {
-
-			} else if (sc == SDL_SCANCODE_DOWN) {
-
-			} else if (sc == SDL_SCANCODE_EQUALS) {
-				z += 0.05;
-				vp_mat = proj_mat * rsw::translation_mat4(0, 0, z);
-			} else if (sc == SDL_SCANCODE_MINUS) {
-				z -= 0.05;
-				vp_mat = proj_mat * rsw::translation_mat4(0, 0, z);
 			}
 		}
 	}
 	return 0;
 }
+
 
 
 

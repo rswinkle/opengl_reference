@@ -206,7 +206,8 @@ int main(int argc, char** argv)
 	mat4 rot_mat(1);
 
 	mvp_loc = glGetUniformLocation(program, "mvp_mat");
-
+	int tex_loc = glGetUniformLocation(program, "color_map");
+	glUniform1i(tex_loc, 0);
 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
