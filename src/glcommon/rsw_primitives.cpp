@@ -706,5 +706,46 @@ void make_dodecahedron(vector<vec3>& verts, vector<ivec3>& tris)
 
 void make_icosahedron(vector<vec3>& verts, vector<ivec3>& tris)
 {
+	verts.push_back(vec3(0, 1, phi));
+	verts.push_back(vec3(0, -1, phi));
+	verts.push_back(vec3(0, -1, -phi));
+	verts.push_back(vec3(0, 1, -phi));
 
+	verts.push_back(vec3(1, phi, 0));
+	verts.push_back(vec3(-1, phi, 0));
+	verts.push_back(vec3(-1, -phi, 0));
+	verts.push_back(vec3(1, -phi, 0));
+
+	verts.push_back(vec3(phi, 0, 1));
+	verts.push_back(vec3(phi, 0, -1));
+	verts.push_back(vec3(-phi, 0, -1));
+	verts.push_back(vec3(-phi, 0, 1));
+
+	// "top" centered at vertex 0
+	tris.push_back(ivec3(0, 11, 1));
+	tris.push_back(ivec3(0, 1, 8));
+	tris.push_back(ivec3(0, 8, 4));
+	tris.push_back(ivec3(0, 4, 5));
+	tris.push_back(ivec3(0, 5, 11));
+
+	// adjacent triangles to top
+	tris.push_back(ivec3(1, 11, 6));
+	tris.push_back(ivec3(1, 7, 8));
+	tris.push_back(ivec3(8, 9, 4));
+	tris.push_back(ivec3(5, 4, 3));
+	tris.push_back(ivec3(11, 5, 10));
+
+	//adjacent triangles to bottom
+	tris.push_back(ivec3(6, 7, 1));
+	tris.push_back(ivec3(7, 9, 8));
+	tris.push_back(ivec3(9, 3, 4));
+	tris.push_back(ivec3(3, 10, 5));
+	tris.push_back(ivec3(10, 6, 11));
+	
+	// "bottom" centered at v 2
+	tris.push_back(ivec3(2, 7, 6));
+	tris.push_back(ivec3(2, 9, 7));
+	tris.push_back(ivec3(2, 3, 9));
+	tris.push_back(ivec3(2, 10, 3));
+	tris.push_back(ivec3(2, 6, 10));
 }

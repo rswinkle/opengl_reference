@@ -72,7 +72,8 @@ int main(int argc, char** argv)
 	//make_tetrahedron(verts, tris);
 	//make_cube(verts, tris);
 	//make_octahedron(verts, tris);
-	make_dodecahedron(verts, tris);
+	//make_dodecahedron(verts, tris);
+	make_icosahedron(verts, tris);
 
 	vector<vec3> draw_verts;
 	expand_verts(draw_verts, verts, tris);

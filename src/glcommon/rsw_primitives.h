@@ -42,6 +42,7 @@ void make_tetrahedron(vector<vec3>& verts, vector<ivec3>& tris);
 void make_cube(vector<vec3>& verts, vector<ivec3>& tris);
 void make_octahedron(vector<vec3>& verts, vector<ivec3>& tris);
 void make_dodecahedron(vector<vec3>& verts, vector<ivec3>& tris);
+void make_icosahedron(vector<vec3>& verts, vector<ivec3>& tris);
 
 
 #endif
