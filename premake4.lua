@@ -172,6 +172,21 @@ solution "opengl_reference"
 		configuration { "gmake" }
 			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
+	project "testprimitives"
+		location "build"
+		kind "ConsoleApp"
+		language "C++"
+		files {
+			"src/testprimitives.cpp",
+			"src/glcommon/gltools.cpp",
+			"src/glcommon/rsw_math.cpp",
+			"src/glcommon/rsw_primitives.cpp",
+			"src/glcommon/rsw_halfedge.cpp"
+		}
+		targetdir "build"
+		
+		configuration { "gmake" }
+			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "grass"
 		location "build"

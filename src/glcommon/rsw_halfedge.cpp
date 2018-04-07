@@ -15,15 +15,28 @@ using namespace std;
 void compute_face_normals(vector<vec3>& verts, vector<ivec3>& t, vector<vec3>& normals)
 {
 	vec3 tmp, v1, v2;
-	for (int i=0; i<t.size(); ++i) {
-		v1 = verts[t[i].y] - verts[t[i].x];
-		v2 = verts[t[i].z] - verts[t[i].x];
-		tmp = rsw::cross(v1, v2);
+	if (t.size()) {
+		for (int i=0; i<t.size(); ++i) {
+			v1 = verts[t[i].y] - verts[t[i].x];
+			v2 = verts[t[i].z] - verts[t[i].x];
+			tmp = rsw::cross(v1, v2);
 
-		tmp = normalize(tmp);
-		normals.push_back(tmp);
-		normals.push_back(tmp);
-		normals.push_back(tmp);
+			tmp = normalize(tmp);
+			normals.push_back(tmp);
+			normals.push_back(tmp);
+			normals.push_back(tmp);
+		}
+	} else {
+		for (int i=0; i<verts.size(); i+=3) {
+			v1 = verts[i+1] - verts[i];
+			v2 = verts[i+2] - verts[i];
+			tmp = rsw::cross(v1, v2);
+
+			tmp = normalize(tmp);
+			normals.push_back(tmp);
+			normals.push_back(tmp);
+			normals.push_back(tmp);
+		}
 	}
 }
 

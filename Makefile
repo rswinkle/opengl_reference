@@ -6,7 +6,7 @@ ifndef config
 endif
 export config
 
-PROJECTS := ex1 ex2 lesson1 lesson2 lesson3 lesson4 lesson5 lesson6 lesson7 texturing modelviewer grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites glm_sphereworld_color glm_grass glm_flying left_handed gears
+PROJECTS := ex1 ex2 lesson1 lesson2 lesson3 lesson4 lesson5 lesson6 lesson7 texturing modelviewer testprimitives grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites glm_sphereworld_color glm_grass glm_flying left_handed gears
 
 .PHONY: all clean help $(PROJECTS)
 
@@ -55,6 +55,10 @@ texturing:
 modelviewer: 
 	@echo "==== Building modelviewer ($(config)) ===="
 	@${MAKE} --no-print-directory -C build -f modelviewer.make
+
+testprimitives: 
+	@echo "==== Building testprimitives ($(config)) ===="
+	@${MAKE} --no-print-directory -C build -f testprimitives.make
 
 grass: 
 	@echo "==== Building grass ($(config)) ===="
@@ -112,6 +116,7 @@ clean:
 	@${MAKE} --no-print-directory -C build -f lesson7.make clean
 	@${MAKE} --no-print-directory -C build -f texturing.make clean
 	@${MAKE} --no-print-directory -C build -f modelviewer.make clean
+	@${MAKE} --no-print-directory -C build -f testprimitives.make clean
 	@${MAKE} --no-print-directory -C build -f grass.make clean
 	@${MAKE} --no-print-directory -C build -f sphereworld_color.make clean
 	@${MAKE} --no-print-directory -C build -f flying.make clean
@@ -145,6 +150,7 @@ help:
 	@echo "   lesson7"
 	@echo "   texturing"
 	@echo "   modelviewer"
+	@echo "   testprimitives"
 	@echo "   grass"
 	@echo "   sphereworld_color"
 	@echo "   flying"

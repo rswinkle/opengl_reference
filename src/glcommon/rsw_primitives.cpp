@@ -434,24 +434,277 @@ void generate_cone(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, 
 
 void expand_verts(vector<vec3>& draw_verts, vector<vec3>& verts, vector<ivec3>& triangles)
 {
-	for (int i=0; i<triangles.size(); ++i) {
-		draw_verts.push_back(verts[triangles[i].x]);
-		draw_verts.push_back(verts[triangles[i].y]);
-		draw_verts.push_back(verts[triangles[i].z]);
+	if (!triangles.empty()) {
+		for (int i=0; i<triangles.size(); ++i) {
+			draw_verts.push_back(verts[triangles[i].x]);
+			draw_verts.push_back(verts[triangles[i].y]);
+			draw_verts.push_back(verts[triangles[i].z]);
+		}
+	} else {
+		draw_verts.assign(verts.begin(), verts.end());
 	}
 }
 
 
 void expand_tex(vector<vec2>& draw_tex, vector<vec2>& tex, vector<ivec3>& triangles)
 {
-	for (int i=0; i<triangles.size(); ++i) {
-		draw_tex.push_back(tex[triangles[i].x]);
-		draw_tex.push_back(tex[triangles[i].y]);
-		draw_tex.push_back(tex[triangles[i].z]);
+	if (!triangles.empty()) {
+		for (int i=0; i<triangles.size(); ++i) {
+			draw_tex.push_back(tex[triangles[i].x]);
+			draw_tex.push_back(tex[triangles[i].y]);
+			draw_tex.push_back(tex[triangles[i].z]);
+		}
+	} else {
+		draw_tex.assign(tex.begin(), tex.end());
 	}
+}
+
+
+// platonic solids, just verts and triangles
+
+void make_tetrahedron(vector<vec3>& verts, vector<ivec3>& tris)
+{
+	verts.push_back(vec3(1, 1, 1));
+	verts.push_back(vec3(1, -1, -1));
+	verts.push_back(vec3(-1, 1, -1));
+	verts.push_back(vec3(-1, -1, 1));
+
+	tris.push_back(ivec3(0, 1, 2));
+	tris.push_back(ivec3(0, 2, 3));
+	tris.push_back(ivec3(0, 3, 1));
+	tris.push_back(ivec3(1, 3, 2));
+
+	/*
+	// other orientation
+	verts.push_back(vec3(-1, 1, 1));
+	verts.push_back(vec3(1, -1, 1));
+	verts.push_back(vec3(1, 1, -1));
+	verts.push_back(vec3(-1, -1, -1));
+
+	tris.push_back(ivec3(0, 1, 2));
+	tris.push_back(ivec3(0, 2, 3));
+	tris.push_back(ivec3(0, 3, 1));
+	tris.push_back(ivec3(1, 2, 3));
+
+	*/
 }
 
 
 
 
 
+void make_cube(vector<vec3>& verts, vector<ivec3>& tris)
+{
+	verts.push_back(vec3(-1, -1, -1));
+	verts.push_back(vec3(1, -1, -1));
+	verts.push_back(vec3(-1, 1, -1));
+	verts.push_back(vec3(1, 1, -1));
+
+	verts.push_back(vec3(-1, -1, 1));
+	verts.push_back(vec3(1, -1, 1));
+	verts.push_back(vec3(-1, 1, 1));
+	verts.push_back(vec3(1, 1, 1));
+
+	//back face
+	tris.push_back(ivec3(0, 2, 3));
+	//tex.push_back(vec2(1, 1));
+	//tex.push_back(vec2(1, 0));
+	//tex.push_back(vec2(0, 0));
+
+	tris.push_back(ivec3(0, 3, 1));
+	//tex.push_back(vec2(1, 1));
+	//tex.push_back(vec2(0, 0));
+	//tex.push_back(vec2(0, 1));
+
+	//left face
+	tris.push_back(ivec3(0, 6, 2));
+	//tex.push_back(vec2(0, 1));
+	//tex.push_back(vec2(1, 0));
+	//tex.push_back(vec2(0, 0));
+
+	tris.push_back(ivec3(0, 4, 6));
+	//tex.push_back(vec2(0, 1));
+	//tex.push_back(vec2(1, 1));
+	//tex.push_back(vec2(1, 0));
+
+
+	//bottom face
+	tris.push_back(ivec3(0, 1, 5));
+	//tex.push_back(vec2(0, 1));
+	//tex.push_back(vec2(1, 1));
+	//tex.push_back(vec2(1, 0));
+
+	tris.push_back(ivec3(0, 5, 4));
+	//tex.push_back(vec2(0, 1));
+	//tex.push_back(vec2(1, 0));
+	//tex.push_back(vec2(0, 0));
+
+
+	//top face
+	tris.push_back(ivec3(7, 3, 2));
+	//tex.push_back(vec2(1, 1));
+	//tex.push_back(vec2(1, 0));
+	//tex.push_back(vec2(0, 0));
+
+	tris.push_back(ivec3(7, 2, 6));
+	//tex.push_back(vec2(1, 1));
+	//tex.push_back(vec2(0, 0));
+	//tex.push_back(vec2(0, 1));
+
+
+	//right face
+	tris.push_back(ivec3(7, 1, 3));
+	//tex.push_back(vec2(0, 0));
+	//tex.push_back(vec2(1, 1));
+	//tex.push_back(vec2(1, 0));
+
+	tris.push_back(ivec3(7, 5, 1));
+	//tex.push_back(vec2(0, 0));
+	//tex.push_back(vec2(0, 1));
+	//tex.push_back(vec2(1, 1));
+
+
+	//front face
+	tris.push_back(ivec3(7, 6, 4));
+	//tex.push_back(vec2(1, 0));
+	//tex.push_back(vec2(0, 0));
+	//tex.push_back(vec2(0, 1));
+
+	tris.push_back(ivec3(7, 4, 5));
+	//tex.push_back(vec2(1, 0));
+	//tex.push_back(vec2(0, 1));
+	//tex.push_back(vec2(1, 1));
+}
+
+void make_octahedron(vector<vec3>& verts, vector<ivec3>& tris)
+{
+	verts.push_back(vec3(1, 0, 0));
+	verts.push_back(vec3(0, 0, -1));
+	verts.push_back(vec3(-1, 0, 0));
+	verts.push_back(vec3(0, 0, 1));
+	verts.push_back(vec3(0, 1, 0));
+	verts.push_back(vec3(0, -1, 0));
+
+	tris.push_back(ivec3(0, 1, 4));
+	tris.push_back(ivec3(1, 2, 4));
+	tris.push_back(ivec3(2, 3, 4));
+	tris.push_back(ivec3(3, 0, 4));
+
+	tris.push_back(ivec3(1, 0, 5));
+	tris.push_back(ivec3(2, 1, 5));
+	tris.push_back(ivec3(3, 2, 5));
+	tris.push_back(ivec3(0, 3, 5));
+}
+
+
+#define phi 1.618
+void make_dodecahedron(vector<vec3>& verts, vector<ivec3>& tris)
+{
+	verts.push_back(vec3(1, 1, 1));
+	verts.push_back(vec3(1/phi, phi, 0));
+	verts.push_back(vec3(-1, 1, 1));
+	verts.push_back(vec3(0, 1/phi, phi));
+	verts.push_back(vec3(-1/phi, phi, 0));
+	verts.push_back(vec3(1, 1, 1));
+	verts.push_back(vec3(phi, 0, 1/phi));
+	verts.push_back(vec3(1, 1, -1));
+	verts.push_back(vec3(1/phi, phi, 0));
+	verts.push_back(vec3(phi, 0, -1/phi));
+
+	verts.push_back(vec3(1, 1, 1));
+	verts.push_back(vec3(0, 1/phi, phi));
+	verts.push_back(vec3(1, -1, 1));
+	verts.push_back(vec3(phi, 0, 1/phi));
+	verts.push_back(vec3(0, -1/phi, phi));
+	verts.push_back(vec3(1/phi, phi, 0));
+	verts.push_back(vec3(1, 1, -1));
+	verts.push_back(vec3(-1, 1, -1));
+	verts.push_back(vec3(-1/phi, phi, 0));
+	verts.push_back(vec3(0, 1/phi, -phi));
+
+	verts.push_back(vec3(phi, 0, 1/phi));
+	verts.push_back(vec3(1, -1, 1));
+	verts.push_back(vec3(1, -1, -1));
+	verts.push_back(vec3(phi, 0, -1/phi));
+	verts.push_back(vec3(1/phi, -phi, 0));
+	verts.push_back(vec3(0, 1/phi, phi));
+	verts.push_back(vec3(-1, 1, 1));
+	verts.push_back(vec3(-1, -1, 1));
+	verts.push_back(vec3(0, -1/phi, phi));
+	verts.push_back(vec3(-phi, 0, 1/phi));
+
+	verts.push_back(vec3(-1/phi, phi, 0));
+	verts.push_back(vec3(-1, 1, -1));
+	verts.push_back(vec3(-phi, 0, 1/phi));
+	verts.push_back(vec3(-1, 1, 1));
+	verts.push_back(vec3(-phi, 0, -1/phi));
+	verts.push_back(vec3(-1, -1, 1));
+	verts.push_back(vec3(-1/phi, -phi, 0));
+	verts.push_back(vec3(1, -1, 1));
+	verts.push_back(vec3(0, -1/phi, phi));
+	verts.push_back(vec3(1/phi, -phi, 0));
+
+	verts.push_back(vec3(1, -1, -1));
+	verts.push_back(vec3(0, -1/phi, -phi));
+	verts.push_back(vec3(1, 1, -1));
+	verts.push_back(vec3(phi, 0, -1/phi));
+	verts.push_back(vec3(0, 1/phi, -phi));
+	verts.push_back(vec3(-1, -1, -1));
+	verts.push_back(vec3(-phi, 0, -1/phi));
+	verts.push_back(vec3(0, 1/phi, -phi));
+	verts.push_back(vec3(0, -1/phi, -phi));
+	verts.push_back(vec3(-1, 1, -1));
+
+	verts.push_back(vec3(-1, -1, -1));
+	verts.push_back(vec3(-1/phi, -phi, 0));
+	verts.push_back(vec3(-phi, 0, 1/phi));
+	verts.push_back(vec3(-phi, 0, -1/phi));
+	verts.push_back(vec3(-1, -1, 1));
+	verts.push_back(vec3(-1, -1, -1));
+	verts.push_back(vec3(0, -1/phi, -phi));
+	verts.push_back(vec3(1/phi, -phi, 0));
+	verts.push_back(vec3(-1/phi, -phi, 0));
+	verts.push_back(vec3(1, -1, -1));
+
+	tris.push_back(ivec3(0, 1, 2));
+	tris.push_back(ivec3(2, 3, 0));
+	tris.push_back(ivec3(1, 4, 2));
+	tris.push_back(ivec3(5, 6, 7));
+	tris.push_back(ivec3(7, 8, 5));
+	tris.push_back(ivec3(6, 9, 7));
+	tris.push_back(ivec3(10, 11, 12));
+	tris.push_back(ivec3(12, 13, 10));
+	tris.push_back(ivec3(11, 14, 12));
+	tris.push_back(ivec3(15, 16, 17));
+	tris.push_back(ivec3(17, 18, 15));
+	tris.push_back(ivec3(16, 19, 17));
+	tris.push_back(ivec3(20, 21, 22));
+	tris.push_back(ivec3(22, 23, 20));
+	tris.push_back(ivec3(21, 24, 22));
+	tris.push_back(ivec3(25, 26, 27));
+	tris.push_back(ivec3(27, 28, 25));
+	tris.push_back(ivec3(26, 29, 27));
+	tris.push_back(ivec3(30, 31, 32));
+	tris.push_back(ivec3(32, 33, 30));
+	tris.push_back(ivec3(31, 34, 32));
+	tris.push_back(ivec3(35, 36, 37));
+	tris.push_back(ivec3(37, 38, 35));
+	tris.push_back(ivec3(36, 39, 37));
+	tris.push_back(ivec3(40, 41, 42));
+	tris.push_back(ivec3(42, 43, 40));
+	tris.push_back(ivec3(41, 44, 42));
+	tris.push_back(ivec3(45, 46, 47));
+	tris.push_back(ivec3(47, 48, 45));
+	tris.push_back(ivec3(46, 49, 47));
+	tris.push_back(ivec3(50, 51, 52));
+	tris.push_back(ivec3(52, 53, 50));
+	tris.push_back(ivec3(51, 54, 52));
+	tris.push_back(ivec3(55, 56, 57));
+	tris.push_back(ivec3(57, 58, 55));
+	tris.push_back(ivec3(56, 59, 57));
+}
+
+void make_icosahedron(vector<vec3>& verts, vector<ivec3>& tris)
+{
+
+}
