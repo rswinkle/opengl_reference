@@ -749,3 +749,5 @@ void make_icosahedron(vector<vec3>& verts, vector<ivec3>& tris)
 	tris.push_back(ivec3(2, 10, 3));
 	tris.push_back(ivec3(2, 6, 10));
 }
+
+#undef phi
