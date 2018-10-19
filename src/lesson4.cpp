@@ -25,29 +25,25 @@ int handle_events();
 
 
 
-int polygon_mode;
-
 int main(int argc, char** argv)
 {
 	setup_context();
 
-	polygon_mode = 2;
-
 	float pyramid_verts[] = {
 		// Front face
- 	 	 0.0,  1.0,  0.0,
+		 0.0,  1.0,  0.0,
 		-1.0, -1.0,  1.0,
- 	 	 1.0, -1.0,  1.0,
+		 1.0, -1.0,  1.0,
 		// Right face
- 	 	 0.0,  1.0,  0.0,
- 	 	 1.0, -1.0,  1.0,
- 	 	 1.0, -1.0, -1.0,
+		 0.0,  1.0,  0.0,
+		 1.0, -1.0,  1.0,
+		 1.0, -1.0, -1.0,
 		// Back face
- 	 	 0.0,  1.0,  0.0,
- 	 	 1.0, -1.0, -1.0,
+		 0.0,  1.0,  0.0,
+		 1.0, -1.0, -1.0,
 		-1.0, -1.0, -1.0,
 		// Left face
- 	 	 0.0,  1.0,  0.0,
+		 0.0,  1.0,  0.0,
 		-1.0, -1.0, -1.0,
 		-1.0, -1.0,  1.0
 	};
@@ -74,29 +70,29 @@ int main(int argc, char** argv)
 	float cube_verts[] = {
 		// Front face
 		-1.0, -1.0,  1.0,
- 	 	 1.0, -1.0,  1.0,
- 	 	 1.0,  1.0,  1.0,
+		 1.0, -1.0,  1.0,
+		 1.0,  1.0,  1.0,
 		-1.0,  1.0,  1.0,
 		// Back face
 		-1.0, -1.0, -1.0,
 		-1.0,  1.0, -1.0,
- 	 	 1.0,  1.0, -1.0,
- 	 	 1.0, -1.0, -1.0,
+		 1.0,  1.0, -1.0,
+		 1.0, -1.0, -1.0,
 		// Top face
 		-1.0,  1.0, -1.0,
 		-1.0,  1.0,  1.0,
- 	 	 1.0,  1.0,  1.0,
- 	 	 1.0,  1.0, -1.0,
+		 1.0,  1.0,  1.0,
+		 1.0,  1.0, -1.0,
 		// Bottom face
 		-1.0, -1.0, -1.0,
- 	 	 1.0, -1.0, -1.0,
- 	 	 1.0, -1.0,  1.0,
+		 1.0, -1.0, -1.0,
+		 1.0, -1.0,  1.0,
 		-1.0, -1.0,  1.0,
 		// Right face
- 	 	 1.0, -1.0, -1.0,
- 	 	 1.0,  1.0, -1.0,
- 	 	 1.0,  1.0,  1.0,
- 	 	 1.0, -1.0,  1.0,
+		 1.0, -1.0, -1.0,
+		 1.0,  1.0, -1.0,
+		 1.0,  1.0,  1.0,
+		 1.0, -1.0,  1.0,
 		// Left face
 		-1.0, -1.0, -1.0,
 		-1.0, -1.0,  1.0,
@@ -322,14 +318,6 @@ int handle_events()
 
 			if (sc == SDL_SCANCODE_ESCAPE) {
 				return 1;
-			} else if (sc == SDL_SCANCODE_P) {
-				polygon_mode = (polygon_mode + 1) % 3;
-				if (polygon_mode == 0)
-					glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-				else if (polygon_mode == 1)
-					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				else
-					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 #include <gltools.h>
-#include <rsw_math.h>
+#include <rsw_matstack.h>
 
 
 #include <SDL2/SDL.h>
@@ -20,27 +20,20 @@ SDL_GLContext glcontext;
 
 void cleanup();
 void setup_context();
-int handle_events();
+int handle_events(unsigned int elapsed);
 
-
-
-
-int polygon_mode;
 int cur_tex;
 GLuint textures[3];
 
 float z;
-mat4 proj_mat;
-mat4 vp_mat;
+float x_rot, y_rot;
+float x_speed, y_speed;
 
 int mvp_loc;
 
 int main(int argc, char** argv)
 {
 	setup_context();
-
-	polygon_mode = 2;
-
 
 	glGenTextures(3, textures);
 	glBindTexture(GL_TEXTURE_2D, textures[0]);
@@ -170,39 +163,43 @@ int main(int argc, char** argv)
 	}
 	glUseProgram(program);
 
-
-	rsw::make_perspective_matrix(proj_mat, DEG_TO_RAD(45), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
+	matrix_stack mat_stack;
+	rsw::make_perspective_matrix(mat_stack.stack[mat_stack.top], DEG_TO_RAD(45), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
 
 	z = -5;
-	vp_mat = proj_mat * rsw::translation_mat4(0, 0, z);
 
 	mat4 mvp_mat;
-	mat4 rot_mat(1);
 
 	mvp_loc = glGetUniformLocation(program, "mvp_mat");
 	int tex_loc = glGetUniformLocation(program, "color_map");
 	glUniform1i(tex_loc, 0);
 
-
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 
-	unsigned int old_time = 0, new_time=0, counter = 0;
+	unsigned int old_time = 0, new_time=0, counter = 0, elapsed;
 	while (1) {
-		if (handle_events())
+		new_time = SDL_GetTicks();
+		elapsed = new_time - old_time;
+		if (handle_events(elapsed))
 			break;
 
+		old_time = new_time;
+
 		counter++;
-		new_time = SDL_GetTicks();
-		if (new_time - old_time > 3000) {
-			printf("%f FPS\n", counter*1000.f/(new_time-old_time));
+		if (elapsed > 3000) {
+			printf("%f FPS\n", counter*1000.f/(elapsed));
 			old_time = new_time;
 			counter = 0;
 		}
 
-		rsw::load_rotation_mat4(rot_mat, vec3(0, 1, 0), 0.5f*new_time/1000.0f);
+		mat_stack.push();
+		mat_stack.translate(0, 0, z);
 
-		mvp_mat = vp_mat * rot_mat;
+		mat_stack.rotate(DEG_TO_RAD(x_rot), 1, 0, 0);
+		mat_stack.rotate(DEG_TO_RAD(y_rot), 0, 1, 0);
+		mvp_mat = mat_stack.get_matrix();
+
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mvp_mat);
 		
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -212,6 +209,8 @@ int main(int argc, char** argv)
 
 
 		SDL_GL_SwapWindow(window);
+
+		mat_stack.pop();
 	}
 
 	glDeleteVertexArrays(1, &vao);
@@ -271,7 +270,7 @@ void cleanup()
 	SDL_Quit();
 }
 
-int handle_events()
+int handle_events(unsigned int elapsed)
 {
 	SDL_Event e;
 	int sc;
@@ -283,14 +282,6 @@ int handle_events()
 
 			if (sc == SDL_SCANCODE_ESCAPE) {
 				return 1;
-			} else if (sc == SDL_SCANCODE_P) {
-				polygon_mode = (polygon_mode + 1) % 3;
-				if (polygon_mode == 0)
-					glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-				else if (polygon_mode == 1)
-					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				else
-					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			} else if (sc == SDL_SCANCODE_F) {
 				
 				cur_tex = (cur_tex + 1) % 3;
@@ -303,24 +294,29 @@ int handle_events()
 				}
 				glBindTexture(GL_TEXTURE_2D, textures[cur_tex]);
 
-			// if I decide to let the user control rotation
 			} else if (sc == SDL_SCANCODE_LEFT) {
-
+				y_speed -= 1;
 			} else if (sc == SDL_SCANCODE_RIGHT) {
-
+				y_speed += 1;
 			} else if (sc == SDL_SCANCODE_UP) {
-
+				x_speed -= 1;
 			} else if (sc == SDL_SCANCODE_DOWN) {
-
-			} else if (sc == SDL_SCANCODE_EQUALS) {
-				z += 0.05;
-				vp_mat = proj_mat * rsw::translation_mat4(0, 0, z);
-			} else if (sc == SDL_SCANCODE_MINUS) {
-				z -= 0.05;
-				vp_mat = proj_mat * rsw::translation_mat4(0, 0, z);
+				x_speed += 1;
 			}
 		}
 	}
+
+	//SDL_PumpEvents() is called above in SDL_PollEvent()
+	const Uint8 *state = SDL_GetKeyboardState(NULL);
+
+	if (state[SDL_SCANCODE_EQUALS]) {
+		z += 0.05;
+	} else if (state[SDL_SCANCODE_MINUS]) {
+		z -= 0.05;
+	}
+
+	x_rot += x_speed*elapsed / 1000.0f;
+	y_rot += y_speed*elapsed / 1000.0f;
 	return 0;
 }
 

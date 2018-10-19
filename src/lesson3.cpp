@@ -23,20 +23,14 @@ void setup_context();
 int handle_events();
 
 
-
-
-int polygon_mode;
-
 int main(int argc, char** argv)
 {
 	setup_context();
 
-	polygon_mode = 2;
-
 	float triangle_verts[] = {
- 	 	 0.0,  1.0,  0.0,
+		 0.0,  1.0,  0.0,
 		-1.0, -1.0,  0.0,
- 	 	 1.0, -1.0,  0.0
+		 1.0, -1.0,  0.0
 	};
 
 	float triangle_colors[] = {
@@ -226,14 +220,6 @@ int handle_events()
 
 			if (sc == SDL_SCANCODE_ESCAPE) {
 				return 1;
-			} else if (sc == SDL_SCANCODE_P) {
-				polygon_mode = (polygon_mode + 1) % 3;
-				if (polygon_mode == 0)
-					glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-				else if (polygon_mode == 1)
-					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				else
-					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			}
 		}
 	}
