@@ -26,7 +26,7 @@ ifeq ($(config),debug)
   DEFINES   += -DDEBUG
   INCLUDES  += -I../inc -I../src/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type -Wimplicit
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += 
   LIBS      += -lSDL2 -lGLEW -lGL -lm
@@ -48,7 +48,7 @@ ifeq ($(config),release)
   DEFINES   += -DNDEBUG -DOptimize
   INCLUDES  += -I../inc -I../src/glcommon
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type -Wimplicit
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -s
   LIBS      += -lSDL2 -lGLEW -lGL -lm

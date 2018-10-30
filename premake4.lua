@@ -29,7 +29,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
 
 	project "ex2"
@@ -42,7 +42,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
 	project "lesson1"
 		location "build"
@@ -278,7 +278,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
 	project "glm_sphereworld_color"
 		location "build"
@@ -337,7 +337,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
 
 	project "gears"
@@ -350,4 +350,4 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
