@@ -12,11 +12,11 @@ solution "opengl_reference"
 
 	configuration "Debug"
 		defines { "DEBUG" }
-		flags { "Symbols" }
+		symbols "On"
 
 	configuration "Release"
 		defines { "NDEBUG" }
-		defines { "Optimize" }
+		optimize "On"
 	
 
 	project "ex1"
