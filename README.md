@@ -1,6 +1,8 @@
 opengl_reference
 ================
 
+[Download](https://github.com/rswinkle/opengl_reference)
+
 This is going to be a repository of modern (3.3/4.x) OpenGL programs.
 Most of these will be either exploring/demonstrating concepts or
 be framework/template programs for starting new projects.
