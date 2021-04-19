@@ -6,6 +6,22 @@
 #include <iostream>
 #include <stdio.h>
 
+#define NK_INCLUDE_FIXED_TYPES
+#define NK_INCLUDE_STANDARD_IO
+#define NK_INCLUDE_STANDARD_VARARGS
+#define NK_INCLUDE_DEFAULT_ALLOCATOR
+#define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
+#define NK_INCLUDE_FONT_BAKING
+#define NK_INCLUDE_DEFAULT_FONT
+#define NK_IMPLEMENTATION
+#define NK_SDL_GL3_IMPLEMENTATION
+#include "nuklear.h"
+#include "nuklear_sdl_gl3.h"
+
+#define MAX_VERTEX_MEMORY 512 * 1024
+#define MAX_ELEMENT_MEMORY 128 * 1024
+
+
 #define WIDTH 640
 #define HEIGHT 480
 
@@ -17,6 +33,7 @@ using rsw::mat4;
 
 SDL_Window* window;
 SDL_GLContext glcontext;
+struct nk_context* ctx;
 
 void cleanup();
 void setup_context();
@@ -203,9 +220,6 @@ int main(int argc, char** argv)
 	int tex_loc = glGetUniformLocation(program, "color_map");
 	glUniform1i(tex_loc, 0);
 
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
-
 	unsigned int old_time = 0, new_time=0, counter = 0, elapsed;
 	while (1) {
 		new_time = SDL_GetTicks();
@@ -222,6 +236,12 @@ int main(int argc, char** argv)
 			counter = 0;
 		}
 
+		// reset state every frame due to GUI
+		glEnable(GL_CULL_FACE);
+		glEnable(GL_DEPTH_TEST);
+		glUseProgram(program);
+		glBindTexture(GL_TEXTURE_2D, texture);
+
 		mat_stack.push();
 		mat_stack.translate(0, 0, z);
 
@@ -235,6 +255,26 @@ int main(int argc, char** argv)
 
 		glBindVertexArray(vao);
 		glDrawElements(GL_TRIANGLES, sizeof(triangles), GL_UNSIGNED_INT, 0);
+
+
+		if (nk_begin(ctx, "Demo", nk_rect(500, 340, 120, 120),
+		    NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
+		    NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
+		{
+			nk_layout_row_static(ctx, 30, 80, 1);
+			if (nk_button_label(ctx, "button"))
+				printf("button pressed!\n");
+		}
+		nk_end(ctx);
+
+
+		/* IMPORTANT: `nk_sdl_render` modifies some global OpenGL state
+		 * with blending, scissor, face culling, depth test and viewport and
+		 * defaults everything back into a default state.
+		 * Make sure to either a.) save and restore or b.) reset your own state after
+		 * rendering the UI. */
+		nk_sdl_render(NK_ANTI_ALIASING_ON, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY);
+
 
 
 		SDL_GL_SwapWindow(window);
@@ -290,6 +330,22 @@ void setup_context()
 	SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &profile);
 
 	printf("OpenGL version %d.%d with profile %d\n", major, minor, profile);
+
+    ctx = nk_sdl_init(window);
+    /* Load Fonts: if none of these are loaded a default font will be used  */
+    /* Load Cursor: if you uncomment cursor loading please hide the cursor */
+    {struct nk_font_atlas *atlas;
+    nk_sdl_font_stash_begin(&atlas);
+    /*struct nk_font *droid = nk_font_atlas_add_from_file(atlas, "../../../extra_font/DroidSans.ttf", 14, 0);*/
+    /*struct nk_font *roboto = nk_font_atlas_add_from_file(atlas, "../../../extra_font/Roboto-Regular.ttf", 16, 0);*/
+    /*struct nk_font *future = nk_font_atlas_add_from_file(atlas, "../../../extra_font/kenvector_future_thin.ttf", 13, 0);*/
+    /*struct nk_font *clean = nk_font_atlas_add_from_file(atlas, "../../../extra_font/ProggyClean.ttf", 12, 0);*/
+    /*struct nk_font *tiny = nk_font_atlas_add_from_file(atlas, "../../../extra_font/ProggyTiny.ttf", 10, 0);*/
+    /*struct nk_font *cousine = nk_font_atlas_add_from_file(atlas, "../../../extra_font/Cousine-Regular.ttf", 13, 0);*/
+    nk_sdl_font_stash_end();
+    /*nk_style_load_all_cursors(ctx, atlas->cursors);*/
+    /*nk_style_set_font(ctx, &roboto->handle);*/}
+
 }
 
 void cleanup()
@@ -304,6 +360,7 @@ int handle_events(unsigned int elapsed)
 {
 	SDL_Event e;
 	int sc;
+	nk_input_begin(ctx);
 	while (SDL_PollEvent(&e)) {
 		if (e.type == SDL_QUIT) {
 			return 1;
@@ -323,6 +380,7 @@ int handle_events(unsigned int elapsed)
 				x_speed += 1;
 			}
 		}
+		nk_sdl_handle_event(&e);
 	}
 
 	//SDL_PumpEvents() is called above in SDL_PollEvent()
