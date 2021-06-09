@@ -87,7 +87,7 @@ int main(int argc, char** argv)
 	}
 
 	vector<vec3> normals;
-	compute_normals(verts, tris, NULL, 3.14159f/2, normals);
+	compute_normals(verts, tris, NULL, RM_PI/2, normals);
 	//compute_face_normals(verts, tris, normals);
 
 	int v;
