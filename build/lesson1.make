@@ -19,8 +19,8 @@ ifeq ($(config),debug)
   INCLUDES += -I../inc -I../src/glcommon
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g -ansi -fno-strict-aliasing -Wunused-variable -Wreturn-type
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g -ansi -fno-strict-aliasing -Wunused-variable -Wreturn-type
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g -fno-strict-aliasing -Wunused-variable -Wreturn-type
+  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g -fno-strict-aliasing -Wunused-variable -Wreturn-type
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
   LIBS += -lSDL2 -lGLEW -lGL -lm
   LDDEPS +=
@@ -46,8 +46,8 @@ ifeq ($(config),release)
   INCLUDES += -I../inc -I../src/glcommon
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O2 -ansi -fno-strict-aliasing -Wunused-variable -Wreturn-type
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O2 -ansi -fno-strict-aliasing -Wunused-variable -Wreturn-type
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O2 -fno-strict-aliasing -Wunused-variable -Wreturn-type
+  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O2 -fno-strict-aliasing -Wunused-variable -Wreturn-type
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
   LIBS += -lSDL2 -lGLEW -lGL -lm
   LDDEPS +=

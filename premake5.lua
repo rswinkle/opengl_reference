@@ -56,7 +56,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "lesson2"
 		location "build"
@@ -70,7 +70,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "lesson3"
 		location "build"
@@ -84,7 +84,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "lesson4"
 		location "build"
@@ -98,7 +98,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "lesson5"
 		location "build"
@@ -112,7 +112,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "lesson6"
 		location "build"
@@ -126,7 +126,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "lesson7"
 		location "build"
@@ -140,7 +140,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "texturing"
 		location "build"
@@ -154,7 +154,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "modelviewer"
 		location "build"
@@ -170,7 +170,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "testprimitives"
 		location "build"
@@ -186,7 +186,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "grass"
 		location "build"
@@ -201,7 +201,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 
 	project "sphereworld_color"
@@ -219,7 +219,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "flying"
 		location "build"
@@ -234,7 +234,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	
 	project "glm_modelviewer"
@@ -250,7 +250,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 
 	project "glm_texturing"
@@ -265,7 +265,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "point_sprites"
 		location "build"
@@ -295,7 +295,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "glm_grass"
 		location "build"
@@ -309,7 +309,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 
 	project "glm_flying"
@@ -324,7 +324,7 @@ solution "opengl_reference"
 		targetdir "build"
 		
 		configuration { "gmake" }
-			buildoptions { "-ansi", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 
 	project "left_handed"
