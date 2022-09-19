@@ -68,165 +68,165 @@ all: $(PROJECTS)
 ex1:
 ifneq (,$(ex1_config))
 	@echo "==== Building ex1 ($(ex1_config)) ===="
-	@${MAKE} --no-print-directory -C build -f ex1.make config=$(ex1_config)
+	@${MAKE} --no-print-directory -C . -f ex1.make config=$(ex1_config)
 endif
 
 ex2:
 ifneq (,$(ex2_config))
 	@echo "==== Building ex2 ($(ex2_config)) ===="
-	@${MAKE} --no-print-directory -C build -f ex2.make config=$(ex2_config)
+	@${MAKE} --no-print-directory -C . -f ex2.make config=$(ex2_config)
 endif
 
 lesson1:
 ifneq (,$(lesson1_config))
 	@echo "==== Building lesson1 ($(lesson1_config)) ===="
-	@${MAKE} --no-print-directory -C build -f lesson1.make config=$(lesson1_config)
+	@${MAKE} --no-print-directory -C . -f lesson1.make config=$(lesson1_config)
 endif
 
 lesson2:
 ifneq (,$(lesson2_config))
 	@echo "==== Building lesson2 ($(lesson2_config)) ===="
-	@${MAKE} --no-print-directory -C build -f lesson2.make config=$(lesson2_config)
+	@${MAKE} --no-print-directory -C . -f lesson2.make config=$(lesson2_config)
 endif
 
 lesson3:
 ifneq (,$(lesson3_config))
 	@echo "==== Building lesson3 ($(lesson3_config)) ===="
-	@${MAKE} --no-print-directory -C build -f lesson3.make config=$(lesson3_config)
+	@${MAKE} --no-print-directory -C . -f lesson3.make config=$(lesson3_config)
 endif
 
 lesson4:
 ifneq (,$(lesson4_config))
 	@echo "==== Building lesson4 ($(lesson4_config)) ===="
-	@${MAKE} --no-print-directory -C build -f lesson4.make config=$(lesson4_config)
+	@${MAKE} --no-print-directory -C . -f lesson4.make config=$(lesson4_config)
 endif
 
 lesson5:
 ifneq (,$(lesson5_config))
 	@echo "==== Building lesson5 ($(lesson5_config)) ===="
-	@${MAKE} --no-print-directory -C build -f lesson5.make config=$(lesson5_config)
+	@${MAKE} --no-print-directory -C . -f lesson5.make config=$(lesson5_config)
 endif
 
 lesson6:
 ifneq (,$(lesson6_config))
 	@echo "==== Building lesson6 ($(lesson6_config)) ===="
-	@${MAKE} --no-print-directory -C build -f lesson6.make config=$(lesson6_config)
+	@${MAKE} --no-print-directory -C . -f lesson6.make config=$(lesson6_config)
 endif
 
 lesson7:
 ifneq (,$(lesson7_config))
 	@echo "==== Building lesson7 ($(lesson7_config)) ===="
-	@${MAKE} --no-print-directory -C build -f lesson7.make config=$(lesson7_config)
+	@${MAKE} --no-print-directory -C . -f lesson7.make config=$(lesson7_config)
 endif
 
 texturing:
 ifneq (,$(texturing_config))
 	@echo "==== Building texturing ($(texturing_config)) ===="
-	@${MAKE} --no-print-directory -C build -f texturing.make config=$(texturing_config)
+	@${MAKE} --no-print-directory -C . -f texturing.make config=$(texturing_config)
 endif
 
 modelviewer:
 ifneq (,$(modelviewer_config))
 	@echo "==== Building modelviewer ($(modelviewer_config)) ===="
-	@${MAKE} --no-print-directory -C build -f modelviewer.make config=$(modelviewer_config)
+	@${MAKE} --no-print-directory -C . -f modelviewer.make config=$(modelviewer_config)
 endif
 
 testprimitives:
 ifneq (,$(testprimitives_config))
 	@echo "==== Building testprimitives ($(testprimitives_config)) ===="
-	@${MAKE} --no-print-directory -C build -f testprimitives.make config=$(testprimitives_config)
+	@${MAKE} --no-print-directory -C . -f testprimitives.make config=$(testprimitives_config)
 endif
 
 grass:
 ifneq (,$(grass_config))
 	@echo "==== Building grass ($(grass_config)) ===="
-	@${MAKE} --no-print-directory -C build -f grass.make config=$(grass_config)
+	@${MAKE} --no-print-directory -C . -f grass.make config=$(grass_config)
 endif
 
 sphereworld_color:
 ifneq (,$(sphereworld_color_config))
 	@echo "==== Building sphereworld_color ($(sphereworld_color_config)) ===="
-	@${MAKE} --no-print-directory -C build -f sphereworld_color.make config=$(sphereworld_color_config)
+	@${MAKE} --no-print-directory -C . -f sphereworld_color.make config=$(sphereworld_color_config)
 endif
 
 flying:
 ifneq (,$(flying_config))
 	@echo "==== Building flying ($(flying_config)) ===="
-	@${MAKE} --no-print-directory -C build -f flying.make config=$(flying_config)
+	@${MAKE} --no-print-directory -C . -f flying.make config=$(flying_config)
 endif
 
 glm_modelviewer:
 ifneq (,$(glm_modelviewer_config))
 	@echo "==== Building glm_modelviewer ($(glm_modelviewer_config)) ===="
-	@${MAKE} --no-print-directory -C build -f glm_modelviewer.make config=$(glm_modelviewer_config)
+	@${MAKE} --no-print-directory -C . -f glm_modelviewer.make config=$(glm_modelviewer_config)
 endif
 
 glm_texturing:
 ifneq (,$(glm_texturing_config))
 	@echo "==== Building glm_texturing ($(glm_texturing_config)) ===="
-	@${MAKE} --no-print-directory -C build -f glm_texturing.make config=$(glm_texturing_config)
+	@${MAKE} --no-print-directory -C . -f glm_texturing.make config=$(glm_texturing_config)
 endif
 
 point_sprites:
 ifneq (,$(point_sprites_config))
 	@echo "==== Building point_sprites ($(point_sprites_config)) ===="
-	@${MAKE} --no-print-directory -C build -f point_sprites.make config=$(point_sprites_config)
+	@${MAKE} --no-print-directory -C . -f point_sprites.make config=$(point_sprites_config)
 endif
 
 glm_sphereworld_color:
 ifneq (,$(glm_sphereworld_color_config))
 	@echo "==== Building glm_sphereworld_color ($(glm_sphereworld_color_config)) ===="
-	@${MAKE} --no-print-directory -C build -f glm_sphereworld_color.make config=$(glm_sphereworld_color_config)
+	@${MAKE} --no-print-directory -C . -f glm_sphereworld_color.make config=$(glm_sphereworld_color_config)
 endif
 
 glm_grass:
 ifneq (,$(glm_grass_config))
 	@echo "==== Building glm_grass ($(glm_grass_config)) ===="
-	@${MAKE} --no-print-directory -C build -f glm_grass.make config=$(glm_grass_config)
+	@${MAKE} --no-print-directory -C . -f glm_grass.make config=$(glm_grass_config)
 endif
 
 glm_flying:
 ifneq (,$(glm_flying_config))
 	@echo "==== Building glm_flying ($(glm_flying_config)) ===="
-	@${MAKE} --no-print-directory -C build -f glm_flying.make config=$(glm_flying_config)
+	@${MAKE} --no-print-directory -C . -f glm_flying.make config=$(glm_flying_config)
 endif
 
 left_handed:
 ifneq (,$(left_handed_config))
 	@echo "==== Building left_handed ($(left_handed_config)) ===="
-	@${MAKE} --no-print-directory -C build -f left_handed.make config=$(left_handed_config)
+	@${MAKE} --no-print-directory -C . -f left_handed.make config=$(left_handed_config)
 endif
 
 gears:
 ifneq (,$(gears_config))
 	@echo "==== Building gears ($(gears_config)) ===="
-	@${MAKE} --no-print-directory -C build -f gears.make config=$(gears_config)
+	@${MAKE} --no-print-directory -C . -f gears.make config=$(gears_config)
 endif
 
 clean:
-	@${MAKE} --no-print-directory -C build -f ex1.make clean
-	@${MAKE} --no-print-directory -C build -f ex2.make clean
-	@${MAKE} --no-print-directory -C build -f lesson1.make clean
-	@${MAKE} --no-print-directory -C build -f lesson2.make clean
-	@${MAKE} --no-print-directory -C build -f lesson3.make clean
-	@${MAKE} --no-print-directory -C build -f lesson4.make clean
-	@${MAKE} --no-print-directory -C build -f lesson5.make clean
-	@${MAKE} --no-print-directory -C build -f lesson6.make clean
-	@${MAKE} --no-print-directory -C build -f lesson7.make clean
-	@${MAKE} --no-print-directory -C build -f texturing.make clean
-	@${MAKE} --no-print-directory -C build -f modelviewer.make clean
-	@${MAKE} --no-print-directory -C build -f testprimitives.make clean
-	@${MAKE} --no-print-directory -C build -f grass.make clean
-	@${MAKE} --no-print-directory -C build -f sphereworld_color.make clean
-	@${MAKE} --no-print-directory -C build -f flying.make clean
-	@${MAKE} --no-print-directory -C build -f glm_modelviewer.make clean
-	@${MAKE} --no-print-directory -C build -f glm_texturing.make clean
-	@${MAKE} --no-print-directory -C build -f point_sprites.make clean
-	@${MAKE} --no-print-directory -C build -f glm_sphereworld_color.make clean
-	@${MAKE} --no-print-directory -C build -f glm_grass.make clean
-	@${MAKE} --no-print-directory -C build -f glm_flying.make clean
-	@${MAKE} --no-print-directory -C build -f left_handed.make clean
-	@${MAKE} --no-print-directory -C build -f gears.make clean
+	@${MAKE} --no-print-directory -C . -f ex1.make clean
+	@${MAKE} --no-print-directory -C . -f ex2.make clean
+	@${MAKE} --no-print-directory -C . -f lesson1.make clean
+	@${MAKE} --no-print-directory -C . -f lesson2.make clean
+	@${MAKE} --no-print-directory -C . -f lesson3.make clean
+	@${MAKE} --no-print-directory -C . -f lesson4.make clean
+	@${MAKE} --no-print-directory -C . -f lesson5.make clean
+	@${MAKE} --no-print-directory -C . -f lesson6.make clean
+	@${MAKE} --no-print-directory -C . -f lesson7.make clean
+	@${MAKE} --no-print-directory -C . -f texturing.make clean
+	@${MAKE} --no-print-directory -C . -f modelviewer.make clean
+	@${MAKE} --no-print-directory -C . -f testprimitives.make clean
+	@${MAKE} --no-print-directory -C . -f grass.make clean
+	@${MAKE} --no-print-directory -C . -f sphereworld_color.make clean
+	@${MAKE} --no-print-directory -C . -f flying.make clean
+	@${MAKE} --no-print-directory -C . -f glm_modelviewer.make clean
+	@${MAKE} --no-print-directory -C . -f glm_texturing.make clean
+	@${MAKE} --no-print-directory -C . -f point_sprites.make clean
+	@${MAKE} --no-print-directory -C . -f glm_sphereworld_color.make clean
+	@${MAKE} --no-print-directory -C . -f glm_grass.make clean
+	@${MAKE} --no-print-directory -C . -f glm_flying.make clean
+	@${MAKE} --no-print-directory -C . -f left_handed.make clean
+	@${MAKE} --no-print-directory -C . -f gears.make clean
 
 help:
 	@echo "Usage: make [config=name] [target]"
