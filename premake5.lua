@@ -125,6 +125,15 @@ solution "opengl_reference"
 		configuration { "gmake" }
 			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
+	project "multidraw"
+		kind "ConsoleApp"
+		language "C++"
+		files {
+			"src/multidraw.cpp",
+			"src/glcommon/gltools.cpp",
+			"src/glcommon/rsw_math.cpp",
+		}
+
 	project "texturing"
 		kind "ConsoleApp"
 		language "C++"

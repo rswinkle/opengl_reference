@@ -18,6 +18,7 @@ ifeq ($(config),debug)
   lesson5_config = debug
   lesson6_config = debug
   lesson7_config = debug
+  multidraw_config = debug
   texturing_config = debug
   modelviewer_config = debug
   testprimitives_config = debug
@@ -43,6 +44,7 @@ ifeq ($(config),release)
   lesson5_config = release
   lesson6_config = release
   lesson7_config = release
+  multidraw_config = release
   texturing_config = release
   modelviewer_config = release
   testprimitives_config = release
@@ -59,7 +61,7 @@ ifeq ($(config),release)
   gears_config = release
 endif
 
-PROJECTS := ex1 ex2 lesson1 lesson2 lesson3 lesson4 lesson5 lesson6 lesson7 texturing modelviewer testprimitives grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites glm_sphereworld_color glm_grass glm_flying left_handed gears
+PROJECTS := ex1 ex2 lesson1 lesson2 lesson3 lesson4 lesson5 lesson6 lesson7 multidraw texturing modelviewer testprimitives grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites glm_sphereworld_color glm_grass glm_flying left_handed gears
 
 .PHONY: all clean help $(PROJECTS) 
 
@@ -117,6 +119,12 @@ lesson7:
 ifneq (,$(lesson7_config))
 	@echo "==== Building lesson7 ($(lesson7_config)) ===="
 	@${MAKE} --no-print-directory -C . -f lesson7.make config=$(lesson7_config)
+endif
+
+multidraw:
+ifneq (,$(multidraw_config))
+	@echo "==== Building multidraw ($(multidraw_config)) ===="
+	@${MAKE} --no-print-directory -C . -f multidraw.make config=$(multidraw_config)
 endif
 
 texturing:
@@ -213,6 +221,7 @@ clean:
 	@${MAKE} --no-print-directory -C . -f lesson5.make clean
 	@${MAKE} --no-print-directory -C . -f lesson6.make clean
 	@${MAKE} --no-print-directory -C . -f lesson7.make clean
+	@${MAKE} --no-print-directory -C . -f multidraw.make clean
 	@${MAKE} --no-print-directory -C . -f texturing.make clean
 	@${MAKE} --no-print-directory -C . -f modelviewer.make clean
 	@${MAKE} --no-print-directory -C . -f testprimitives.make clean
@@ -247,6 +256,7 @@ help:
 	@echo "   lesson5"
 	@echo "   lesson6"
 	@echo "   lesson7"
+	@echo "   multidraw"
 	@echo "   texturing"
 	@echo "   modelviewer"
 	@echo "   testprimitives"
