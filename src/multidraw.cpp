@@ -42,21 +42,26 @@ int main(int argc, char** argv)
 	vector<GLint> firsts;
 	vector<void*> first_elems;
 	vector<GLsizei> counts;
+
+	const int cols = 25;
+	const int rows = 19;
 	
-	for (int i=0; i<20; i++) {
-		firsts.push_back(tri_strips.size());
-		first_elems.push_back((void*)(tri_strips.size()*sizeof(GLuint)));
-		counts.push_back(4);
+	for (int j=0; j<rows; j++) {
+		for (int i=0; i<cols; i++) {
+			firsts.push_back(tri_strips.size());
+			first_elems.push_back((void*)(tri_strips.size()*sizeof(GLuint)));
+			counts.push_back(4);
 
-		tri_strips.push_back(vec3(i*(sq_dim+5),        0,      0));
-		tri_strips.push_back(vec3(i*(sq_dim+5),        sq_dim, 0));
-		tri_strips.push_back(vec3(i*(sq_dim+5)+sq_dim, 0,      0));
-		tri_strips.push_back(vec3(i*(sq_dim+5)+sq_dim, sq_dim, 0));
+			tri_strips.push_back(vec3(i*(sq_dim+5),        j*(sq_dim+5),        0));
+			tri_strips.push_back(vec3(i*(sq_dim+5),        j*(sq_dim+5)+sq_dim, 0));
+			tri_strips.push_back(vec3(i*(sq_dim+5)+sq_dim, j*(sq_dim+5),        0));
+			tri_strips.push_back(vec3(i*(sq_dim+5)+sq_dim, j*(sq_dim+5)+sq_dim, 0));
 
-		strip_elems.push_back(i*4);
-		strip_elems.push_back(i*4+1);
-		strip_elems.push_back(i*4+2);
-		strip_elems.push_back(i*4+3);
+			strip_elems.push_back((j*cols+i)*4);
+			strip_elems.push_back((j*cols+i)*4+1);
+			strip_elems.push_back((j*cols+i)*4+2);
+			strip_elems.push_back((j*cols+i)*4+3);
+		}
 	}
 
 	GLuint vao;
@@ -123,9 +128,9 @@ int main(int argc, char** argv)
 		//glDrawArrays(GL_TRIANGLE_STRIP, 0, 8);
 		
 		if (!use_elements) {
-			glMultiDrawArrays(GL_TRIANGLE_STRIP, &firsts[0], &counts[0], 10);
+			glMultiDrawArrays(GL_TRIANGLE_STRIP, &firsts[0], &counts[0], 100);
 		} else {
-			glMultiDrawElements(GL_TRIANGLE_STRIP, &counts[0], GL_UNSIGNED_INT, (const void* const*)(&first_elems[0]), 20);
+			glMultiDrawElements(GL_TRIANGLE_STRIP, &counts[0], GL_UNSIGNED_INT, (const void* const*)(&first_elems[0]), 475);
 		}
 		
 		mat_stack.pop();
@@ -211,6 +216,11 @@ int handle_events()
 					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			} else if (sc == SDL_SCANCODE_E) {
 				use_elements = !use_elements;
+				if (use_elements) {
+					puts("Using MultiDrawElements");
+				} else {
+					puts("Using MultiDrawArrays");
+				}
 			}
 		}
 	}
