@@ -740,7 +740,9 @@ struct ivec2
 		int pts[2];
 	};
 
-	ivec2(int x=0, int y=0) : x(x), y(y) {}
+	ivec2() : x(), y() {}
+	ivec2(int a) : x(a), y(a) {}
+	ivec2(int x, int y) : x(x), y(y) {}
 
 
 	ivec2& operator+=(ivec2 a) { x += a.x; y += a.y; return *this; }
@@ -772,7 +774,11 @@ struct ivec3
 		int pts[3];
 	};
 
-	ivec3(int x=0, int y=0, int z=0) : x(x), y(y), z(z) {}
+	ivec3() : x(), y(), z() {}
+	ivec3(int a) : x(a), y(a), z(a) {}
+	ivec3(int x, int y, int z) : x(x), y(y), z(z) {}
+	ivec3(ivec2 a, int z) : x(a.x), y(a.y), z(z) {}
+	ivec3(int x, ivec2 a) : x(x), y(a.x), z(a.y) {}
 
 
 	ivec3& operator+=(ivec3 a) { x += a.x; y += a.y; z += a.z; return *this; }
@@ -801,7 +807,13 @@ struct ivec4
 		int pts[4];
 	};
 
-	ivec4(int x=0, int y=0, int z=0, int w=1) : x(x), y(y), z(z), w(w) {}
+	ivec4() : x(), y(), z(), w() {}
+	ivec4(int a) : x(a), y(a), z(a), w(a) {}
+	ivec4(int x, int y, int z, int w) : x(x), y(y), z(z), w(w) {}
+	ivec4(ivec3 a, int w) : x(a.x), y(a.y), z(a.z), w(w) {}
+	ivec4(ivec2 a, int z, int w) : x(a.x), y(a.y), z(z), w(w) {}
+	ivec4(ivec2 a, ivec2 b) : x(a.x), y(a.y), z(b.x), w(b.y) {}
+	ivec4(int x, int y, ivec2 b) : x(x), y(y), z(b.x), w(b.y) {}
 
 
 	ivec4& operator+=(ivec4 a) { x += a.x; y += a.y; z += a.z; w += a.w; return *this; }
