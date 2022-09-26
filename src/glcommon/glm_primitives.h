@@ -38,4 +38,12 @@ void expand_verts(vector<vec3>& draw_verts, vector<vec3>& verts, vector<ivec3>& 
 void expand_tex(vector<vec2>& draw_tex, vector<vec2>& tex, vector<ivec3>& triangles);
 
 
+void make_tetrahedron(vector<vec3>& verts, vector<ivec3>& tris);
+void make_cube(vector<vec3>& verts, vector<ivec3>& tris);
+void make_octahedron(vector<vec3>& verts, vector<ivec3>& tris);
+void make_dodecahedron(vector<vec3>& verts, vector<ivec3>& tris);
+void make_icosahedron(vector<vec3>& verts, vector<ivec3>& tris);
+
+
 #endif
+

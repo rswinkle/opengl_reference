@@ -30,7 +30,6 @@ int handle_events();
 
 int load_model(const char* filename, vector<vec3>& verts, vector<ivec3>&tris);
 
-
 struct vert_attribs
 {
 	vec3 pos;
@@ -39,8 +38,40 @@ struct vert_attribs
 	vert_attribs(vec3 p, vec3 n) : pos(p), normal(n) {}
 };
 
+// lots of data duplication here but it's just a quick demo
+struct mesh
+{
+	vector<vec3> verts;
+	vector<ivec3> tris;
+	vector<vec2> tex;
+	vector<vec3> normals;
+
+	vector<vec3> draw_verts;
+
+	vector<vert_attribs> vert_data;
+	GLuint vao;
+	GLuint buffer;
+
+	vector<vec3> normal_lines;
+	GLuint normal_vao;
+	GLuint norm_buf;
+
+};
+
+enum {
+	SPHERE,
+	TETRA,
+	CUBE,
+	OCTA,
+	DODECA,
+	ICOSA,
+	NUM_SHAPES
+};
+
 int polygon_mode;
 int cur_prog;
+int cur_shape;
+bool show_normals;
 
 #define NUM_PROGRAMS 2
 int programs[NUM_PROGRAMS];
@@ -62,66 +93,64 @@ int main(int argc, char** argv)
 	polygon_mode = 2;
 	cur_prog = 0;
 
+	mesh shapes[NUM_SHAPES];
+
 	vector<vec3> verts;
 	vector<ivec3> tris;
 	vector<vec2> tex;
 	vector<vert_attribs> vert_data;
 	vec3 tmp;
 
-	//generate_sphere(verts, tris, tex, 5.0f, 14, 7);
-	//make_tetrahedron(verts, tris);
-	//make_cube(verts, tris);
-	//make_octahedron(verts, tris);
-	//make_dodecahedron(verts, tris);
-	make_icosahedron(verts, tris);
+	generate_sphere(shapes[SPHERE].verts, shapes[SPHERE].tris, shapes[SPHERE].tex, 2.0f, 30, 15);
+	make_tetrahedron(shapes[TETRA].verts, shapes[TETRA].tris);
+	make_cube(shapes[CUBE].verts, shapes[CUBE].tris);
+	make_octahedron(shapes[OCTA].verts, shapes[OCTA].tris);
+	make_dodecahedron(shapes[DODECA].verts, shapes[DODECA].tris);
+	make_icosahedron(shapes[ICOSA].verts, shapes[ICOSA].tris);
 
 	vector<vec3> draw_verts;
-	expand_verts(draw_verts, verts, tris);
+	for (int j=0; j<NUM_SHAPES; j++) {
+		mesh& s = shapes[j];
 
-	vector<vec3> normals;
-	compute_face_normals(verts, tris, normals);
+		expand_verts(s.draw_verts, s.verts, s.tris);
 
-	int v;
-	vector<vec3> normal_lines;
-	for (int i=0; i<draw_verts.size(); i+=3) {
-		vert_data.push_back(vert_attribs(draw_verts[i], normals[i]));
-		vert_data.push_back(vert_attribs(draw_verts[i+1], normals[i]));
-		vert_data.push_back(vert_attribs(draw_verts[i+2], normals[i]));
+		compute_face_normals(s.verts, s.tris, s.normals);
 
-		tmp = draw_verts[i] + draw_verts[i+1] + draw_verts[i+2];
-		tmp /= 3;
+		for (int i=0; i<s.draw_verts.size(); i+=3) {
+			s.vert_data.push_back(vert_attribs(s.draw_verts[i],   s.normals[i]));
+			s.vert_data.push_back(vert_attribs(s.draw_verts[i+1], s.normals[i]));
+			s.vert_data.push_back(vert_attribs(s.draw_verts[i+2], s.normals[i]));
 
-		normal_lines.push_back(tmp);
-		normal_lines.push_back(tmp + normals[i]*0.5f);
+			tmp = s.draw_verts[i] + s.draw_verts[i+1] + s.draw_verts[i+2];
+			tmp /= 3;
+
+			s.normal_lines.push_back(tmp);
+			s.normal_lines.push_back(tmp + s.normals[i]*0.5f);
+		}
+
+		glGenVertexArrays(1, &s.vao);
+		glBindVertexArray(s.vao);
+
+		glGenBuffers(1, &s.buffer);
+		glBindBuffer(GL_ARRAY_BUFFER, s.buffer);
+		glBufferData(GL_ARRAY_BUFFER, s.vert_data.size()*sizeof(vert_attribs), &s.vert_data[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vert_attribs), 0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vert_attribs), (void*)sizeof(vec3));
+
+		glGenVertexArrays(1, &s.normal_vao);
+		glBindVertexArray(s.normal_vao);
+
+		glGenBuffers(1, &s.norm_buf);
+		glBindBuffer(GL_ARRAY_BUFFER, s.norm_buf);
+		glBufferData(GL_ARRAY_BUFFER, s.normal_lines.size()*sizeof(vec3), &s.normal_lines[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+		glBindVertexArray(0);
 	}
-
-
-	GLuint vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	GLuint buffer;
-	glGenBuffers(1, &buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, vert_data.size()*sizeof(vert_attribs), &vert_data[0], GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vert_attribs), 0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vert_attribs), (void*)sizeof(vec3));
-
-
-	
-	GLuint normal_vao, norm_buf;
-	glGenVertexArrays(1, &normal_vao);
-	glBindVertexArray(normal_vao);
-	glGenBuffers(1, &norm_buf);
-	glBindBuffer(GL_ARRAY_BUFFER, norm_buf);
-	glBufferData(GL_ARRAY_BUFFER, normal_lines.size()*sizeof(vec3), &normal_lines[0], GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-
-	glBindVertexArray(0);
 
 
 	int loc;
@@ -181,9 +210,7 @@ int main(int argc, char** argv)
 			counter = 0;
 		}
 
-
 		glUseProgram(programs[cur_prog]);
-
 
 		rsw::load_rotation_mat4(rot_mat, vec3(0, 1, 0), 0.5f*new_time/1000.0f);
 
@@ -195,23 +222,28 @@ int main(int argc, char** argv)
 		
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, vert_data.size());
+		glBindVertexArray(shapes[cur_shape].vao);
+		glDrawArrays(GL_TRIANGLES, 0, shapes[cur_shape].vert_data.size());
 
-		/*
-		glUseProgram(normal_prog);
-		loc = glGetUniformLocation(normal_prog, "mvp_mat");
-		glUniformMatrix4fv(loc, 1, GL_FALSE, (float*)&mvp_mat);
+		if (show_normals) {
+			glUseProgram(normal_prog);
+			loc = glGetUniformLocation(normal_prog, "mvp_mat");
+			glUniformMatrix4fv(loc, 1, GL_FALSE, (float*)&mvp_mat);
 
-		glBindVertexArray(normal_vao);
-		glDrawArrays(GL_LINES, 0, normal_lines.size());
-		*/
+			glBindVertexArray(shapes[cur_shape].normal_vao);
+			glDrawArrays(GL_LINES, 0, shapes[cur_shape].normal_lines.size());
+		}
 
 		SDL_GL_SwapWindow(window);
 	}
 
-	glDeleteVertexArrays(1, &vao);
-	glDeleteBuffers(1, &buffer);
+	for (int i=0; i<NUM_SHAPES; i++) {
+		glDeleteVertexArrays(1, &shapes[i].vao);
+		glDeleteBuffers(1, &shapes[i].buffer);
+
+		glDeleteVertexArrays(1, &shapes[i].normal_vao);
+		glDeleteBuffers(1, &shapes[i].norm_buf);
+	}
 	glDeleteProgram(programs[cur_prog]);
 
 	cleanup();
@@ -231,7 +263,7 @@ void setup_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	window = SDL_CreateWindow("Ex 3", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Test Primitives", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
 		cleanup();
 		exit(0);
@@ -291,6 +323,15 @@ int handle_events()
 				glUseProgram(programs[cur_prog]);
 				mvp_loc = glGetUniformLocation(programs[cur_prog], "mvp_mat");
 				normal_loc = glGetUniformLocation(programs[cur_prog], "normal_mat");
+			} else if (sc == SDL_SCANCODE_RIGHT) {
+				cur_shape = (cur_shape + 1) % NUM_SHAPES;
+			} else if (sc == SDL_SCANCODE_LEFT) {
+				cur_shape--;
+				if (cur_shape < 0) {
+					cur_shape = NUM_SHAPES-1;
+				}
+			} else if (sc == SDL_SCANCODE_N) {
+				show_normals = !show_normals;
 			}
 		}
 	}

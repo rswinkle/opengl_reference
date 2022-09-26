@@ -119,7 +119,7 @@ void generate_cylinder(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& t
 	verts.push_back(vec3(0, 0, 0));
 
 	for (i = 0; i <= stacks; i++) {
-		cur_radius = i/stacks * top_radius + (1.0 - i/stacks) * radius;
+		cur_radius = i/(float)stacks * top_radius + (1.0 - i/(float)stacks) * radius;
 		for (j = 0; j < slices; j++) {
 			verts.push_back(vec3(cur_radius*cos(j*theta), cur_radius*sin(j*theta), i*stack_height));
 		}
@@ -347,7 +347,7 @@ void generate_torus(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex,
     double major_step = RM_2PI / major_slices;
     double minor_step = RM_2PI / minor_slices;
     int i, j;
-	
+
 	double a0, a1, b;
 	float x0, y0, x1, y1, c, r, z;
 
@@ -369,7 +369,7 @@ void generate_torus(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex,
 			verts.push_back(vec3(x0 * r, y0 * r, z));
 		}
 	}
-		
+
 	int s;
 	for (i=0; i<major_slices; ++i) {
 		s = i*minor_slices;
@@ -741,7 +741,7 @@ void make_icosahedron(vector<vec3>& verts, vector<ivec3>& tris)
 	tris.push_back(ivec3(9, 3, 4));
 	tris.push_back(ivec3(3, 10, 5));
 	tris.push_back(ivec3(10, 6, 11));
-	
+
 	// "bottom" centered at v 2
 	tris.push_back(ivec3(2, 7, 6));
 	tris.push_back(ivec3(2, 9, 7));
