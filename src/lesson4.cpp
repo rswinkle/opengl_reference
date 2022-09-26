@@ -212,7 +212,7 @@ int main(int argc, char** argv)
 
 		elapsed = new_time - last_time;
 		last_time = new_time;
-		
+
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 		r_pyramid += 90 * (elapsed / 1000.0f);
@@ -241,7 +241,7 @@ int main(int argc, char** argv)
 		glBindBuffer(GL_ARRAY_BUFFER, cube_color_buf);
 		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
 		glDrawElements(GL_TRIANGLES, sizeof(cube_triangles), GL_UNSIGNED_SHORT, 0);
-		
+
 		mat_stack.pop();
 
 		SDL_GL_SwapWindow(window);
@@ -279,7 +279,7 @@ void setup_context()
 	}
 
 	glcontext = SDL_GL_CreateContext(window);
-	
+
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {

@@ -194,7 +194,7 @@ int main(int argc, char** argv)
 		y_rot += 90 * (elapsed / 1000.0f);
 		z_rot += 90 * (elapsed / 1000.0f);
 
-		
+
 		mat_stack.rotate(DEG_TO_RAD(x_rot), 1, 0, 0);
 		mat_stack.rotate(DEG_TO_RAD(y_rot), 0, 1, 0);
 		mat_stack.rotate(DEG_TO_RAD(z_rot), 0, 0, 1);
@@ -240,7 +240,7 @@ void setup_context()
 	}
 
 	glcontext = SDL_GL_CreateContext(window);
-	
+
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {

@@ -124,7 +124,7 @@ int main(int argc, char** argv)
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vert_attribs), (void*)sizeof(vec3));
 
 
-	
+
 	GLuint normal_vao, norm_buf;
 	glGenVertexArrays(1, &normal_vao);
 	glBindVertexArray(normal_vao);
@@ -206,7 +206,7 @@ int main(int argc, char** argv)
 
 		mvp_mat = vp_mat * rot_mat;
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mvp_mat);
-		
+
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 		glBindVertexArray(vao);
@@ -245,14 +245,14 @@ void setup_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	window = SDL_CreateWindow("Ex 3", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Model Viewer", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
 		cleanup();
 		exit(0);
 	}
 
 	glcontext = SDL_GL_CreateContext(window);
-	
+
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
@@ -329,7 +329,7 @@ int load_model(const char* filename, vector<vec3>& verts, vector<ivec3>&tris)
 		return 0;
 
 	printf("%u vertices\n", num);
-	
+
 	verts.reserve(num);
 	for (int i=0; i<num; ++i) {
 		fscanf(file, " (%f, %f, %f)", &vec.x, &vec.y, &vec.z);
@@ -341,7 +341,7 @@ int load_model(const char* filename, vector<vec3>& verts, vector<ivec3>&tris)
 		return 0;
 
 	printf("%u triangles\n", num);
-	
+
 	tris.reserve(num);
 
 	for (int i=0; i<num; ++i) {

@@ -27,9 +27,6 @@ void setup_context();
 int handle_events();
 
 
-
-int load_model(const char* filename, vector<vec3>& verts, vector<ivec3>&tris);
-
 struct vert_attribs
 {
 	vec3 pos;
@@ -337,54 +334,6 @@ int handle_events()
 	}
 	return 0;
 }
-
-
-
-
-int load_model(const char* filename, vector<vec3>& verts, vector<ivec3>&tris)
-{
-	FILE* file = NULL;
-	unsigned int num = 0;
-	vec3 vec;
-	ivec3 ivec;
-
-	if (!(file = fopen(filename, "r")))
-		return 0;
-
-	fscanf(file, "%u", &num);
-	if (!num)
-		return 0;
-
-	printf("%u vertices\n", num);
-	
-	verts.reserve(num);
-	for (int i=0; i<num; ++i) {
-		fscanf(file, " (%f, %f, %f)", &vec.x, &vec.y, &vec.z);
-		verts.push_back(vec);
-	}
-
-	fscanf(file, "%u", &num);
-	if (!num)
-		return 0;
-
-	printf("%u triangles\n", num);
-	
-	tris.reserve(num);
-
-	for (int i=0; i<num; ++i) {
-		fscanf(file, " (%d, %d, %d)", &ivec.x, &ivec.y, &ivec.z);
-		tris.push_back(ivec);
-	}
-
-	fclose(file);
-
-	return 1;
-}
-
-
-
-
-
 
 
 

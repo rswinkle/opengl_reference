@@ -201,7 +201,7 @@ int main(int argc, char** argv)
 		mvp_mat = mat_stack.get_matrix();
 
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mvp_mat);
-		
+
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 		glBindVertexArray(vao);
@@ -243,7 +243,7 @@ void setup_context()
 	}
 
 	glcontext = SDL_GL_CreateContext(window);
-	
+
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
@@ -283,7 +283,6 @@ int handle_events(unsigned int elapsed)
 			if (sc == SDL_SCANCODE_ESCAPE) {
 				return 1;
 			} else if (sc == SDL_SCANCODE_F) {
-				
 				cur_tex = (cur_tex + 1) % 3;
 				if (cur_tex == 0) {
 					puts("GL_NEAREST\n");

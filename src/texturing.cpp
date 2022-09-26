@@ -99,7 +99,7 @@ int main(int argc, char** argv)
 	glUseProgram(program);
 	int loc = glGetUniformLocation(program, "color_map");
 	glUniform1i(loc, 0);
-	
+
 
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
@@ -137,7 +137,7 @@ int main(int argc, char** argv)
 		}
 
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mvp_mat);
-		
+
 		glClear(GL_COLOR_BUFFER_BIT);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -167,14 +167,14 @@ void setup_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	window = SDL_CreateWindow("Ex 4", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Texturing", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
 		cleanup();
 		exit(0);
 	}
 
 	glcontext = SDL_GL_CreateContext(window);
-	
+
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
@@ -209,7 +209,7 @@ int handle_events(unsigned int last_time, unsigned int cur_time, mat4& mvp_mat)
 		switch (e.type) {
 		case SDL_KEYDOWN:
 			sc = e.key.keysym.scancode;
-			
+
 			switch (sc) {
 			case SDL_SCANCODE_ESCAPE:
 				return 1;
@@ -256,7 +256,7 @@ int handle_events(unsigned int last_time, unsigned int cur_time, mat4& mvp_mat)
 #define MOVE_SPEED DEG_TO_RAD(30)
 
 	mat4 tmp(1);
-	
+
 	if (state[SDL_SCANCODE_LEFT]) {
 		rsw::load_rotation_mat4(tmp, vec3(0, 0, 1), time * MOVE_SPEED);
 	}

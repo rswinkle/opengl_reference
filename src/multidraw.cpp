@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 
 	const int cols = 25;
 	const int rows = 19;
-	
+
 	for (int j=0; j<rows; j++) {
 		for (int i=0; i<cols; i++) {
 			firsts.push_back(tri_strips.size());
@@ -115,7 +115,7 @@ int main(int argc, char** argv)
 			counter = 0;
 		}
 
-		
+
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 
@@ -126,13 +126,13 @@ int main(int argc, char** argv)
 		glBindBuffer(GL_ARRAY_BUFFER, square_buf);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		//glDrawArrays(GL_TRIANGLE_STRIP, 0, 8);
-		
+
 		if (!use_elements) {
 			glMultiDrawArrays(GL_TRIANGLE_STRIP, &firsts[0], &counts[0], 100);
 		} else {
 			glMultiDrawElements(GL_TRIANGLE_STRIP, &counts[0], GL_UNSIGNED_INT, (const void* const*)(&first_elems[0]), 475);
 		}
-		
+
 		mat_stack.pop();
 
 		SDL_GL_SwapWindow(window);
@@ -160,14 +160,14 @@ void setup_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	window = SDL_CreateWindow("Lesson 1", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Multidraw", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
 		cleanup();
 		exit(0);
 	}
 
 	glcontext = SDL_GL_CreateContext(window);
-	
+
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
