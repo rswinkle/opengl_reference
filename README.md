@@ -2,8 +2,9 @@ opengl_reference
 ================
 
 This is going to be a repository of modern (3.3/4.x) OpenGL programs.
-Most of these will be either exploring/demonstrating concepts or
-be framework/template programs for starting new projects.
+Most of these will be either exploring/demonstrating concepts, testing
+my own OpenGL helper libraries, or be framework/template programs for
+starting new projects.
 
 There are better repositories of modern OpenGL programs to
 use for learning because they're more complete/organized,
@@ -17,9 +18,9 @@ Download
 Get the source from [Github](https://github.com/rswinkle/opengl_reference).
 
 
-I'll try to maintain a table/list of programs here.  Maybe
+The table below lists only a handful of the programs in this repo.  Maybe
 I'll split them up by category (templates/frameworks, feature examples, demos, "games") later.
-Those listed use my own math library, rsw_math, but there are glm versions as well, ie glm_modelviewer.cpp.
+Those listed use my own math library, rsw_math, but there are often glm versions as well, ie glm_modelviewer.cpp.
 
 | Program | Description | Image |
 | --- | --- | --- |
