@@ -56,7 +56,11 @@ struct mesh
 };
 
 enum {
+	BOX,
+	CYLINDER,
+	PLANE,
 	SPHERE,
+	TORUS,
 	TETRA,
 	CUBE,
 	OCTA,
@@ -98,7 +102,12 @@ int main(int argc, char** argv)
 	vector<vert_attribs> vert_data;
 	vec3 tmp;
 
-	generate_sphere(shapes[SPHERE].verts, shapes[SPHERE].tris, shapes[SPHERE].tex, 2.0f, 30, 15);
+	make_box(shapes[BOX].verts, shapes[BOX].tris, shapes[BOX].tex, 2.0f, 2.0f, 2.0f, true, ivec3(4, 4, 4), vec3(0,0,0));
+	make_cylinder(shapes[CYLINDER].verts, shapes[CYLINDER].tris, shapes[CYLINDER].tex, 1, 2, 30, 15, 1);
+	make_plane(shapes[PLANE].verts, shapes[PLANE].tris, shapes[PLANE].tex, vec3(-2, -2, 0), vec3(0,1,0), vec3(1,0,0), 4, 4, false);
+	make_sphere(shapes[SPHERE].verts, shapes[SPHERE].tris, shapes[SPHERE].tex, 2.0f, 30, 15);
+	make_torus(shapes[TORUS].verts, shapes[TORUS].tris, shapes[TORUS].tex, 2.0f, 0.6f, 40, 20);
+
 	make_tetrahedron(shapes[TETRA].verts, shapes[TETRA].tris);
 	make_cube(shapes[CUBE].verts, shapes[CUBE].tris);
 	make_octahedron(shapes[OCTA].verts, shapes[OCTA].tris);

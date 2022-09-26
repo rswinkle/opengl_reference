@@ -7,7 +7,7 @@
 #define RM_2PI 6.28318530717958647692528676655900576
 
 
-void generate_box(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, float dimX, float dimY, float dimZ, bool plane, ivec3 seg, vec3 origin)
+void make_box(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, float dimX, float dimY, float dimZ, bool plane, ivec3 seg, vec3 origin)
 {
 	vec3 x_vec(dimX, 0, 0);
 	vec3 y_vec(0, dimY, 0);
@@ -97,14 +97,14 @@ void generate_box(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, f
 	} else {
 		float segx = seg.x, segy = seg.y, segz = seg.z;
 		//front and back
-		generate_plane(verts, tris, tex, origin+x_vec, y_vec/segy, (-x_vec)/segx, segy, segx, true);
-		generate_plane(verts, tris, tex, origin+z_vec, y_vec/segy, x_vec/segx, segy, segx, true);
+		make_plane(verts, tris, tex, origin+x_vec, y_vec/segy, (-x_vec)/segx, segy, segx, true);
+		make_plane(verts, tris, tex, origin+z_vec, y_vec/segy, x_vec/segx, segy, segx, true);
 		//left and right
-		generate_plane(verts, tris, tex, origin, y_vec/segy, z_vec/segz, segy, segz, true);
-		generate_plane(verts, tris, tex, origin+x_vec+z_vec, y_vec/segy, (-z_vec)/segz, segy, segz, true);
+		make_plane(verts, tris, tex, origin, y_vec/segy, z_vec/segz, segy, segz, true);
+		make_plane(verts, tris, tex, origin+x_vec+z_vec, y_vec/segy, (-z_vec)/segz, segy, segz, true);
 		//top and bottom
-		generate_plane(verts, tris, tex, origin, z_vec/segz, x_vec/segx, segz, segx, true);
-		generate_plane(verts, tris, tex, origin+y_vec+z_vec, (-z_vec)/segz, x_vec/segx, segz, segx, true);
+		make_plane(verts, tris, tex, origin, z_vec/segz, x_vec/segx, segz, segx, true);
+		make_plane(verts, tris, tex, origin+y_vec+z_vec, (-z_vec)/segz, x_vec/segx, segz, segx, true);
 
 	}
 }
@@ -112,7 +112,7 @@ void generate_box(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, f
 
 
 
-void generate_cylinder(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, float radius, float height, size_t slices, size_t stacks, float top_radius)
+void make_cylinder(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, float radius, float height, size_t slices, size_t stacks, float top_radius)
 {
 	int i = 0, j = 0;
 
@@ -198,7 +198,7 @@ void generate_cylinder(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& t
 
 
 
-void generate_plane(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, vec3 corner, vec3 v1, vec3 v2, size_t dimV1, size_t dimV2, bool tile)
+void make_plane(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, vec3 corner, vec3 v1, vec3 v2, size_t dimV1, size_t dimV2, bool tile)
 {
 	//TODO should check here if v1 and v2 are too close to the same direction
 	int i = 0;
@@ -247,7 +247,7 @@ void generate_plane(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex,
 
 
 
-void generate_sphere(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, float radius, size_t slices, size_t stacks)
+void make_sphere(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, float radius, size_t slices, size_t stacks)
 {
 	float down = RM_PI/float(stacks);
 	float around = RM_2PI/float(slices);
@@ -347,7 +347,7 @@ void generate_sphere(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex
 
 
 // Draw a torus (doughnut) in xy plane
-void generate_torus(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, float major_r, float minor_r, size_t major_slices, size_t minor_slices)
+void make_torus(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, float major_r, float minor_r, size_t major_slices, size_t minor_slices)
 {
     double major_step = RM_2PI / major_slices;
     double minor_step = RM_2PI / minor_slices;
@@ -419,21 +419,13 @@ void generate_torus(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex,
 
 
 
-void generate_cone(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, float radius, float height, size_t slices, float top_radius)
+void make_cone(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, float radius, float height, size_t slices, size_t stacks, bool flip)
 {
-	size_t i;
-	vec3 tmp(radius, 0, 0);
-	float deg = RM_PI/float(slices);
-	mat4 rot_mat4;
-	mat3 rot_mat = mat3(glm::rotate(rot_mat4, deg, vec3(0,0,1)));
-
-	verts.push_back(vec3(0, 0, height));
-	for (i=0; i<slices; i++) {
-		verts.push_back(tmp);
-		tmp = rot_mat * tmp;
+	if (!flip) {
+		make_cylinder(verts, tris, tex, radius, height, slices, stacks, 0.0f);
+	} else {
+		make_cylinder(verts, tris, tex, 0.0f, height, slices, stacks, radius);
 	}
-
-	verts.push_back(vec3(0, 0, 0));
 }
 
 

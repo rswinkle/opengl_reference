@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 	if (argc == 1) {
 		printf("usage: %s [model_file]\n", argv[0]);
 		printf("No model given, so generating a sphere...\n");
-		generate_sphere(verts, tris, tex, 5.0f, 14, 7);
+		make_sphere(verts, tris, tex, 5.0f, 14, 7);
 
 		// translate so it's in the same position as the models
 		// couuld also change the camera but meh
@@ -82,7 +82,7 @@ int main(int argc, char** argv)
 			printf("Failed to load %s!\nGenerating a sphere instead.\n", argv[1]);
 			verts.clear();
 			tris.clear();
-			generate_sphere(verts, tris, tex, 5.0f, 14, 7);
+			make_sphere(verts, tris, tex, 5.0f, 14, 7);
 		}
 	}
 

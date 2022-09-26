@@ -86,7 +86,7 @@ int main(int argc, char** argv)
 	if (argc == 1) {
 		printf("usage: %s [model_file]\n", argv[0]);
 		printf("No model given, so generating a sphere...\n");
-		generate_sphere(verts, tris, tex, 5.0f, 14, 7);
+		make_sphere(verts, tris, tex, 5.0f, 14, 7);
 		//
 		// translate so it's in the same position as the models
 		// couuld also change the camera but meh
@@ -97,7 +97,7 @@ int main(int argc, char** argv)
 			printf("Failed to load %s!\nGenerating a sphere instead.\n", argv[1]);
 			verts.clear();
 			tris.clear();
-			generate_sphere(verts, tris, tex, 5.0f, 14, 7);
+			make_sphere(verts, tris, tex, 5.0f, 14, 7);
 		}
 	}
 
@@ -262,7 +262,7 @@ void setup_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	window = SDL_CreateWindow("Ex 3", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Model Viewer", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
 		cleanup();
 		exit(0);
