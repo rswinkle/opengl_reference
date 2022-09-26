@@ -31,7 +31,7 @@ void make_sphere(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, fl
 void make_torus(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, float major_r, float minor_r, size_t major_slices, size_t minor_slices);
 
 
-void make_cone(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, float radius, float height, size_t slices, bool flip=false);
+void make_cone(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, float radius, float height, size_t slices, size_t stacks, bool flip=false);
 
 
 void expand_verts(vector<vec3>& draw_verts, vector<vec3>& verts, vector<ivec3>& triangles);

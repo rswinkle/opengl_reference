@@ -61,6 +61,7 @@ enum {
 	PLANE,
 	SPHERE,
 	TORUS,
+	CONE,
 	TETRA,
 	CUBE,
 	OCTA,
@@ -107,6 +108,7 @@ int main(int argc, char** argv)
 	make_plane(shapes[PLANE].verts, shapes[PLANE].tris, shapes[PLANE].tex, vec3(-2, -2, 0), vec3(0,1,0), vec3(1,0,0), 4, 4, false);
 	make_sphere(shapes[SPHERE].verts, shapes[SPHERE].tris, shapes[SPHERE].tex, 2.0f, 30, 15);
 	make_torus(shapes[TORUS].verts, shapes[TORUS].tris, shapes[TORUS].tex, 2.0f, 0.6f, 40, 20);
+	make_cone(shapes[CONE].verts, shapes[CONE].tris, shapes[CONE].tex, 1, 2, 30, 1);
 
 	make_tetrahedron(shapes[TETRA].verts, shapes[TETRA].tris);
 	make_cube(shapes[CUBE].verts, shapes[CUBE].tris);
