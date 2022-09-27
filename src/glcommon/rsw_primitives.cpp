@@ -12,7 +12,6 @@ void make_box(vector<vec3>& verts, vector<ivec3>& tris, vector<vec2>& tex, float
 	int tri_start = tris.size();
 
 	if (!plane) {
-
 		verts.push_back(origin);
 		verts.push_back(origin+x_vec);
 		verts.push_back(origin+y_vec);
@@ -605,7 +604,7 @@ void make_cube(vector<vec3>& verts, vector<ivec3>& tris)
 	//tex.push_back(vec2(1, 0));
 	//tex.push_back(vec2(0, 1));
 	//tex.push_back(vec2(1, 1));
-	
+
 	for (int i=tri_start; i<tris.size(); i++) {
 		tris[i] += ivec3(vert_start);
 	}
