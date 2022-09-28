@@ -72,6 +72,7 @@ int main(int argc, char** argv)
 	glGenBuffers(1, &square_buf);
 	glBindBuffer(GL_ARRAY_BUFFER, square_buf);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*tri_strips.size(), &tri_strips[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	GLuint elem_buf;
 	glGenBuffers(1, &elem_buf);
@@ -90,13 +91,9 @@ int main(int argc, char** argv)
 	}
 	glUseProgram(program);
 
-
 	matrix_stack mat_stack;
 	//rsw::make_perspective_matrix(mat_stack.stack[mat_stack.top], DEG_TO_RAD(45), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
 	rsw::make_orthographic_matrix(mat_stack.stack[mat_stack.top], 0, WIDTH-1, 0, HEIGHT-1, 1, -1);
-
-
-	//mat_stack.load_mat(proj_mat);
 
 	mat4 mvp_mat;
 
@@ -115,17 +112,12 @@ int main(int argc, char** argv)
 			counter = 0;
 		}
 
-
-		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
+		glClear(GL_COLOR_BUFFER_BIT);
 
 		mat_stack.push();
 		mat_stack.translate(10.0, 10.0, 0.0);
 
-		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mat_stack.stack[mat_stack.top]);
-		glBindBuffer(GL_ARRAY_BUFFER, square_buf);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		//glDrawArrays(GL_TRIANGLE_STRIP, 0, 8);
+		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mat_stack.get_matrix());
 
 		if (!use_elements) {
 			glMultiDrawArrays(GL_TRIANGLE_STRIP, &firsts[0], &counts[0], 100);
@@ -139,7 +131,6 @@ int main(int argc, char** argv)
 	}
 
 	glDeleteVertexArrays(1, &vao);
-	//glDeleteBuffers(1, &tri_buf);
 	glDeleteBuffers(1, &square_buf);
 	glDeleteProgram(program);
 
