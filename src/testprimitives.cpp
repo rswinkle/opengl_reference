@@ -41,6 +41,7 @@ struct mesh
 	vector<vec3> verts;
 	vector<ivec3> tris;
 	vector<vec2> tex;
+	vector<vec3> face_normals;
 	vector<vec3> normals;
 
 	vector<vec3> draw_verts;
@@ -49,6 +50,7 @@ struct mesh
 	GLuint vao;
 	GLuint buffer;
 
+	vector<vec3> face_normal_lines;
 	vector<vec3> normal_lines;
 	GLuint normal_vao;
 	GLuint norm_buf;
@@ -70,10 +72,13 @@ enum {
 	NUM_SHAPES
 };
 
+mesh shapes[NUM_SHAPES];
+
 int polygon_mode;
 int cur_prog;
 int cur_shape;
 bool show_normals;
+bool face_normals;
 
 #define NUM_PROGRAMS 2
 int programs[NUM_PROGRAMS];
@@ -94,13 +99,8 @@ int main(int argc, char** argv)
 
 	polygon_mode = 2;
 	cur_prog = 0;
+	face_normals = true;
 
-	mesh shapes[NUM_SHAPES];
-
-	vector<vec3> verts;
-	vector<ivec3> tris;
-	vector<vec2> tex;
-	vector<vert_attribs> vert_data;
 	vec3 tmp;
 
 	make_box(shapes[BOX].verts, shapes[BOX].tris, shapes[BOX].tex, 2.0f, 2.0f, 2.0f, true, ivec3(4, 4, 4), vec3(0,0,0));
@@ -122,18 +122,26 @@ int main(int argc, char** argv)
 
 		expand_verts(s.draw_verts, s.verts, s.tris);
 
-		compute_face_normals(s.verts, s.tris, s.normals);
+		compute_face_normals(s.verts, s.tris, s.face_normals);
+		compute_normals(s.verts, s.tris, NULL, RM_PI/6, s.normals);
 
 		for (int i=0; i<s.draw_verts.size(); i+=3) {
-			s.vert_data.push_back(vert_attribs(s.draw_verts[i],   s.normals[i]));
-			s.vert_data.push_back(vert_attribs(s.draw_verts[i+1], s.normals[i]));
-			s.vert_data.push_back(vert_attribs(s.draw_verts[i+2], s.normals[i]));
+			s.vert_data.push_back(vert_attribs(s.draw_verts[i],   s.face_normals[i]));
+			s.vert_data.push_back(vert_attribs(s.draw_verts[i+1], s.face_normals[i+1]));
+			s.vert_data.push_back(vert_attribs(s.draw_verts[i+2], s.face_normals[i+2]));
 
 			tmp = s.draw_verts[i] + s.draw_verts[i+1] + s.draw_verts[i+2];
 			tmp /= 3;
 
-			s.normal_lines.push_back(tmp);
-			s.normal_lines.push_back(tmp + s.normals[i]*0.5f);
+			s.face_normal_lines.push_back(tmp);
+			s.face_normal_lines.push_back(tmp + s.face_normals[i]*0.5f);
+
+			s.normal_lines.push_back(s.draw_verts[i]);
+			s.normal_lines.push_back(s.draw_verts[i] + s.normals[i]*0.5f);
+			s.normal_lines.push_back(s.draw_verts[i+1]);
+			s.normal_lines.push_back(s.draw_verts[i+1] + s.normals[i+1]*0.5f);
+			s.normal_lines.push_back(s.draw_verts[i+2]);
+			s.normal_lines.push_back(s.draw_verts[i+2] + s.normals[i+2]*0.5f);
 		}
 
 		glGenVertexArrays(1, &s.vao);
@@ -152,7 +160,7 @@ int main(int argc, char** argv)
 
 		glGenBuffers(1, &s.norm_buf);
 		glBindBuffer(GL_ARRAY_BUFFER, s.norm_buf);
-		glBufferData(GL_ARRAY_BUFFER, s.normal_lines.size()*sizeof(vec3), &s.normal_lines[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, s.face_normal_lines.size()*sizeof(vec3), &s.face_normal_lines[0], GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
@@ -239,7 +247,11 @@ int main(int argc, char** argv)
 			glUniformMatrix4fv(loc, 1, GL_FALSE, (float*)&mvp_mat);
 
 			glBindVertexArray(shapes[cur_shape].normal_vao);
-			glDrawArrays(GL_LINES, 0, shapes[cur_shape].normal_lines.size());
+			if (face_normals) {
+				glDrawArrays(GL_LINES, 0, shapes[cur_shape].face_normal_lines.size());
+			} else {
+				glDrawArrays(GL_LINES, 0, shapes[cur_shape].normal_lines.size());
+			}
 		}
 
 		SDL_GL_SwapWindow(window);
@@ -328,6 +340,12 @@ int handle_events()
 			} else if (sc == SDL_SCANCODE_S) {
 				cur_prog = (cur_prog + 1) % NUM_PROGRAMS;
 
+				if (cur_prog) {
+					puts("phong shading");
+				} else {
+					puts("gouraud shading");
+				}
+
 				glUseProgram(programs[cur_prog]);
 				mvp_loc = glGetUniformLocation(programs[cur_prog], "mvp_mat");
 				normal_loc = glGetUniformLocation(programs[cur_prog], "normal_mat");
@@ -340,6 +358,29 @@ int handle_events()
 				}
 			} else if (sc == SDL_SCANCODE_N) {
 				show_normals = !show_normals;
+			} else if (sc == SDL_SCANCODE_F) {
+				face_normals = !face_normals;
+
+				// switch between face normals and blended/vert normals so phong shading actually makes a difference
+				for (int j=0; j<NUM_SHAPES; j++) {
+					mesh& s = shapes[j];
+					vector<vec3>& n = (face_normals) ? s.face_normals : s.normals;
+					for (int i=0; i<s.draw_verts.size(); i++) {
+						s.vert_data[i].normal = n[i];
+					}
+					glBindVertexArray(s.vao);
+
+					glBindBuffer(GL_ARRAY_BUFFER, s.buffer);
+					glBufferData(GL_ARRAY_BUFFER, s.vert_data.size()*sizeof(vert_attribs), &s.vert_data[0], GL_STATIC_DRAW);
+
+					glBindVertexArray(s.normal_vao);
+					glBindBuffer(GL_ARRAY_BUFFER, s.norm_buf);
+					if (face_normals) {
+						glBufferData(GL_ARRAY_BUFFER, s.face_normal_lines.size()*sizeof(vec3), &s.face_normal_lines[0], GL_STATIC_DRAW);
+					} else {
+						glBufferData(GL_ARRAY_BUFFER, s.normal_lines.size()*sizeof(vec3), &s.normal_lines[0], GL_STATIC_DRAW);
+					}
+				}
 			}
 		}
 	}

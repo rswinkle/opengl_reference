@@ -19,7 +19,7 @@ uniform vec4 material;
 // out to fragment program
 out vec3 color;
 
-void main(void) 
+void main(void)
 { 
 	// Get surface normal in eye coordinates
 	//make sure normalMatrix and normal are normalized before drawing
@@ -27,7 +27,7 @@ void main(void)
 	
 	//non-local viewer and constant directional light
 	vec3 light_dir = normalize(vec3(-1, 1, 0.5));
-	vec3 eye_dir = vec3(0, 0, 1);	
+	vec3 eye_dir = vec3(0, 0, 1);
 	
 	// add ambient, everything is grayscale in this shader
 	//as if all lights are perfectly white
