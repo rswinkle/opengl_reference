@@ -3,6 +3,23 @@
 namespace rsw
 {
 
+mat2 operator*(const mat2& a, const mat2& b)
+{
+	mat2 tmp;
+	//could use setx/y/z functions and no ifdef?
+#ifndef ROW_MAJOR
+	tmp[0] = dot(a.x(), b.c1());
+	tmp[2] = dot(a.x(), b.c2());
+	tmp[1] = dot(a.y(), b.c1());
+	tmp[3] = dot(a.y(), b.c2());
+#else
+	tmp[0] = dot(a.x(), b.c1());
+	tmp[1] = dot(a.x(), b.c2());
+	tmp[2] = dot(a.y(), b.c1());
+	tmp[3] = dot(a.y(), b.c2());
+#endif
+	return tmp;
+}
 
 
 mat3 operator*(const mat3& a, const mat3& b)
@@ -545,7 +562,7 @@ void make_orthographic_matrix(mat4 &mat, float l, float r, float b, float t, flo
 
 
 	//now I know why the superbible had the -
-	//OpenGL uses a left handed canonical view volume [-1,1]^3 when passed the identity matrix
+	//OpenGL uses a left handed canonical view volume [-1,1]^3
 	//ie in Normalized Device Coordinates.  The math/matrix presented in Fundamentals of Computer
 	//Graphics assumes a right handed version of the same volume.  The negative isn't necessary
 	//if you set n and f correctly as near and far not low and high
@@ -557,6 +574,7 @@ void make_orthographic_matrix(mat4 &mat, float l, float r, float b, float t, flo
 //and glm.g-truc.net (glm/gtc/matrix_transform.inl)
 void lookAt(mat4 &mat, vec3 eye, vec3 center, vec3 up)
 {
+	mat = mat4();
 	vec3 f(normalize(center-eye));
 	vec3 s(normalize(cross(f, up)));
 	vec3 u(cross(s, f));

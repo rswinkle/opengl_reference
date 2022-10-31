@@ -28,16 +28,29 @@
 #define MAX(a, b)  ((a) > (b)) ? (a) : (b)
 #define MIN(a, b)  ((a) < (b)) ? (a) : (b)
 
-typedef uint8_t uint8;
-typedef uint32_t uint32;
+typedef uint8_t  u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+typedef int8_t   i8;
+typedef int16_t  i16;
+typedef int32_t  i32;
+typedef int64_t  i64;
 
 
 namespace rsw
 {
 
-inline float rand_float(float min, float max)
+// returns [0,1)
+inline float randf()
 {
-	return (float(rand())/float(RAND_MAX-1))*(max-min) + min;
+	return rand() / (RAND_MAX + 1.0f);
+}
+
+
+inline float randf_range(float min, float max)
+{
+	return min + (max-min) * randf();
 }
 
 /*
@@ -49,6 +62,9 @@ inline float rand_float(float min, float max)
  *
  *
  */
+struct mat2;
+struct mat3;
+struct mat4;
 
 struct vec2
 {
@@ -76,6 +92,7 @@ struct vec2
 	vec2& operator +=(float a) { x += a; y += a; return *this; }
 	vec2& operator -=(float a) { x -= a; y -= a; return *this; }
 
+	vec2& operator *=(mat2 a);
 
 	vec2 xx() { return vec2(x,x); }
 	vec2 xy() { return vec2(x,y); } //no reason for this ...
@@ -140,9 +157,20 @@ struct vec3
 	vec3(float x, vec2 a) : x(x), y(a.x), z(a.y) {}
 	//vec3(vec4 v) : x(v.x), y(v.y), z(v.z) {}
 
-	float len() { return sqrt(x*x + y*y + z*z); }
-	vec3 norm() { float l = this->len(); return vec3(x/l, y/l, z/l); }
+	float len() const { return sqrt(x*x + y*y + z*z); }
+	float len_squared() const { return x*x + y*y + z*z; }
+	vec3 norm() const { float l = this->len(); return vec3(x/l, y/l, z/l); }
 	void normalize() { (*this)/=this->len(); }
+	bool near_zero() const {
+		const float e = 1e-8; // -7?
+		return ((fabs(x) < e) && (fabs(y) < e) && (fabs(z) < e));
+	}
+
+	// isn't inline redundant in a class body?
+	inline static vec3 random() { return vec3(randf(), randf(), randf()); }
+	inline static vec3 random(float min, float max) {
+		return vec3(randf_range(min,max), randf_range(min,max), randf_range(min,max));
+	}
 
 	vec3& operator -=(vec3 a) { x -= a.x; y -= a.y; z -= a.z; return *this; }
 	vec3& operator +=(vec3 a) { x += a.x; y += a.y; z += a.z; return *this; }
@@ -267,6 +295,55 @@ inline float angle_between_vec3(const vec3 u, const vec3 v)
 {
 	return acos(dot(u, v));
 }
+
+inline vec3 random_in_unit_sphere()
+{
+	// TODO I'm honestly not sure which version I like best...
+	// I guess I'll see if there's any performance difference
+	//
+	vec3 p;
+	do {
+		p = vec3::random(-1,1);
+	} while (p.len_squared() >= 1);
+	return p;
+
+	/*
+	while (true) {
+		vec3 p = vec3::random(-1,1);
+		if (p.len_squared() >= 1) continue;
+		return p;
+	}
+
+	while (true) {
+		vec3 p = vec3::random(-1,1);
+		if (p.len_squared() < 1) return p;
+	}
+	*/
+}
+
+inline vec3 random_unit_vector()
+{
+	return random_in_unit_sphere().norm();
+}
+
+inline vec3 random_in_hemisphere(const vec3& normal)
+{
+	vec3 in_unit_sphere = random_in_unit_sphere();
+	if (dot(in_unit_sphere, normal) > 0.0)
+		return in_unit_sphere;
+	else
+		return -in_unit_sphere;
+}
+
+inline vec3 random_in_unit_disk()
+{
+	vec3 p;
+	do {
+		p = vec3(randf_range(-1,1), randf_range(-1,1), 0);
+	} while (p.len_squared() >= 1);
+	return p;
+}
+
 
 
 
@@ -449,7 +526,10 @@ struct dvec2
 	double y;
 
 
-	dvec2(double x=0, double y=0) : x(x), y(y) {}
+	dvec2() : x(), y() {}
+	dvec2(double a) : x(a), y(a) {}
+	dvec2(double x, double y) : x(x), y(y) {}
+
 	double len() { return sqrt((*this)*(*this)); }
 	dvec2 norm() { double l = this->len(); return dvec2(x/l, y/l); }
 	void normalize() { (*this)/=this->len(); }
@@ -502,7 +582,12 @@ struct dvec3
 		double pts[3];
 	};
 
-	dvec3(double x=0, double y=0, double z=0) : x(x), y(y), z(z) {}
+	dvec3() : x(), y(), z() {}
+	dvec3(double a) : x(a), y(a), z(a) {}
+	dvec3(double x, double y, double z) : x(x), y(y), z(z) {}
+	dvec3(vec2 a, double z) : x(a.x), y(a.y), z(z) {}
+	dvec3(double x, vec2 a) : x(x), y(a.x), z(a.y) {}
+
 	double len() { return sqrt((*this)*(*this)); }
 	dvec3 norm() { double l = this->len(); return dvec3(x/l, y/l, z/l); }
 	void normalize() { (*this)/=this->len(); }
@@ -629,8 +714,14 @@ struct dvec4
 		double pts[4];
 	};
 
-	dvec4(double x=0, double y=0, double z=0, double w=1) : x(x), y(y), z(z), w(w) {}
-	dvec4(dvec3 a) : x(a.x), y(a.y), z(a.z), w(1) {}
+	dvec4() : x(), y(), z(), w() {}
+	dvec4(double a) : x(a), y(a), z(a), w(a) {}
+	dvec4(double x, double y, double z, double w) : x(x), y(y), z(z), w(w) {}
+	dvec4(dvec3 a, double w) : x(a.x), y(a.y), z(a.z), w(w) {}
+	dvec4(dvec2 a, double z, double w) : x(a.x), y(a.y), z(z), w(w) {}
+	dvec4(dvec2 a, dvec2 b) : x(a.x), y(a.y), z(b.x), w(b.y) {}
+	dvec4(double x, double y, dvec2 b) : x(x), y(y), z(b.x), w(b.y) {}
+
 	dvec3 todvec3() { return dvec3(x, y, z); }
 	dvec2 todvec2() { return dvec2(x, y); }
 	dvec3 dvec3h() { return dvec3(x/w, y/w, z/w); }
@@ -844,7 +935,9 @@ struct uvec2
 		unsigned int pts[2];
 	};
 
-	uvec2(unsigned int x=0, unsigned int y=0) : x(x), y(y) {}
+	uvec2() : x(), y() {}
+	uvec2(unsigned int a) : x(a), y(a) {}
+	uvec2(unsigned int x, unsigned int y) : x(x), y(y) {}
 
 	uvec2& operator+=(uvec2 a) { x += a.x; y += a.y; return *this; }
 	uvec2& operator*=(unsigned int a) { x *= a; y *= a; return *this; }
@@ -872,7 +965,11 @@ struct uvec3
 		unsigned int pts[3];
 	};
 
-	uvec3(unsigned int x=0, unsigned int y=0, unsigned int z=0) : x(x), y(y), z(z) {}
+	uvec3() : x(), y(), z() {}
+	uvec3(unsigned int a) : x(a), y(a), z(a) {}
+	uvec3(unsigned int x, unsigned int y, unsigned int z) : x(x), y(y), z(z) {}
+	uvec3(uvec2 a, unsigned int z) : x(a.x), y(a.y), z(z) {}
+	uvec3(unsigned int x, uvec2 a) : x(x), y(a.x), z(a.y) {}
 
 	uvec3& operator+=(uvec3 a) { x += a.x; y += a.y; z += a.z; return *this; }
 	uvec3& operator*=(unsigned int a) { x *= a; y *= a; z *= a; return *this; }
@@ -903,7 +1000,13 @@ struct uvec4
 		unsigned int pts[4];
 	};
 
-	uvec4(unsigned int x=0, unsigned int y=0, unsigned int z=0, unsigned int w=1) : x(x), y(y), z(z), w(w) {}
+	uvec4() : x(), y(), z(), w() {}
+	uvec4(unsigned int a) : x(a), y(a), z(a), w(a) {}
+	uvec4(unsigned int x, unsigned int y, unsigned int z, unsigned int w) : x(x), y(y), z(z), w(w) {}
+	uvec4(uvec3 a, unsigned int w) : x(a.x), y(a.y), z(a.z), w(w) {}
+	uvec4(uvec2 a, unsigned int z, unsigned int w) : x(a.x), y(a.y), z(z), w(w) {}
+	uvec4(uvec2 a, uvec2 b) : x(a.x), y(a.y), z(b.x), w(b.y) {}
+	uvec4(unsigned int x, unsigned int y, uvec2 b) : x(x), y(y), z(b.x), w(b.y) {}
 
 	uvec4& operator+=(uvec4 a) { x += a.x; y += a.y; z += a.z; w += a.w; return *this; }
 	uvec4& operator*=(unsigned int a) { x *= a; y *= a; z *= a; w *= a; return *this; }
@@ -935,7 +1038,149 @@ inline bool operator==(const uvec4& a, const uvec4& b) { return ((a.x==b.x) && (
  **********************************************************
  * Matrices
  */
-struct mat4;
+
+
+struct mat2
+{
+	float matrix[4];
+	mat2() { matrix[0] = matrix[2] = 1; }
+	mat2(float i)
+	{
+		matrix[1] = matrix[3] = 0;
+		matrix[0] = matrix[2] = i;
+	}
+	mat2(float a, float b, float c, float d)
+	{
+#ifndef ROW_MAJOR
+		matrix[0] = a;
+		matrix[1] = b;
+		matrix[2] = c;
+		matrix[3] = d;
+#else
+		matrix[0] = a;
+		matrix[2] = b;
+		matrix[1] = c;
+		matrix[3] = d;
+#endif
+	}
+
+	mat2(mat3 m);
+	mat2(mat4 m);
+
+	mat2(float a[]) { memcpy(matrix, a, sizeof(float)*4); }
+
+	mat2(vec2 c1, vec2 c2)
+	{
+		this->setc1(c1);
+		this->setc2(c2);
+	}
+
+	void set(float a[]) { memcpy(matrix, a, sizeof(float)*4); }
+
+	float& operator [](size_t i) { return matrix[i]; }
+
+#ifndef ROW_MAJOR
+	vec2 x() const { return vec2(matrix[0], matrix[2]); }
+	vec2 y() const { return vec2(matrix[1], matrix[3]); }
+	vec2 c1() const { return vec2(matrix[0], matrix[1]); }
+	vec2 c2() const { return vec2(matrix[2], matrix[3]); }
+
+	void setx(vec2 v) { matrix[0]=v.x, matrix[2]=v.y; }
+	void sety(vec2 v) { matrix[1]=v.x, matrix[3]=v.y; }
+
+	void setc1(vec2 v) { matrix[0]=v.x, matrix[1]=v.y; }
+	void setc2(vec2 v) { matrix[2]=v.x, matrix[3]=v.y; }
+#else
+	vec2 x() const { return vec2(matrix[0], matrix[1]); }
+	vec2 y() const { return vec2(matrix[2], matrix[3]); }
+	vec2 c1() const { return vec2(matrix[0], matrix[2]); }
+	vec2 c2() const { return vec2(matrix[1], matrix[3]); }
+
+	void setx(vec2 v) { matrix[0]=v.x, matrix[1]=v.y; }
+	void sety(vec2 v) { matrix[2]=v.x, matrix[3]=v.y; }
+
+	void setc1(vec2 v) { matrix[0]=v.x, matrix[2]=v.y; }
+	void setc2(vec2 v) { matrix[1]=v.x, matrix[3]=v.y; }
+#endif
+
+	mat2& operator *=(float a)
+	{
+		matrix[0] *= a;
+		matrix[1] *= a;
+		matrix[2] *= a;
+		matrix[3] *= a;
+		return *this;
+	}
+	mat2& operator /=(float a)
+	{
+		matrix[0] /= a;
+		matrix[1] /= a;
+		matrix[2] /= a;
+		matrix[3] /= a;
+		return *this;
+	}
+	mat2& operator +=(float a)
+	{
+		matrix[0] += a;
+		matrix[1] += a;
+		matrix[2] += a;
+		matrix[3] += a;
+		return *this;
+	}
+	mat2& operator -=(float a)
+	{
+		matrix[0] -= a;
+		matrix[1] -= a;
+		matrix[2] -= a;
+		matrix[3] -= a;
+		return *this;
+	}
+};
+
+// TODO wrong if ROW_MAJOR since that constructor is defined as col major
+inline mat2 operator+(mat2 a, float b) { return mat2(a[0]+b, a[1]+b, a[2]+b, a[3]+b); }
+inline mat2 operator-(mat2 a, float b) { return mat2(a[0]-b, a[1]-b, a[2]-b, a[3]-b); }
+inline mat2 operator*(mat2 a, float b) { return mat2(a[0]*b, a[1]*b, a[2]*b, a[3]*b); }
+inline mat2 operator/(mat2 a, float b) { return mat2(a[0]/b, a[1]/b, a[2]/b, a[3]/b); }
+
+inline mat2 operator-(mat2 a) { return mat2(-a[0], -a[1], -a[2], -a[3]); }
+
+inline vec2 operator*(const mat2& mat, const vec2& vec)
+{
+	vec2 tmp;
+	tmp.x = dot(mat.x(), vec);
+	tmp.y = dot(mat.y(), vec);
+	return tmp;
+}
+
+inline vec2 operator*(const vec2& vec, const mat2& mat)
+{
+	vec2 tmp;
+	tmp.x = dot(vec, mat.c1());
+	tmp.y = dot(vec, mat.c2());
+	return tmp;
+}
+
+inline vec2& vec2::operator *=(mat2 a)
+{
+	vec2 tmp = *this;
+	x = dot(tmp, a.c1());
+	y = dot(tmp, a.c2());
+	return *this;
+}
+
+inline std::ostream& operator<<(std::ostream& stream, const mat2& mat)
+{
+	return stream <<"["<<mat.x()<<"\n "<<mat.y()<<"]";
+}
+
+//implemented inin rmath.cpp
+mat2 operator*(const mat2& a, const mat2& b);
+
+// TODO support creating 2D rotation matrices?
+//void load_rotation_mat2(mat2& mat, vec2 v, float angle);
+
+
 
 struct mat3
 {
@@ -967,7 +1212,7 @@ struct mat3
 
 	float& operator [](size_t i) { return matrix[i]; }
 
-	//Getters for rows and columns
+	//Getters/setters for rows and columns
 #ifndef ROW_MAJOR
 	vec3 x() const { return vec3(matrix[0], matrix[3], matrix[6]); }
 	vec3 y() const { return vec3(matrix[1], matrix[4], matrix[7]); }
@@ -1028,10 +1273,18 @@ inline std::ostream& operator<<(std::ostream& stream, const mat3& mat)
 	return stream <<"["<<mat.x()<<"\n "<<mat.y()<<"\n "<<mat.z()<<"]";
 }
 
-//implemented inin rmath.cpp
+//implemented in rsw_math.cpp
 mat3 operator*(const mat3& a, const mat3& b);
 void load_rotation_mat3(mat3& mat, vec3 v, float angle);
 
+// Note no change between row or column major
+inline mat2::mat2(mat3 m)
+{
+	matrix[0] = m[0];
+	matrix[1] = m[1];
+	matrix[2] = m[3];
+	matrix[3] = m[4];
+}
 
 
 
@@ -1162,6 +1415,15 @@ inline vec4 operator*(const mat4& mat, const vec4& vec)
 inline std::ostream& operator<<(std::ostream& stream, const mat4& mat)
 {
 	return stream <<"["<<mat.x()<<"\n "<<mat.y()<<"\n "<<mat.z()<<"\n "<<mat.w()<<"]";
+}
+
+// Note these are the same whether row or column major
+inline mat2::mat2(mat4 m)
+{
+	matrix[0] = m[0];
+	matrix[1] = m[1];
+	matrix[2] = m[4];
+	matrix[3] = m[5];
 }
 
 inline mat3::mat3(mat4 m)
@@ -1377,6 +1639,17 @@ inline vec3 reflect(vec3 i, vec3 n)
 	return i - 2 * dot(i, n) * n;
 }
 
+// TODO decide if I care about const and passing by reference for small
+// structs once and for all, but for now copying raytracing in 1 weekend
+inline vec3 refract(const vec3& uv, const vec3& n, float etai_over_etat)
+{
+	float cos_theta = fminf(dot(-uv, n), 1.0f);
+	vec3 r_out_perp = etai_over_etat * (uv + cos_theta*n);
+	vec3 r_out_parallel = -sqrt(fabsf(1.0f - r_out_perp.len_squared())) * n;
+	return r_out_perp + r_out_parallel;
+}
+
+
 inline float smoothstep(float edge0, float edge1, float x)
 {
 	float t = clamp_01((x-edge0)/(edge1-edge0));
@@ -1438,6 +1711,7 @@ inline vec4 min(vec4 a, vec4 b)
 VECTORIZE_VEC_STD(abs)
 VECTORIZE_VEC_STD(floor)
 VECTORIZE_VEC_STD(ceil)
+VECTORIZE_VEC_STD(sqrt)
 
 VECTORIZE_VEC_STD(sin)
 VECTORIZE_VEC_STD(cos)
@@ -1494,12 +1768,12 @@ struct Color
 		r = g = b = 0;
 		a = 255;
 	}
-	Color(uint8 red, uint8 green, uint8 blue, uint8 alpha=255) : r(red), g(green), b(blue), a(alpha) {}
+	Color(u8 red, u8 green, u8 blue, u8 alpha=255) : r(red), g(green), b(blue), a(alpha) {}
 
-	uint8 r;
-	uint8 g;
-	uint8 b;
-	uint8 a;
+	u8 r;
+	u8 g;
+	u8 b;
+	u8 a;
 };
 
 inline Color vec4_to_Color(vec4 v)
