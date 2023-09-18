@@ -254,6 +254,16 @@ solution "opengl_reference"
 		configuration { "gmake" }
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
+	project "test_poly_modes"
+		kind "ConsoleApp"
+		language "C"
+		files {
+			"src/test_poly_modes.c"
+		}
+		
+		configuration { "gmake" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
+
 	project "glm_sphereworld_color"
 		kind "ConsoleApp"
 		language "C++"

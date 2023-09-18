@@ -21,9 +21,12 @@ int main(int argc, char** argv)
 {
 	setup_context();
 
+	// Apparently, even if the point itself (ie the center of a point sprite) would
+	// have been clipped, it is still rendered as if it were a quad with part
+	// of it off screen
 	float points[] = { -0.5, -0.5, 0,
 	                    0.5, -0.5, 0,
-	                    0,    0.5, 0 };
+	                    0,    1.2, 0 };
 
 
 	GLuint textures[2];
