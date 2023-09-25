@@ -264,6 +264,16 @@ solution "opengl_reference"
 		configuration { "gmake" }
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
+	project "test_scissoring"
+		kind "ConsoleApp"
+		language "C"
+		files {
+			"src/test_scissoring.c"
+		}
+		
+		configuration { "gmake" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
+
 	project "glm_sphereworld_color"
 		kind "ConsoleApp"
 		language "C++"

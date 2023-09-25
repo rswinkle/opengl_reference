@@ -21,13 +21,18 @@ int main(int argc, char** argv)
 {
 	setup_context();
 
-	// Apparently, even if the point itself (ie the center of a point sprite) would
+	// NOTE: Apparently, even if the point itself (ie the center of a point sprite) would
 	// have been clipped, it is still rendered as if it were a quad with part
-	// of it off screen
+	// of it off screen though that is against the spec. (even on my Intel iGPU)
+	// https://www.khronos.org/opengl/wiki/Vertex_Post-Processing#Clipping
 	float points[] = { -0.5, -0.5, 0,
 	                    0.5, -0.5, 0,
-	                    0,    1.2, 0 };
+	                    0,    0.5, 0 };
 
+	// NOTE: The scissor test is the same as above but that makes more sense since it's
+	// about pixels not geometry.
+	glEnable(GL_SCISSOR_TEST);
+	glScissor(100, 80, 350, 300);
 
 	GLuint textures[2];
 	glGenTextures(2, textures);
@@ -110,8 +115,12 @@ int main(int argc, char** argv)
 		
 		glClear(GL_COLOR_BUFFER_BIT);
 		glUseProgram(simple_prog);
-		glDrawArrays(GL_POINTS, 0, 2);
+		glDrawArrays(GL_POINTS, 0, 1);
 
+		glDisable(GL_SCISSOR_TEST);
+		glDrawArrays(GL_POINTS, 1, 1);
+
+		glEnable(GL_SCISSOR_TEST);
 		glUseProgram(texture_prog);
 		glDrawArrays(GL_POINTS, 2, 1);
 

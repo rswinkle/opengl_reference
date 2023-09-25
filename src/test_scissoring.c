@@ -45,40 +45,31 @@ static const char fs_shader_str[] =
 "	frag_color = color;                \n"
 "}";
 
-int polygon_mode;
-float point_size;
-float line_width;
-int line_smooth;
-
 int main(int argc, char** argv)
 {
 	setup_context();
-	polygon_mode = 2;
-	point_size = 1.0f;
-	line_width = 1.0f;
 
-	//glEnable(GL_LINE_SMOOTH);
+	float points[] = {
+		-0.5, -0.5, -0.9,
+		0.5, -0.5,  -0.9,
+		0,    0.5,  -0.9,
 
-	// Findings: Points are not clipped absolutely, ie even if the vertex
-	// is out of the canonical view volume, if pointsize is large enough
-	// it will partially show on the screen
-	// 
-	// Apparently this was historically an NVIDIA quirk:
-	// https://www.khronos.org/opengl/wiki/Vertex_Post-Processing#Clipping
-	//
-	// Platform Issue (NVIDIA): These cards will not clip points "properly". That is, they will do what people generally want (only discard the point if it is fully outside the volume), rather than what the OpenGL specification requires. Be advised that other hardware does what OpenGL asks. 
-	//
-	// However my iGPU (intel) seems to do the same thing so...*shrug*
-	
-	//float points[] = { -1.1, -0.5, 0,
-	//                    1.1, -0.5, 0,
-	//                    0,    10, 0 };
-	//float points[] = { -0.5, -0.5, 0,
-	//                    0.5, -0.5, 0,
-	//                    0,    .5, 0 };
-	float points[] = { -0.5, -0.5, 0,
-	                    0.5, -0.5, 0,
-	                    0,    0.9, 0 };
+		-0.5, -0.5, -0.7,
+		0.5, -0.5,  -0.7,
+		0,    0.5,  -0.7,
+
+		-0.5, -0.5, -0.5,
+		0.5, -0.5,  -0.5,
+		0,    0.5,  -0.5,
+
+		-0.5, -0.5, -0.3,
+		0.5, -0.5,  -0.3,
+		0,    0.5,  -0.3,
+
+		-0.5, -0.5, -0.1,
+		0.5, -0.5,  -0.1,
+		0,    0.5,  -0.1,
+	};
 
 	//no error checking done for any of this except shader compilation
 	GLuint program = load_shader_pair(vs_shader_str, fs_shader_str);
@@ -89,9 +80,14 @@ int main(int argc, char** argv)
 
 	glUseProgram(program);
 
+
 	float Red[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
+	float Green[4] = { 0.0f, 1.0f, 0.0f, 1.0f };
+	float Blue[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
+	float Purple[4] = { 1.0f, 0.0f, 1.0f, 1.0f };
+	float Cyan[4] = { 0.0f, 1.0f, 1.0f, 1.0f };
+
 	int loc = glGetUniformLocation(program, "color");
-	glUniform4fv(loc, 1, Red);
 
 	//no default vao in core profile ...
 	GLuint vao;
@@ -105,7 +101,8 @@ int main(int argc, char** argv)
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_SCISSOR_TEST);
 
 	unsigned int old_time = 0, new_time=0, counter = 0;
 	while (1) {
@@ -121,9 +118,35 @@ int main(int argc, char** argv)
 			counter = 0;
 		}
 
-		
-		glClear(GL_COLOR_BUFFER_BIT);
+		// Make sure to clear entire window to prevent flickering
+		glScissor(0, 0, WIDTH, HEIGHT);
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+		// Cut off all sides
+		glScissor(220, 150, 200, 150);
+		glUniform4fv(loc, 1, Red);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		//glDisable(GL_SCISSOR_TEST);
+		// allow right side
+		glScissor(220, 150, 500, 150);
+		glUniform4fv(loc, 1, Green);
+		glDrawArrays(GL_TRIANGLES, 3, 3);
+
+		// Allow bottom
+		glScissor(220, 0, 200, 300);
+		glUniform4fv(loc, 1, Blue);
+		glDrawArrays(GL_TRIANGLES, 6, 3);
+
+		//allow left
+		glScissor(0, 150, 420, 150);
+		glUniform4fv(loc, 1, Purple);
+		glDrawArrays(GL_TRIANGLES, 9, 3);
+
+		//allow top
+		glScissor(220, 150, 200, 550);
+		glUniform4fv(loc, 1, Cyan);
+		glDrawArrays(GL_TRIANGLES, 12, 3);
 
 		SDL_GL_SwapWindow(window);
 	}
@@ -148,7 +171,7 @@ void setup_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	window = SDL_CreateWindow("Test Polygon Modes", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Test Scissoring", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
 		cleanup();
 		exit(0);
@@ -192,57 +215,9 @@ int handle_events()
 		} else if (e.type == SDL_KEYDOWN) {
 			sc = e.key.keysym.scancode;
 
-			if (sc == SDL_SCANCODE_ESCAPE) {
+			if (sc == SDL_SCANCODE_ESCAPE)
 				return 1;
-			}
-		} else if (e.type == SDL_KEYUP) {
-			sc = e.key.keysym.scancode;
-			switch (sc) {
-			case SDL_SCANCODE_P:
-				polygon_mode = (polygon_mode + 1) % 3;
-				if (polygon_mode == 0)
-					glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-				else if (polygon_mode == 1)
-					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				else
-					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-				break;
-			case SDL_SCANCODE_UP:
-				point_size *= 2;
-				glPointSize(point_size);
-				break;
-			case SDL_SCANCODE_DOWN:
-				point_size /= 2.0f;
-				if (point_size < 1)
-					point_size = 1.0f;
-				glPointSize(point_size);
-				break;
-
-			case SDL_SCANCODE_RIGHT:
-				line_width *= 2;
-				glLineWidth(line_width);
-				break;
-			case SDL_SCANCODE_LEFT:
-				line_width /= 2.0f;
-				if (line_width < 1)
-					line_width = 1.0f;
-				glLineWidth(line_width);
-				break;
-			
-			case SDL_SCANCODE_S:
-				line_smooth = !line_smooth;
-				if (line_smooth) {
-					glEnable(GL_LINE_SMOOTH);
-				} else {
-					glDisable(GL_LINE_SMOOTH);
-				}
-				break;
-
-				
-			}
 		}
-
-
 	}
 	return 0;
 }
