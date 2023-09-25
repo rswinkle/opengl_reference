@@ -274,6 +274,16 @@ solution "opengl_reference"
 		configuration { "gmake" }
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
+	project "test_viewport"
+		kind "ConsoleApp"
+		language "C"
+		files {
+			"src/test_viewport.c"
+		}
+		
+		configuration { "gmake" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
+
 	project "glm_sphereworld_color"
 		kind "ConsoleApp"
 		language "C++"

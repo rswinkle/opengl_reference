@@ -30,6 +30,7 @@ ifeq ($(config),debug)
   point_sprites_config = debug
   test_poly_modes_config = debug
   test_scissoring_config = debug
+  test_viewport_config = debug
   glm_sphereworld_color_config = debug
   glm_grass_config = debug
   glm_flying_config = debug
@@ -58,6 +59,7 @@ ifeq ($(config),release)
   point_sprites_config = release
   test_poly_modes_config = release
   test_scissoring_config = release
+  test_viewport_config = release
   glm_sphereworld_color_config = release
   glm_grass_config = release
   glm_flying_config = release
@@ -65,7 +67,7 @@ ifeq ($(config),release)
   gears_config = release
 endif
 
-PROJECTS := ex1 ex2 lesson1 lesson2 lesson3 lesson4 lesson5 lesson6 lesson7 multidraw texturing modelviewer testprimitives grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites test_poly_modes test_scissoring glm_sphereworld_color glm_grass glm_flying left_handed gears
+PROJECTS := ex1 ex2 lesson1 lesson2 lesson3 lesson4 lesson5 lesson6 lesson7 multidraw texturing modelviewer testprimitives grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites test_poly_modes test_scissoring test_viewport glm_sphereworld_color glm_grass glm_flying left_handed gears
 
 .PHONY: all clean help $(PROJECTS) 
 
@@ -197,6 +199,12 @@ ifneq (,$(test_scissoring_config))
 	@${MAKE} --no-print-directory -C . -f test_scissoring.make config=$(test_scissoring_config)
 endif
 
+test_viewport:
+ifneq (,$(test_viewport_config))
+	@echo "==== Building test_viewport ($(test_viewport_config)) ===="
+	@${MAKE} --no-print-directory -C . -f test_viewport.make config=$(test_viewport_config)
+endif
+
 glm_sphereworld_color:
 ifneq (,$(glm_sphereworld_color_config))
 	@echo "==== Building glm_sphereworld_color ($(glm_sphereworld_color_config)) ===="
@@ -249,6 +257,7 @@ clean:
 	@${MAKE} --no-print-directory -C . -f point_sprites.make clean
 	@${MAKE} --no-print-directory -C . -f test_poly_modes.make clean
 	@${MAKE} --no-print-directory -C . -f test_scissoring.make clean
+	@${MAKE} --no-print-directory -C . -f test_viewport.make clean
 	@${MAKE} --no-print-directory -C . -f glm_sphereworld_color.make clean
 	@${MAKE} --no-print-directory -C . -f glm_grass.make clean
 	@${MAKE} --no-print-directory -C . -f glm_flying.make clean
@@ -286,6 +295,7 @@ help:
 	@echo "   point_sprites"
 	@echo "   test_poly_modes"
 	@echo "   test_scissoring"
+	@echo "   test_viewport"
 	@echo "   glm_sphereworld_color"
 	@echo "   glm_grass"
 	@echo "   glm_flying"
