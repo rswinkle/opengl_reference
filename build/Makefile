@@ -31,6 +31,8 @@ ifeq ($(config),debug)
   test_poly_modes_config = debug
   test_scissoring_config = debug
   test_viewport_config = debug
+  test_clipping_config = debug
+  test_depthclamp_config = debug
   glm_sphereworld_color_config = debug
   glm_grass_config = debug
   glm_flying_config = debug
@@ -60,6 +62,8 @@ ifeq ($(config),release)
   test_poly_modes_config = release
   test_scissoring_config = release
   test_viewport_config = release
+  test_clipping_config = release
+  test_depthclamp_config = release
   glm_sphereworld_color_config = release
   glm_grass_config = release
   glm_flying_config = release
@@ -67,7 +71,7 @@ ifeq ($(config),release)
   gears_config = release
 endif
 
-PROJECTS := ex1 ex2 lesson1 lesson2 lesson3 lesson4 lesson5 lesson6 lesson7 multidraw texturing modelviewer testprimitives grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites test_poly_modes test_scissoring test_viewport glm_sphereworld_color glm_grass glm_flying left_handed gears
+PROJECTS := ex1 ex2 lesson1 lesson2 lesson3 lesson4 lesson5 lesson6 lesson7 multidraw texturing modelviewer testprimitives grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites test_poly_modes test_scissoring test_viewport test_clipping test_depthclamp glm_sphereworld_color glm_grass glm_flying left_handed gears
 
 .PHONY: all clean help $(PROJECTS) 
 
@@ -205,6 +209,18 @@ ifneq (,$(test_viewport_config))
 	@${MAKE} --no-print-directory -C . -f test_viewport.make config=$(test_viewport_config)
 endif
 
+test_clipping:
+ifneq (,$(test_clipping_config))
+	@echo "==== Building test_clipping ($(test_clipping_config)) ===="
+	@${MAKE} --no-print-directory -C . -f test_clipping.make config=$(test_clipping_config)
+endif
+
+test_depthclamp:
+ifneq (,$(test_depthclamp_config))
+	@echo "==== Building test_depthclamp ($(test_depthclamp_config)) ===="
+	@${MAKE} --no-print-directory -C . -f test_depthclamp.make config=$(test_depthclamp_config)
+endif
+
 glm_sphereworld_color:
 ifneq (,$(glm_sphereworld_color_config))
 	@echo "==== Building glm_sphereworld_color ($(glm_sphereworld_color_config)) ===="
@@ -258,6 +274,8 @@ clean:
 	@${MAKE} --no-print-directory -C . -f test_poly_modes.make clean
 	@${MAKE} --no-print-directory -C . -f test_scissoring.make clean
 	@${MAKE} --no-print-directory -C . -f test_viewport.make clean
+	@${MAKE} --no-print-directory -C . -f test_clipping.make clean
+	@${MAKE} --no-print-directory -C . -f test_depthclamp.make clean
 	@${MAKE} --no-print-directory -C . -f glm_sphereworld_color.make clean
 	@${MAKE} --no-print-directory -C . -f glm_grass.make clean
 	@${MAKE} --no-print-directory -C . -f glm_flying.make clean
@@ -296,6 +314,8 @@ help:
 	@echo "   test_poly_modes"
 	@echo "   test_scissoring"
 	@echo "   test_viewport"
+	@echo "   test_clipping"
+	@echo "   test_depthclamp"
 	@echo "   glm_sphereworld_color"
 	@echo "   glm_grass"
 	@echo "   glm_flying"

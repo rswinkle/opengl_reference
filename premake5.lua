@@ -284,6 +284,26 @@ solution "opengl_reference"
 		configuration { "gmake" }
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
+	project "test_clipping"
+		kind "ConsoleApp"
+		language "C"
+		files {
+			"src/test_clipping.c"
+		}
+		
+		configuration { "gmake" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
+
+	project "test_depthclamp"
+		kind "ConsoleApp"
+		language "C"
+		files {
+			"src/test_depthclamp.c"
+		}
+		
+		configuration { "gmake" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
+
 	project "glm_sphereworld_color"
 		kind "ConsoleApp"
 		language "C++"

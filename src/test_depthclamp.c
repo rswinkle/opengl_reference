@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 #define WIDTH 640
-#define HEIGHT 480
+#define HEIGHT 640
 
 
 SDL_Window* window;
@@ -45,13 +45,118 @@ static const char fs_shader_str[] =
 "	frag_color = color;                \n"
 "}";
 
+int polygon_mode;
+float point_size;
+float line_width;
+int line_smooth;
+
 int main(int argc, char** argv)
 {
 	setup_context();
+	polygon_mode = 2;
+	point_size = 1.0f;
+	line_width = 1.0f;
 
-	float points[] = { -0.5, -0.5, 0,
-	                    0.5, -0.5, 0,
-	                    0,    0.5, 0 };
+	float points[] = {
+		// top and bottom, 1 and 2, CCW and CW
+		-0.7, 0.8, 0,
+		-0.3, 0.8, 0,
+		-0.5, 1.2, 0,
+
+		 0.3, 1.2, 0,
+		 0.7, 1.2, 0,
+		 0.5, 0.8, 0,
+
+		-0.3, -0.8, 0,
+		-0.7, -0.8, 0,
+		-0.5, -1.2, 0,
+
+		 0.3, -1.2, 0,
+		 0.7, -1.2, 0,
+		 0.5, -0.8, 0,
+
+		// left and right, 1 and 2, CCW and CW
+		-0.8, -0.7, 0,
+		-0.8, -0.3, 0,
+		-1.2, -0.5, 0,
+
+		-1.2,  0.3, 0,
+		-1.2,  0.7, 0,
+		-0.8,  0.5, 0,
+
+		 0.8, -0.3, 0,
+		 0.8, -0.7, 0,
+		 1.2, -0.5, 0,
+
+		 1.2,  0.7, 0,
+		 1.2,  0.3, 0,
+		 0.8,  0.5, 0,
+
+		 // z tests
+		// bottom three are CCW
+		-0.8, -0.7, 0,
+		-0.4, -0.7, 0,
+		-0.6, -0.3, 0,
+
+		-0.2, -0.7, 0,
+		 0.2, -0.7, 0,
+		 0.0, -0.3, -1.3,
+
+		 0.4, -0.7, 1.3,
+		 0.8, -0.7, 1.3,
+		 0.6, -0.3, 0,
+
+		// top three are CW
+		-0.8, 0.7, 0,
+		-0.4, 0.7, 0,
+		-0.6, 0.3, 0,
+
+		-0.2, 0.7, 0,
+		 0.2, 0.7, 0,
+		 0.0, 0.3, -1.3,
+
+		 0.4, 0.7, 1.3,
+		 0.8, 0.7, 1.3,
+		 0.6, 0.3, 0,
+
+	};
+
+	int arg = 0;
+	if (argc > 1) {
+		arg = atoi(argv[1]);
+	}
+
+	switch (arg) {
+		case 1:
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			break;
+		case 2:
+			glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+			break;
+		case 3:
+			glLineWidth(8);
+			line_width = 8.0f;
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			break;
+		case 4:
+			glPointSize(8);
+			point_size = 8.0f;
+			glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+			break;
+		case 5:
+			glLineWidth(32);
+			line_width = 32.0f;
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			break;
+		case 6:
+			glPointSize(32);
+			point_size = 32.0f;
+			glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+			break;
+		default:
+			break;
+	}
+
 
 	//no error checking done for any of this except shader compilation
 	GLuint program = load_shader_pair(vs_shader_str, fs_shader_str);
@@ -63,19 +168,8 @@ int main(int argc, char** argv)
 	glUseProgram(program);
 
 	float Red[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
-	float Green[4] = { 0.0f, 1.0f, 0.0f, 1.0f };
-	float Blue[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
-
-	float Magenta[4] = { 1.0f, 0.0f, 1.0f, 1.0f };
-	float Yellow[4] = { 1.0f, 1.0f, 0.0f, 1.0f };
-	float Cyan[4] = { 0.0f, 1.0f, 1.0f, 1.0f };
-
-	float White[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	float Grey[4] = { 0.5f, 0.5f, 0.5f, 0.5f };
-
-
-
 	int loc = glGetUniformLocation(program, "color");
+	glUniform4fv(loc, 1, Red);
 
 	//no default vao in core profile ...
 	GLuint vao;
@@ -89,13 +183,14 @@ int main(int argc, char** argv)
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-
-	glEnable(GL_SCISSOR_TEST);
+	glEnable(GL_DEPTH_CLAMP);
 
 	unsigned int old_time = 0, new_time=0, counter = 0;
 	while (1) {
 		if (handle_events())
 			break;
+
+		glClearColor(0, 0, 0, 1);
 
 		counter++;
 		new_time = SDL_GetTicks();
@@ -108,42 +203,7 @@ int main(int argc, char** argv)
 
 		
 		glClear(GL_COLOR_BUFFER_BIT);
-
-		glUniform4fv(loc, 1, Red);
-		glViewport(0, 0, WIDTH/2, HEIGHT/2);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
-		glUniform4fv(loc, 1, Green);
-		glViewport(0, HEIGHT/2, WIDTH/2, HEIGHT/2);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
-		glUniform4fv(loc, 1, Blue);
-		glViewport(WIDTH/2, HEIGHT/2, WIDTH/2, HEIGHT/2);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
-		glScissor(0, 100, 1000, 1000);
-		glUniform4fv(loc, 1, Magenta);
-		glViewport(WIDTH/2, 0, WIDTH/2, HEIGHT/2);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		glScissor(0, 0, WIDTH, HEIGHT);
-
-		// testing going off all edges
-		glUniform4fv(loc, 1, Cyan);
-		glViewport(-WIDTH/4, -HEIGHT/4, WIDTH/2, HEIGHT/2);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
-		glUniform4fv(loc, 1, Yellow);
-		glViewport(-WIDTH/4, 3*HEIGHT/4, WIDTH/2, HEIGHT/2);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
-		glUniform4fv(loc, 1, White);
-		glViewport(3*WIDTH/4, 3*HEIGHT/4, WIDTH/2, HEIGHT/2);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
-		glUniform4fv(loc, 1, Grey);
-		glViewport(3*WIDTH/4, -HEIGHT/4, WIDTH/2, HEIGHT/2);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
+		glDrawArrays(GL_TRIANGLES, 0, 42);
 
 		SDL_GL_SwapWindow(window);
 	}
@@ -168,7 +228,7 @@ void setup_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	window = SDL_CreateWindow("Ex 1", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Test DEPTH_CLAMP", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
 		cleanup();
 		exit(0);
@@ -212,9 +272,57 @@ int handle_events()
 		} else if (e.type == SDL_KEYDOWN) {
 			sc = e.key.keysym.scancode;
 
-			if (sc == SDL_SCANCODE_ESCAPE)
+			if (sc == SDL_SCANCODE_ESCAPE) {
 				return 1;
+			}
+		} else if (e.type == SDL_KEYUP) {
+			sc = e.key.keysym.scancode;
+			switch (sc) {
+			case SDL_SCANCODE_P:
+				polygon_mode = (polygon_mode + 1) % 3;
+				if (polygon_mode == 0)
+					glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+				else if (polygon_mode == 1)
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				else
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				break;
+			case SDL_SCANCODE_UP:
+				point_size *= 2;
+				glPointSize(point_size);
+				break;
+			case SDL_SCANCODE_DOWN:
+				point_size /= 2.0f;
+				if (point_size < 1)
+					point_size = 1.0f;
+				glPointSize(point_size);
+				break;
+
+			case SDL_SCANCODE_RIGHT:
+				line_width *= 2;
+				glLineWidth(line_width);
+				break;
+			case SDL_SCANCODE_LEFT:
+				line_width /= 2.0f;
+				if (line_width < 1)
+					line_width = 1.0f;
+				glLineWidth(line_width);
+				break;
+			
+			case SDL_SCANCODE_S:
+				line_smooth = !line_smooth;
+				if (line_smooth) {
+					glEnable(GL_LINE_SMOOTH);
+				} else {
+					glDisable(GL_LINE_SMOOTH);
+				}
+				break;
+
+				
+			}
 		}
+
+
 	}
 	return 0;
 }
@@ -324,4 +432,6 @@ GLuint load_shader_pair(const char* vert_shader_src, const char* frag_shader_src
 
 	return link_program(program);
 }
+
+
 

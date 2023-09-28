@@ -86,6 +86,7 @@ int main(int argc, char** argv)
 	float Blue[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
 	float Purple[4] = { 1.0f, 0.0f, 1.0f, 1.0f };
 	float Cyan[4] = { 0.0f, 1.0f, 1.0f, 1.0f };
+	float White[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 	int loc = glGetUniformLocation(program, "color");
 
@@ -103,6 +104,7 @@ int main(int argc, char** argv)
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_SCISSOR_TEST);
+	GLint box[4];
 
 	unsigned int old_time = 0, new_time=0, counter = 0;
 	while (1) {
@@ -133,6 +135,8 @@ int main(int argc, char** argv)
 		glUniform4fv(loc, 1, Green);
 		glDrawArrays(GL_TRIANGLES, 3, 3);
 
+		glGetIntegerv(GL_SCISSOR_BOX, box);
+
 		// Allow bottom
 		glScissor(220, 0, 200, 300);
 		glUniform4fv(loc, 1, Blue);
@@ -148,8 +152,17 @@ int main(int argc, char** argv)
 		glUniform4fv(loc, 1, Cyan);
 		glDrawArrays(GL_TRIANGLES, 12, 3);
 
+		glDisable(GL_SCISSOR_TEST);
+		glUniform4fv(loc, 1, White);
+		glDrawArrays(GL_TRIANGLES, 3, 3);
+
+		glEnable(GL_SCISSOR_TEST);
+		glUniform4fv(loc, 1, Cyan);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
 		SDL_GL_SwapWindow(window);
 	}
+	printf("scissor: %d %d %d %d\n", box[0], box[1], box[2], box[3]);
 
 	glDeleteBuffers(1, &triangle);
 	glDeleteProgram(program);
