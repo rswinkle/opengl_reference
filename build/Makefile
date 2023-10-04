@@ -33,6 +33,7 @@ ifeq ($(config),debug)
   test_viewport_config = debug
   test_clipping_config = debug
   test_depthclamp_config = debug
+  test_line_depth_config = debug
   glm_sphereworld_color_config = debug
   glm_grass_config = debug
   glm_flying_config = debug
@@ -64,6 +65,7 @@ ifeq ($(config),release)
   test_viewport_config = release
   test_clipping_config = release
   test_depthclamp_config = release
+  test_line_depth_config = release
   glm_sphereworld_color_config = release
   glm_grass_config = release
   glm_flying_config = release
@@ -71,7 +73,7 @@ ifeq ($(config),release)
   gears_config = release
 endif
 
-PROJECTS := ex1 ex2 lesson1 lesson2 lesson3 lesson4 lesson5 lesson6 lesson7 multidraw texturing modelviewer testprimitives grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites test_poly_modes test_scissoring test_viewport test_clipping test_depthclamp glm_sphereworld_color glm_grass glm_flying left_handed gears
+PROJECTS := ex1 ex2 lesson1 lesson2 lesson3 lesson4 lesson5 lesson6 lesson7 multidraw texturing modelviewer testprimitives grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites test_poly_modes test_scissoring test_viewport test_clipping test_depthclamp test_line_depth glm_sphereworld_color glm_grass glm_flying left_handed gears
 
 .PHONY: all clean help $(PROJECTS) 
 
@@ -221,6 +223,12 @@ ifneq (,$(test_depthclamp_config))
 	@${MAKE} --no-print-directory -C . -f test_depthclamp.make config=$(test_depthclamp_config)
 endif
 
+test_line_depth:
+ifneq (,$(test_line_depth_config))
+	@echo "==== Building test_line_depth ($(test_line_depth_config)) ===="
+	@${MAKE} --no-print-directory -C . -f test_line_depth.make config=$(test_line_depth_config)
+endif
+
 glm_sphereworld_color:
 ifneq (,$(glm_sphereworld_color_config))
 	@echo "==== Building glm_sphereworld_color ($(glm_sphereworld_color_config)) ===="
@@ -276,6 +284,7 @@ clean:
 	@${MAKE} --no-print-directory -C . -f test_viewport.make clean
 	@${MAKE} --no-print-directory -C . -f test_clipping.make clean
 	@${MAKE} --no-print-directory -C . -f test_depthclamp.make clean
+	@${MAKE} --no-print-directory -C . -f test_line_depth.make clean
 	@${MAKE} --no-print-directory -C . -f glm_sphereworld_color.make clean
 	@${MAKE} --no-print-directory -C . -f glm_grass.make clean
 	@${MAKE} --no-print-directory -C . -f glm_flying.make clean
@@ -316,6 +325,7 @@ help:
 	@echo "   test_viewport"
 	@echo "   test_clipping"
 	@echo "   test_depthclamp"
+	@echo "   test_line_depth"
 	@echo "   glm_sphereworld_color"
 	@echo "   glm_grass"
 	@echo "   glm_flying"
