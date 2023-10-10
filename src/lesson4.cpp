@@ -161,10 +161,12 @@ int main(int argc, char** argv)
 	glBindBuffer(GL_ARRAY_BUFFER, cube_color_buf);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_colors), cube_colors, GL_STATIC_DRAW);
 
+#ifdef USE_EBO
 	GLuint cube_tri_buf;
 	glGenBuffers(1, &cube_tri_buf);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_tri_buf);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_triangles), cube_triangles, GL_STATIC_DRAW);
+#endif
 
 
 	glEnableVertexAttribArray(0);
@@ -240,7 +242,21 @@ int main(int argc, char** argv)
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, cube_color_buf);
 		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
-		glDrawElements(GL_TRIANGLES, sizeof(cube_triangles), GL_UNSIGNED_SHORT, 0);
+
+#ifdef USE_EBO
+		// count is number of indices ie number of vertices
+		//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);
+		//glDrawElements(GL_TRIANGLES, sizeof(cube_triangles)/sizeof(unsigned short), GL_UNSIGNED_SHORT, 0);
+
+		// indices is a *byte* offset, not an index
+		//glDrawElements(GL_TRIANGLES, 33, GL_UNSIGNED_SHORT, (void*)(3*sizeof(short)));
+
+#else
+		// Apparently, if no Element Array Buffer is bound, you can pass in an array of indices directly
+		// which probably explains why that stupid parameter is a void* instead of a GLsizei or GLuint
+		// So to test this make sure USE_EBO is not defined
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, cube_triangles);
+#endif
 
 		mat_stack.pop();
 
@@ -252,7 +268,9 @@ int main(int argc, char** argv)
 	glDeleteBuffers(1, &pyramid_color_buf);
 	glDeleteBuffers(1, &cube_buf);
 	glDeleteBuffers(1, &cube_color_buf);
+#ifdef USE_EBO
 	glDeleteBuffers(1, &cube_tri_buf);
+#endif
 	glDeleteProgram(program);
 
 	cleanup();
@@ -271,6 +289,12 @@ void setup_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+
+	// figure this out later
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 
 	window = SDL_CreateWindow("Lesson 4", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
