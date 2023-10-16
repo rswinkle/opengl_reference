@@ -65,7 +65,7 @@ all: prebuild prelink $(TARGET)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/test_depthclamp.o \
+	$(OBJDIR)/depthclamp.o \
 
 RESOURCES := \
 
@@ -124,7 +124,7 @@ else
 $(OBJECTS): | $(OBJDIR)
 endif
 
-$(OBJDIR)/test_depthclamp.o: ../src/test_depthclamp.c
+$(OBJDIR)/depthclamp.o: ../src/tests/depthclamp.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

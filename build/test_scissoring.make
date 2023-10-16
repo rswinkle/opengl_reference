@@ -65,7 +65,7 @@ all: prebuild prelink $(TARGET)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/test_scissoring.o \
+	$(OBJDIR)/scissoring.o \
 
 RESOURCES := \
 
@@ -124,7 +124,7 @@ else
 $(OBJECTS): | $(OBJDIR)
 endif
 
-$(OBJDIR)/test_scissoring.o: ../src/test_scissoring.c
+$(OBJDIR)/scissoring.o: ../src/tests/scissoring.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

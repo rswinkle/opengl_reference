@@ -28,17 +28,17 @@ ifeq ($(config),debug)
   glm_modelviewer_config = debug
   glm_texturing_config = debug
   point_sprites_config = debug
+  glm_sphereworld_color_config = debug
+  glm_grass_config = debug
+  glm_flying_config = debug
+  left_handed_config = debug
+  gears_config = debug
   test_poly_modes_config = debug
   test_scissoring_config = debug
   test_viewport_config = debug
   test_clipping_config = debug
   test_depthclamp_config = debug
   test_line_depth_config = debug
-  glm_sphereworld_color_config = debug
-  glm_grass_config = debug
-  glm_flying_config = debug
-  left_handed_config = debug
-  gears_config = debug
 endif
 ifeq ($(config),release)
   ex1_config = release
@@ -60,20 +60,20 @@ ifeq ($(config),release)
   glm_modelviewer_config = release
   glm_texturing_config = release
   point_sprites_config = release
+  glm_sphereworld_color_config = release
+  glm_grass_config = release
+  glm_flying_config = release
+  left_handed_config = release
+  gears_config = release
   test_poly_modes_config = release
   test_scissoring_config = release
   test_viewport_config = release
   test_clipping_config = release
   test_depthclamp_config = release
   test_line_depth_config = release
-  glm_sphereworld_color_config = release
-  glm_grass_config = release
-  glm_flying_config = release
-  left_handed_config = release
-  gears_config = release
 endif
 
-PROJECTS := ex1 ex2 lesson1 lesson2 lesson3 lesson4 lesson5 lesson6 lesson7 multidraw texturing modelviewer testprimitives grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites test_poly_modes test_scissoring test_viewport test_clipping test_depthclamp test_line_depth glm_sphereworld_color glm_grass glm_flying left_handed gears
+PROJECTS := ex1 ex2 lesson1 lesson2 lesson3 lesson4 lesson5 lesson6 lesson7 multidraw texturing modelviewer testprimitives grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites glm_sphereworld_color glm_grass glm_flying left_handed gears test_poly_modes test_scissoring test_viewport test_clipping test_depthclamp test_line_depth
 
 .PHONY: all clean help $(PROJECTS) 
 
@@ -193,6 +193,36 @@ ifneq (,$(point_sprites_config))
 	@${MAKE} --no-print-directory -C . -f point_sprites.make config=$(point_sprites_config)
 endif
 
+glm_sphereworld_color:
+ifneq (,$(glm_sphereworld_color_config))
+	@echo "==== Building glm_sphereworld_color ($(glm_sphereworld_color_config)) ===="
+	@${MAKE} --no-print-directory -C . -f glm_sphereworld_color.make config=$(glm_sphereworld_color_config)
+endif
+
+glm_grass:
+ifneq (,$(glm_grass_config))
+	@echo "==== Building glm_grass ($(glm_grass_config)) ===="
+	@${MAKE} --no-print-directory -C . -f glm_grass.make config=$(glm_grass_config)
+endif
+
+glm_flying:
+ifneq (,$(glm_flying_config))
+	@echo "==== Building glm_flying ($(glm_flying_config)) ===="
+	@${MAKE} --no-print-directory -C . -f glm_flying.make config=$(glm_flying_config)
+endif
+
+left_handed:
+ifneq (,$(left_handed_config))
+	@echo "==== Building left_handed ($(left_handed_config)) ===="
+	@${MAKE} --no-print-directory -C . -f left_handed.make config=$(left_handed_config)
+endif
+
+gears:
+ifneq (,$(gears_config))
+	@echo "==== Building gears ($(gears_config)) ===="
+	@${MAKE} --no-print-directory -C . -f gears.make config=$(gears_config)
+endif
+
 test_poly_modes:
 ifneq (,$(test_poly_modes_config))
 	@echo "==== Building test_poly_modes ($(test_poly_modes_config)) ===="
@@ -229,36 +259,6 @@ ifneq (,$(test_line_depth_config))
 	@${MAKE} --no-print-directory -C . -f test_line_depth.make config=$(test_line_depth_config)
 endif
 
-glm_sphereworld_color:
-ifneq (,$(glm_sphereworld_color_config))
-	@echo "==== Building glm_sphereworld_color ($(glm_sphereworld_color_config)) ===="
-	@${MAKE} --no-print-directory -C . -f glm_sphereworld_color.make config=$(glm_sphereworld_color_config)
-endif
-
-glm_grass:
-ifneq (,$(glm_grass_config))
-	@echo "==== Building glm_grass ($(glm_grass_config)) ===="
-	@${MAKE} --no-print-directory -C . -f glm_grass.make config=$(glm_grass_config)
-endif
-
-glm_flying:
-ifneq (,$(glm_flying_config))
-	@echo "==== Building glm_flying ($(glm_flying_config)) ===="
-	@${MAKE} --no-print-directory -C . -f glm_flying.make config=$(glm_flying_config)
-endif
-
-left_handed:
-ifneq (,$(left_handed_config))
-	@echo "==== Building left_handed ($(left_handed_config)) ===="
-	@${MAKE} --no-print-directory -C . -f left_handed.make config=$(left_handed_config)
-endif
-
-gears:
-ifneq (,$(gears_config))
-	@echo "==== Building gears ($(gears_config)) ===="
-	@${MAKE} --no-print-directory -C . -f gears.make config=$(gears_config)
-endif
-
 clean:
 	@${MAKE} --no-print-directory -C . -f ex1.make clean
 	@${MAKE} --no-print-directory -C . -f ex2.make clean
@@ -279,17 +279,17 @@ clean:
 	@${MAKE} --no-print-directory -C . -f glm_modelviewer.make clean
 	@${MAKE} --no-print-directory -C . -f glm_texturing.make clean
 	@${MAKE} --no-print-directory -C . -f point_sprites.make clean
+	@${MAKE} --no-print-directory -C . -f glm_sphereworld_color.make clean
+	@${MAKE} --no-print-directory -C . -f glm_grass.make clean
+	@${MAKE} --no-print-directory -C . -f glm_flying.make clean
+	@${MAKE} --no-print-directory -C . -f left_handed.make clean
+	@${MAKE} --no-print-directory -C . -f gears.make clean
 	@${MAKE} --no-print-directory -C . -f test_poly_modes.make clean
 	@${MAKE} --no-print-directory -C . -f test_scissoring.make clean
 	@${MAKE} --no-print-directory -C . -f test_viewport.make clean
 	@${MAKE} --no-print-directory -C . -f test_clipping.make clean
 	@${MAKE} --no-print-directory -C . -f test_depthclamp.make clean
 	@${MAKE} --no-print-directory -C . -f test_line_depth.make clean
-	@${MAKE} --no-print-directory -C . -f glm_sphereworld_color.make clean
-	@${MAKE} --no-print-directory -C . -f glm_grass.make clean
-	@${MAKE} --no-print-directory -C . -f glm_flying.make clean
-	@${MAKE} --no-print-directory -C . -f left_handed.make clean
-	@${MAKE} --no-print-directory -C . -f gears.make clean
 
 help:
 	@echo "Usage: make [config=name] [target]"
@@ -320,16 +320,16 @@ help:
 	@echo "   glm_modelviewer"
 	@echo "   glm_texturing"
 	@echo "   point_sprites"
+	@echo "   glm_sphereworld_color"
+	@echo "   glm_grass"
+	@echo "   glm_flying"
+	@echo "   left_handed"
+	@echo "   gears"
 	@echo "   test_poly_modes"
 	@echo "   test_scissoring"
 	@echo "   test_viewport"
 	@echo "   test_clipping"
 	@echo "   test_depthclamp"
 	@echo "   test_line_depth"
-	@echo "   glm_sphereworld_color"
-	@echo "   glm_grass"
-	@echo "   glm_flying"
-	@echo "   left_handed"
-	@echo "   gears"
 	@echo ""
 	@echo "For more information, see https://github.com/premake/premake-core/wiki"

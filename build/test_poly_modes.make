@@ -65,7 +65,7 @@ all: prebuild prelink $(TARGET)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/test_poly_modes.o \
+	$(OBJDIR)/poly_modes.o \
 
 RESOURCES := \
 
@@ -124,7 +124,7 @@ else
 $(OBJECTS): | $(OBJDIR)
 endif
 
-$(OBJDIR)/test_poly_modes.o: ../src/test_poly_modes.c
+$(OBJDIR)/poly_modes.o: ../src/tests/poly_modes.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

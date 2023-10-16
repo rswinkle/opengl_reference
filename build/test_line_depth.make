@@ -65,7 +65,7 @@ all: prebuild prelink $(TARGET)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/test_thick_line_depth.o \
+	$(OBJDIR)/thick_line_depth.o \
 
 RESOURCES := \
 
@@ -124,7 +124,7 @@ else
 $(OBJECTS): | $(OBJDIR)
 endif
 
-$(OBJDIR)/test_thick_line_depth.o: ../src/test_thick_line_depth.c
+$(OBJDIR)/thick_line_depth.o: ../src/tests/thick_line_depth.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

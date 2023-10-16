@@ -1,10 +1,22 @@
 opengl_reference
 ================
 
-This is going to be a repository of modern (3.3/4.x) OpenGL programs.
+This is going to be a repository of mostly modern (3.3/4.x) OpenGL programs.
 Most of these will be either exploring/demonstrating concepts, testing
 my own OpenGL helper libraries, or be framework/template programs for
 starting new projects.
+
+Actually I've started using this repo to create small programs to test
+what is supposed to happen (assuming the drivers are obeying the spec
+which isn't always a safe assumption) for various situations to help
+me in developing PortableGL (and creating regression tests for it).
+
+I think I'll reorganize the src directory with subdirectories for tests
+and another for testing OpenGL ES behavior as well.  PortableGL, while
+mostly 3.x-ish already has some 4.x features and while I have always
+said it was targeting a core profile that wasn't strictly accurate.
+There's no reason not to be more compatible and support OpenGL ES features
+as well where they make sense.
 
 There are better repositories of modern OpenGL programs to
 use for learning because they're more complete/organized,

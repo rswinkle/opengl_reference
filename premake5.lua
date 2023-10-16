@@ -254,67 +254,6 @@ solution "opengl_reference"
 		configuration { "gmake" }
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
-	project "test_poly_modes"
-		kind "ConsoleApp"
-		language "C"
-		files {
-			"src/test_poly_modes.c"
-		}
-		
-		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
-
-	project "test_scissoring"
-		kind "ConsoleApp"
-		language "C"
-		files {
-			"src/test_scissoring.c"
-		}
-		
-		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
-
-	project "test_viewport"
-		kind "ConsoleApp"
-		language "C"
-		files {
-			"src/test_viewport.c"
-		}
-		
-		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
-
-	project "test_clipping"
-		kind "ConsoleApp"
-		language "C"
-		files {
-			"src/test_clipping.c"
-		}
-		
-		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
-
-	project "test_depthclamp"
-		kind "ConsoleApp"
-		language "C"
-		files {
-			"src/test_depthclamp.c"
-		}
-		
-		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
-
-	project "test_line_depth"
-		kind "ConsoleApp"
-		language "C"
-		files {
-			"src/test_thick_line_depth.c"
-		}
-		
-		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
-
-
 	project "glm_sphereworld_color"
 		kind "ConsoleApp"
 		language "C++"
@@ -376,3 +315,67 @@ solution "opengl_reference"
 		
 		configuration { "gmake" }
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
+
+-- programs just to test things
+	project "test_poly_modes"
+		kind "ConsoleApp"
+		language "C"
+		files {
+			"src/tests/poly_modes.c"
+		}
+		
+		configuration { "gmake" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
+
+	project "test_scissoring"
+		kind "ConsoleApp"
+		language "C"
+		files {
+			"src/tests/scissoring.c"
+		}
+		
+		configuration { "gmake" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
+
+	project "test_viewport"
+		kind "ConsoleApp"
+		language "C"
+		files {
+			"src/tests/viewport.c"
+		}
+		
+		configuration { "gmake" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
+
+	project "test_clipping"
+		kind "ConsoleApp"
+		language "C"
+		files {
+			"src/tests/clipping.c"
+		}
+		
+		configuration { "gmake" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
+
+	project "test_depthclamp"
+		kind "ConsoleApp"
+		language "C"
+		files {
+			"src/tests/depthclamp.c"
+		}
+		
+		configuration { "gmake" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
+
+	project "test_line_depth"
+		kind "ConsoleApp"
+		language "C"
+		files {
+			"src/tests/thick_line_depth.c"
+		}
+		
+		configuration { "gmake" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
+
+
+
