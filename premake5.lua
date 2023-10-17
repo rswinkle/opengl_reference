@@ -1,21 +1,23 @@
 -- A solution contains projects, and defines the available configurations
-solution "opengl_reference"
+workspace "opengl_reference"
 	configurations { "Debug", "Release" }
 	location "build"
 	targetdir "build"
 	includedirs { "inc", "src/glcommon" }
 
-	configuration "linux"
+	platforms { "linux", "windows" }
+
+	filter "platforms:linux"
 		links { "SDL2", "GLEW", "GL", "m" }
 	
-	configuration "windows"
+	filter "platforms:windows"
 		links { "mingw32", "SDL2main", "SDL2", "glew32", "opengl32" }
 
-	configuration "Debug"
+	filter "configurations:Debug"
 		defines { "DEBUG" }
 		symbols "On"
 
-	configuration "Release"
+	filter "configurations:Release"
 		defines { "NDEBUG" }
 		optimize "On"
 	
@@ -377,5 +379,16 @@ solution "opengl_reference"
 		configuration { "gmake" }
 			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
+	project "client_arrays"
+		kind "ConsoleApp"
+		language "C"
+		files {
+			"src/tests/client_arrays.c"
+		}
+		
+		configuration { "gmake" }
+			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
+-- GLES programs have their own premake5.lua in src/tests/ and a build directory
+-- in build/gles
 

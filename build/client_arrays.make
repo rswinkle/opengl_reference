@@ -13,8 +13,8 @@ endif
 ifeq ($(config),debug_linux)
   RESCOMP = windres
   TARGETDIR = .
-  TARGET = $(TARGETDIR)/test_poly_modes
-  OBJDIR = obj/linux/Debug/test_poly_modes
+  TARGET = $(TARGETDIR)/client_arrays
+  OBJDIR = obj/linux/Debug/client_arrays
   DEFINES += -DDEBUG
   INCLUDES += -I../inc -I../src/glcommon
   FORCE_INCLUDE +=
@@ -40,8 +40,8 @@ endif
 ifeq ($(config),debug_windows)
   RESCOMP = windres
   TARGETDIR = .
-  TARGET = $(TARGETDIR)/test_poly_modes.exe
-  OBJDIR = obj/windows/Debug/test_poly_modes
+  TARGET = $(TARGETDIR)/client_arrays.exe
+  OBJDIR = obj/windows/Debug/client_arrays
   DEFINES += -DDEBUG
   INCLUDES += -I../inc -I../src/glcommon
   FORCE_INCLUDE +=
@@ -67,8 +67,8 @@ endif
 ifeq ($(config),release_linux)
   RESCOMP = windres
   TARGETDIR = .
-  TARGET = $(TARGETDIR)/test_poly_modes
-  OBJDIR = obj/linux/Release/test_poly_modes
+  TARGET = $(TARGETDIR)/client_arrays
+  OBJDIR = obj/linux/Release/client_arrays
   DEFINES += -DNDEBUG
   INCLUDES += -I../inc -I../src/glcommon
   FORCE_INCLUDE +=
@@ -94,8 +94,8 @@ endif
 ifeq ($(config),release_windows)
   RESCOMP = windres
   TARGETDIR = .
-  TARGET = $(TARGETDIR)/test_poly_modes.exe
-  OBJDIR = obj/windows/Release/test_poly_modes
+  TARGET = $(TARGETDIR)/client_arrays.exe
+  OBJDIR = obj/windows/Release/client_arrays
   DEFINES += -DNDEBUG
   INCLUDES += -I../inc -I../src/glcommon
   FORCE_INCLUDE +=
@@ -119,7 +119,7 @@ all: prebuild prelink $(TARGET)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/poly_modes.o \
+	$(OBJDIR)/client_arrays.o \
 
 RESOURCES := \
 
@@ -131,7 +131,7 @@ ifeq (.exe,$(findstring .exe,$(ComSpec)))
 endif
 
 $(TARGET): $(GCH) ${CUSTOMFILES} $(OBJECTS) $(LDDEPS) $(RESOURCES) | $(TARGETDIR)
-	@echo Linking test_poly_modes
+	@echo Linking client_arrays
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -154,7 +154,7 @@ else
 endif
 
 clean:
-	@echo Cleaning test_poly_modes
+	@echo Cleaning client_arrays
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -178,7 +178,7 @@ else
 $(OBJECTS): | $(OBJDIR)
 endif
 
-$(OBJDIR)/poly_modes.o: ../src/tests/poly_modes.c
+$(OBJDIR)/client_arrays.o: ../src/tests/client_arrays.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

@@ -23,7 +23,11 @@
 CMakeFiles/*
 CMakeCache.txt
 stats/*
+scratch/*
 build/*
+!build/gles/*
+!build/gles/Makefile
+!build/gles/*.make
 !build/Makefile
 !build/*.make
 *.swp

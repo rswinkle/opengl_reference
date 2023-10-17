@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	if (!load_texture2D("../media/textures/nehe.gif", GL_NEAREST, GL_NEAREST, GL_MIRRORED_REPEAT, GL_TRUE)) {
+	if (!load_texture2D("../media/textures/nehe.gif", GL_NEAREST, GL_NEAREST, GL_MIRRORED_REPEAT, GL_TRUE, GL_FALSE)) {
 		printf("failed to load texture\n");
 		return 0;
 	}
