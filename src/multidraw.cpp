@@ -40,7 +40,10 @@ int main(int argc, char** argv)
 
 	int sq_dim = 20;
 	vector<GLint> firsts;
-	vector<void*> first_elems;
+	// can be GLsizeiptr or GLintptr or
+	// really any int type that is the same size
+	// as a pointer
+	vector<GLintptr> first_elems;
 	vector<GLsizei> counts;
 
 	const int cols = 25;
@@ -49,7 +52,7 @@ int main(int argc, char** argv)
 	for (int j=0; j<rows; j++) {
 		for (int i=0; i<cols; i++) {
 			firsts.push_back(tri_strips.size());
-			first_elems.push_back((void*)(tri_strips.size()*sizeof(GLuint)));
+			first_elems.push_back(tri_strips.size()*sizeof(GLuint));
 			counts.push_back(4);
 
 			tri_strips.push_back(vec3(i*(sq_dim+5),        j*(sq_dim+5),        0));
@@ -92,7 +95,6 @@ int main(int argc, char** argv)
 	glUseProgram(program);
 
 	matrix_stack mat_stack;
-	//rsw::make_perspective_matrix(mat_stack.stack[mat_stack.top], DEG_TO_RAD(45), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
 	rsw::make_orthographic_matrix(mat_stack.stack[mat_stack.top], 0, WIDTH-1, 0, HEIGHT-1, 1, -1);
 
 	mat4 mvp_mat;
@@ -122,7 +124,7 @@ int main(int argc, char** argv)
 		if (!use_elements) {
 			glMultiDrawArrays(GL_TRIANGLE_STRIP, &firsts[0], &counts[0], 100);
 		} else {
-			glMultiDrawElements(GL_TRIANGLE_STRIP, &counts[0], GL_UNSIGNED_INT, (const void* const*)(&first_elems[0]), 475);
+			glMultiDrawElements(GL_TRIANGLE_STRIP, &counts[0], GL_UNSIGNED_INT, (GLvoid* const*)(&first_elems[0]), 475);
 		}
 
 		mat_stack.pop();
