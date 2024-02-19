@@ -20,6 +20,15 @@ workspace "opengl_reference"
 	filter "configurations:Release"
 		defines { "NDEBUG" }
 		optimize "On"
+
+	filter { "action:gmake", "Release" }
+		buildoptions { "-O3" }
+
+	filter { "action:gmake", "language:C" }
+		buildoptions { "-std=c99", "-pedantic-errors", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
+	filter { "action:gmake", "language:C++" }
+		buildoptions { "-fno-rtti", "-fno-exceptions", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+	
 	
 
 	project "ex1"
@@ -28,10 +37,6 @@ workspace "opengl_reference"
 		files {
 			"src/ex1.c"
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
-
 
 	project "ex2"
 		kind "ConsoleApp"
@@ -39,9 +44,6 @@ workspace "opengl_reference"
 		files {
 			"src/ex2.c"
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
 	project "lesson1"
 		kind "ConsoleApp"
@@ -51,9 +53,6 @@ workspace "opengl_reference"
 			"src/glcommon/gltools.cpp",
 			"src/glcommon/rsw_math.cpp",
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "lesson2"
 		kind "ConsoleApp"
@@ -63,9 +62,7 @@ workspace "opengl_reference"
 			"src/glcommon/gltools.cpp",
 			"src/glcommon/rsw_math.cpp",
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+
 
 	project "lesson3"
 		kind "ConsoleApp"
@@ -75,9 +72,7 @@ workspace "opengl_reference"
 			"src/glcommon/gltools.cpp",
 			"src/glcommon/rsw_math.cpp",
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+
 
 	project "lesson4"
 		kind "ConsoleApp"
@@ -87,9 +82,6 @@ workspace "opengl_reference"
 			"src/glcommon/gltools.cpp",
 			"src/glcommon/rsw_math.cpp",
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "lesson5"
 		kind "ConsoleApp"
@@ -99,9 +91,6 @@ workspace "opengl_reference"
 			"src/glcommon/gltools.cpp",
 			"src/glcommon/rsw_math.cpp",
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "lesson6"
 		kind "ConsoleApp"
@@ -111,9 +100,6 @@ workspace "opengl_reference"
 			"src/glcommon/gltools.cpp",
 			"src/glcommon/rsw_math.cpp",
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "lesson7"
 		kind "ConsoleApp"
@@ -123,9 +109,6 @@ workspace "opengl_reference"
 			"src/glcommon/gltools.cpp",
 			"src/glcommon/rsw_math.cpp",
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "multidraw"
 		kind "ConsoleApp"
@@ -144,9 +127,6 @@ workspace "opengl_reference"
 			"src/glcommon/rsw_math.cpp",
 			"src/glcommon/gltools.cpp"
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "modelviewer"
 		kind "ConsoleApp"
@@ -158,9 +138,6 @@ workspace "opengl_reference"
 			"src/glcommon/rsw_primitives.cpp",
 			"src/glcommon/rsw_halfedge.cpp"
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "testprimitives"
 		kind "ConsoleApp"
@@ -172,9 +149,6 @@ workspace "opengl_reference"
 			"src/glcommon/rsw_primitives.cpp",
 			"src/glcommon/rsw_halfedge.cpp"
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "grass"
 		kind "ConsoleApp"
@@ -185,9 +159,6 @@ workspace "opengl_reference"
 			"src/glcommon/rsw_math.cpp",
 			"src/glcommon/rsw_glframe.cpp",
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 
 	project "sphereworld_color"
@@ -201,9 +172,6 @@ workspace "opengl_reference"
 			"src/glcommon/rsw_primitives.cpp",
 			"src/glcommon/rsw_halfedge.cpp",
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "flying"
 		kind "ConsoleApp"
@@ -214,11 +182,7 @@ workspace "opengl_reference"
 			"src/glcommon/rsw_math.cpp",
 			"src/glcommon/rsw_glframe.cpp",
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
-	
 	project "glm_modelviewer"
 		kind "ConsoleApp"
 		language "C++"
@@ -228,9 +192,6 @@ workspace "opengl_reference"
 			"src/glcommon/glm_primitives.cpp",
 			"src/glcommon/glm_halfedge.cpp"
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 
 	project "glm_texturing"
@@ -241,9 +202,6 @@ workspace "opengl_reference"
 			"src/glcommon/c_utils.cpp",
 			"src/glcommon/gltools.cpp"
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "point_sprites"
 		kind "ConsoleApp"
@@ -252,9 +210,7 @@ workspace "opengl_reference"
 			"src/point_sprites.c",
 			"src/glcommon/gltools.c"
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
+
 
 	project "glm_sphereworld_color"
 		kind "ConsoleApp"
@@ -267,9 +223,6 @@ workspace "opengl_reference"
 			"src/glcommon/glm_halfedge.cpp",
 			"src/glcommon/c_utils.cpp",
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
 
 	project "glm_grass"
 		kind "ConsoleApp"
@@ -279,10 +232,6 @@ workspace "opengl_reference"
 			"src/glcommon/gltools.cpp",
 			"src/glcommon/glm_glframe.cpp",
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
-
 
 	project "glm_flying"
 		kind "ConsoleApp"
@@ -292,10 +241,6 @@ workspace "opengl_reference"
 			"src/glcommon/glm_glframe.cpp",
 			"src/glcommon/gltools.cpp",
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
-
 
 	project "left_handed"
 		kind "ConsoleApp"
@@ -303,10 +248,6 @@ workspace "opengl_reference"
 		files {
 			"src/left_handed.c"
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
-
 
 	project "gears"
 		kind "ConsoleApp"
@@ -314,9 +255,6 @@ workspace "opengl_reference"
 		files {
 			"src/gears.c"
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
 -- programs just to test things
 	project "test_poly_modes"
@@ -325,9 +263,6 @@ workspace "opengl_reference"
 		files {
 			"src/tests/poly_modes.c"
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
 	project "test_scissoring"
 		kind "ConsoleApp"
@@ -335,9 +270,6 @@ workspace "opengl_reference"
 		files {
 			"src/tests/scissoring.c"
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
 	project "test_viewport"
 		kind "ConsoleApp"
@@ -345,9 +277,6 @@ workspace "opengl_reference"
 		files {
 			"src/tests/viewport.c"
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
 	project "test_clipping"
 		kind "ConsoleApp"
@@ -355,9 +284,6 @@ workspace "opengl_reference"
 		files {
 			"src/tests/clipping.c"
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
 	project "test_depthclamp"
 		kind "ConsoleApp"
@@ -365,9 +291,6 @@ workspace "opengl_reference"
 		files {
 			"src/tests/depthclamp.c"
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
 	project "test_line_depth"
 		kind "ConsoleApp"
@@ -375,9 +298,6 @@ workspace "opengl_reference"
 		files {
 			"src/tests/thick_line_depth.c"
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
 	project "client_arrays"
 		kind "ConsoleApp"
@@ -385,9 +305,6 @@ workspace "opengl_reference"
 		files {
 			"src/tests/client_arrays.c"
 		}
-		
-		configuration { "gmake" }
-			buildoptions { "-std=c99", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
 
 -- GLES programs have their own premake5.lua in src/tests/ and a build directory
 -- in build/gles

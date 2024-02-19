@@ -18,9 +18,9 @@ ifeq ($(config),debug_linux)
   DEFINES += -DDEBUG
   INCLUDES += -I../inc -I../src/glcommon
   FORCE_INCLUDE +=
-  ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type -Wimplicit
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type -Wimplicit
+  ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g -std=c99 -pedantic-errors -Wunused-variable -Wreturn-type -Wimplicit
+  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g -std=c99 -pedantic-errors -Wunused-variable -Wreturn-type -Wimplicit
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
   LIBS += -lSDL2 -lGLEW -lGL -lm
   LDDEPS +=
@@ -45,9 +45,9 @@ ifeq ($(config),debug_windows)
   DEFINES += -DDEBUG
   INCLUDES += -I../inc -I../src/glcommon
   FORCE_INCLUDE +=
-  ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type -Wimplicit
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type -Wimplicit
+  ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g -std=c99 -pedantic-errors -Wunused-variable -Wreturn-type -Wimplicit
+  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g -std=c99 -pedantic-errors -Wunused-variable -Wreturn-type -Wimplicit
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
   LIBS += -lmingw32 -lSDL2main -lSDL2 -lglew32 -lopengl32
   LDDEPS +=
@@ -72,9 +72,9 @@ ifeq ($(config),release_linux)
   DEFINES += -DNDEBUG
   INCLUDES += -I../inc -I../src/glcommon
   FORCE_INCLUDE +=
-  ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O2 -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type -Wimplicit
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O2 -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type -Wimplicit
+  ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O2 -O3 -std=c99 -pedantic-errors -Wunused-variable -Wreturn-type -Wimplicit
+  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O2 -O3 -std=c99 -pedantic-errors -Wunused-variable -Wreturn-type -Wimplicit
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
   LIBS += -lSDL2 -lGLEW -lGL -lm
   LDDEPS +=
@@ -99,9 +99,9 @@ ifeq ($(config),release_windows)
   DEFINES += -DNDEBUG
   INCLUDES += -I../inc -I../src/glcommon
   FORCE_INCLUDE +=
-  ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O2 -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type -Wimplicit
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O2 -std=c99 -fno-strict-aliasing -Wunused-variable -Wreturn-type -Wimplicit
+  ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O2 -O3 -std=c99 -pedantic-errors -Wunused-variable -Wreturn-type -Wimplicit
+  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O2 -O3 -std=c99 -pedantic-errors -Wunused-variable -Wreturn-type -Wimplicit
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
   LIBS += -lmingw32 -lSDL2main -lSDL2 -lglew32 -lopengl32
   LDDEPS +=
