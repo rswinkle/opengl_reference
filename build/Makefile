@@ -39,6 +39,7 @@ ifeq ($(config),debug_linux)
   test_clipping_config = debug_linux
   test_depthclamp_config = debug_linux
   test_line_depth_config = debug_linux
+  test_aliasing_lines_config = debug_linux
   client_arrays_config = debug_linux
 endif
 ifeq ($(config),debug_windows)
@@ -72,6 +73,7 @@ ifeq ($(config),debug_windows)
   test_clipping_config = debug_windows
   test_depthclamp_config = debug_windows
   test_line_depth_config = debug_windows
+  test_aliasing_lines_config = debug_windows
   client_arrays_config = debug_windows
 endif
 ifeq ($(config),release_linux)
@@ -105,6 +107,7 @@ ifeq ($(config),release_linux)
   test_clipping_config = release_linux
   test_depthclamp_config = release_linux
   test_line_depth_config = release_linux
+  test_aliasing_lines_config = release_linux
   client_arrays_config = release_linux
 endif
 ifeq ($(config),release_windows)
@@ -138,10 +141,11 @@ ifeq ($(config),release_windows)
   test_clipping_config = release_windows
   test_depthclamp_config = release_windows
   test_line_depth_config = release_windows
+  test_aliasing_lines_config = release_windows
   client_arrays_config = release_windows
 endif
 
-PROJECTS := ex1 ex2 lesson1 lesson2 lesson3 lesson4 lesson5 lesson6 lesson7 multidraw texturing modelviewer testprimitives grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites glm_sphereworld_color glm_grass glm_flying left_handed gears test_poly_modes test_scissoring test_viewport test_clipping test_depthclamp test_line_depth client_arrays
+PROJECTS := ex1 ex2 lesson1 lesson2 lesson3 lesson4 lesson5 lesson6 lesson7 multidraw texturing modelviewer testprimitives grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites glm_sphereworld_color glm_grass glm_flying left_handed gears test_poly_modes test_scissoring test_viewport test_clipping test_depthclamp test_line_depth test_aliasing_lines client_arrays
 
 .PHONY: all clean help $(PROJECTS) 
 
@@ -327,6 +331,12 @@ ifneq (,$(test_line_depth_config))
 	@${MAKE} --no-print-directory -C . -f test_line_depth.make config=$(test_line_depth_config)
 endif
 
+test_aliasing_lines:
+ifneq (,$(test_aliasing_lines_config))
+	@echo "==== Building test_aliasing_lines ($(test_aliasing_lines_config)) ===="
+	@${MAKE} --no-print-directory -C . -f test_aliasing_lines.make config=$(test_aliasing_lines_config)
+endif
+
 client_arrays:
 ifneq (,$(client_arrays_config))
 	@echo "==== Building client_arrays ($(client_arrays_config)) ===="
@@ -364,6 +374,7 @@ clean:
 	@${MAKE} --no-print-directory -C . -f test_clipping.make clean
 	@${MAKE} --no-print-directory -C . -f test_depthclamp.make clean
 	@${MAKE} --no-print-directory -C . -f test_line_depth.make clean
+	@${MAKE} --no-print-directory -C . -f test_aliasing_lines.make clean
 	@${MAKE} --no-print-directory -C . -f client_arrays.make clean
 
 help:
@@ -408,6 +419,7 @@ help:
 	@echo "   test_clipping"
 	@echo "   test_depthclamp"
 	@echo "   test_line_depth"
+	@echo "   test_aliasing_lines"
 	@echo "   client_arrays"
 	@echo ""
 	@echo "For more information, see https://github.com/premake/premake-core/wiki"

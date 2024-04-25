@@ -299,6 +299,13 @@ workspace "opengl_reference"
 			"src/tests/thick_line_depth.c"
 		}
 
+	project "test_aliasing_lines"
+		kind "ConsoleApp"
+		language "C"
+		files {
+			"src/tests/lines.c"
+		}
+
 	project "client_arrays"
 		kind "ConsoleApp"
 		language "C"
