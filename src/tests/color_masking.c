@@ -1,8 +1,5 @@
 #include <GL/glew.h>
 
-//included in SDL.h?
-//#include <GL/gl.h>
-
 #include <SDL2/SDL.h>
 
 #include <stdio.h>
@@ -27,58 +24,41 @@ GLuint load_shader_pair(const char* vert_shader_src, const char* frag_shader_src
 
 
 static const char vs_shader_str[] =
-"#version 330 core                     \n"
-"                                      \n"
-"layout (location = 0) in vec4 vertex; \n"
-"void main(void)                       \n"
-"{\n"
-"	gl_Position = vertex;\n"
+"#version 330 core                        \n"
+"                                         \n"
+"layout (location = 0) in vec4 in_vertex; \n"
+"layout (location = 1) in vec4 in_color;  \n"
+"out vec4 vary_color;                     \n"
+"void main(void)                          \n"
+"{                                        \n"
+"	vary_color = in_color;                \n"
+"	gl_Position = in_vertex;              \n"
 "}";
 
 static const char fs_shader_str[] =
 "#version 330 core                     \n"
 "                                      \n"
-"uniform vec4 color;                   \n"
+"in vec4 vary_color;                   \n"
 "out vec4 frag_color;                  \n"
 "void main(void)                       \n"
 "{                                     \n"
-"	frag_color = color;                \n"
+"	frag_color = vary_color;           \n"
 "}";
-
-int polygon_mode;
-float point_size;
-float line_width;
-int line_smooth;
 
 int main(int argc, char** argv)
 {
 	setup_context();
-	polygon_mode = 2;
-	point_size = 1.0f;
-	line_width = 1.0f;
 
-	//glEnable(GL_LINE_SMOOTH);
+	float points_n_colors[] = {
+		-0.5, -0.5, 0.0,
+		 1.0,  0.0, 0.0,
 
-	// Findings: Points are not clipped absolutely, ie even if the vertex
-	// is out of the canonical view volume, if pointsize is large enough
-	// it will partially show on the screen
-	// 
-	// Apparently this was historically an NVIDIA quirk:
-	// https://www.khronos.org/opengl/wiki/Vertex_Post-Processing#Clipping
-	//
-	// Platform Issue (NVIDIA): These cards will not clip points "properly". That is, they will do what people generally want (only discard the point if it is fully outside the volume), rather than what the OpenGL specification requires. Be advised that other hardware does what OpenGL asks. 
-	//
-	// However my iGPU (intel) seems to do the same thing so...*shrug*
-	
-	//float points[] = { -1.1, -0.5, 0,
-	//                    1.1, -0.5, 0,
-	//                    0,    10, 0 };
-	//float points[] = { -0.5, -0.5, 0,
-	//                    0.5, -0.5, 0,
-	//                    0,    .5, 0 };
-	float points[] = { -0.5, -0.5, 0,
-	                    0.5, -0.5, 0,
-	                    0,    0.9, 0 };
+		 0.5, -0.5, 0.0,
+		 0.0,  1.0, 0.0,
+
+		 0.0,  0.5, 0.0,
+		 0.0,  0.0, 1.0 };
+
 
 	//no error checking done for any of this except shader compilation
 	GLuint program = load_shader_pair(vs_shader_str, fs_shader_str);
@@ -89,11 +69,6 @@ int main(int argc, char** argv)
 
 	glUseProgram(program);
 
-	float Red[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
-	int loc = glGetUniformLocation(program, "color");
-	glUniform4fv(loc, 1, Red);
-
-	//no default vao in core profile ...
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -101,29 +76,47 @@ int main(int argc, char** argv)
 	GLuint triangle;
 	glGenBuffers(1, &triangle);
 	glBindBuffer(GL_ARRAY_BUFFER, triangle);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(points_n_colors), points_n_colors, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6, 0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6, (void*)(sizeof(float)*3));
 
 
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
 
 	unsigned int old_time = 0, new_time=0, counter = 0;
-	while (1) {
-		if (handle_events())
-			break;
-
+	while (handle_events()) {
 		counter++;
 		new_time = SDL_GetTicks();
 		if (new_time - old_time > 3000) {
 			printf("%f FPS\n", counter*1000.f/(new_time-old_time));
-			fflush(stdout); //stupid windows doesn't flush with \n >:-/
 			old_time = new_time;
 			counter = 0;
 		}
 
-		
+	glClearColor(1, 1, 1, 1);
+	glColorMask(GL_TRUE, GL_TRUE, GL_FALSE, GL_TRUE);
+	glClear(GL_COLOR_BUFFER_BIT);
+	
+	// screen should be yellow now
+
+	glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	// Triangle has no red
+
+/*
+
+		glClearColor(1, 1, 1, 1);
+		glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
+*/
 
 		SDL_GL_SwapWindow(window);
 	}
@@ -148,7 +141,7 @@ void setup_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	window = SDL_CreateWindow("Test Polygon Modes", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Ex 2", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
 		cleanup();
 		exit(0);
@@ -188,63 +181,16 @@ int handle_events()
 	int sc;
 	while (SDL_PollEvent(&e)) {
 		if (e.type == SDL_QUIT) {
-			return 1;
+			return 0;
 		} else if (e.type == SDL_KEYDOWN) {
 			sc = e.key.keysym.scancode;
 
 			if (sc == SDL_SCANCODE_ESCAPE) {
-				return 1;
-			}
-		} else if (e.type == SDL_KEYUP) {
-			sc = e.key.keysym.scancode;
-			switch (sc) {
-			case SDL_SCANCODE_P:
-				polygon_mode = (polygon_mode + 1) % 3;
-				if (polygon_mode == 0)
-					glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-				else if (polygon_mode == 1)
-					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				else
-					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-				break;
-			case SDL_SCANCODE_UP:
-				point_size *= 2;
-				glPointSize(point_size);
-				break;
-			case SDL_SCANCODE_DOWN:
-				point_size /= 2.0f;
-				if (point_size < 1)
-					point_size = 1.0f;
-				glPointSize(point_size);
-				break;
-
-			case SDL_SCANCODE_RIGHT:
-				line_width *= 2;
-				glLineWidth(line_width);
-				break;
-			case SDL_SCANCODE_LEFT:
-				line_width /= 2.0f;
-				if (line_width < 1)
-					line_width = 1.0f;
-				glLineWidth(line_width);
-				break;
-			
-			case SDL_SCANCODE_S:
-				line_smooth = !line_smooth;
-				if (line_smooth) {
-					glEnable(GL_LINE_SMOOTH);
-				} else {
-					glDisable(GL_LINE_SMOOTH);
-				}
-				break;
-
-				
+				return 0;
 			}
 		}
-
-
 	}
-	return 0;
+	return 1;
 }
 
 
@@ -352,4 +298,6 @@ GLuint load_shader_pair(const char* vert_shader_src, const char* frag_shader_src
 
 	return link_program(program);
 }
+
+
 

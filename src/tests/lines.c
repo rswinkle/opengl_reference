@@ -47,6 +47,9 @@ static const char fs_shader_str[] =
 
 float line_width;
 int aliased;
+int blending = 1;
+float granularity;
+int hint_nicest;
 
 int main(int argc, char** argv)
 {
@@ -54,6 +57,23 @@ int main(int argc, char** argv)
 
 	line_width = 1;
 	aliased = 1;
+
+	float range[2];
+	glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, range);
+	printf("aliased range: %f %f\n", range[0], range[1]);
+
+	glGetFloatv(GL_SMOOTH_LINE_WIDTH_RANGE, range);
+	printf("smooth range: %f %f\n", range[0], range[1]);
+
+	glGetFloatv(GL_SMOOTH_LINE_WIDTH_GRANULARITY, range);
+	printf("smooth granularity: %f\n", range[0]);
+	granularity = range[0];
+
+	glHint(GL_LINE_SMOOTH_HINT, GL_FASTEST);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 
 	float lines[] =
 	{
@@ -65,6 +85,9 @@ int main(int argc, char** argv)
 
 		-0.5, -0.75, 0.0,
 		0.5, 0.0, 0.0,
+
+		-0.75, 0.9, 0.0,
+		-0.50, 0.0, 0.0,
 	};
 
 	//no error checking done for any of this except shader compilation
@@ -92,6 +115,7 @@ int main(int argc, char** argv)
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
+	glClearColor(0, 0, 0, 1.0);
 
 
 	unsigned int old_time = 0, new_time=0, counter = 0;
@@ -110,12 +134,10 @@ int main(int argc, char** argv)
 
 		
 		glClear(GL_COLOR_BUFFER_BIT);
-		glDrawArrays(GL_LINES, 0, 2);
+		glDrawArrays(GL_LINES, 0, 8);
 
-		//glEnable(GL_LINE_SMOOTH);
-		glDrawArrays(GL_LINES, 2, 2);
-		glDrawArrays(GL_LINES, 4, 2);
-		//glDisable(GL_LINE_SMOOTH);
+		//glDrawArrays(GL_LINES, 2, 2);
+		//glDrawArrays(GL_LINES, 4, 2);
 
 		SDL_GL_SwapWindow(window);
 	}
@@ -140,7 +162,7 @@ void setup_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	window = SDL_CreateWindow("Ex 1", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Test Aliasing Lines", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
 		cleanup();
 		exit(0);
@@ -189,22 +211,47 @@ int handle_events()
 				return 1;
 				break;
 			case SDL_SCANCODE_UP:
-				line_width++;
+				line_width += granularity;
 				glLineWidth(line_width);
+				printf("line_width = %f\n", line_width);
 				break;
 			case SDL_SCANCODE_DOWN:
-				line_width--;
+				line_width -= granularity;
 				if (line_width < 1.0) {
 					line_width = 1.0f;
 				}
 				glLineWidth(line_width);
+				printf("line_width = %f\n", line_width);
 				break;
 			case SDL_SCANCODE_SPACE:
 				aliased = !aliased;
 				if (!aliased) {
 					glEnable(GL_LINE_SMOOTH);
+					puts("smooth");
 				} else {
 					glDisable(GL_LINE_SMOOTH);
+					puts("aliased");
+				}
+				break;
+			case SDL_SCANCODE_B:
+				blending = !blending;
+
+				if (blending) {
+					glEnable(GL_BLEND);
+					puts("blending");
+				} else {
+					glDisable(GL_BLEND);
+					puts("no blending");
+				}
+				break;
+			case SDL_SCANCODE_H:
+				hint_nicest = !hint_nicest;
+				if (hint_nicest) {
+					puts("nicest");
+					glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+				} else {
+					puts("fastest");
+					glHint(GL_LINE_SMOOTH_HINT, GL_FASTEST);
 				}
 				break;
 			}

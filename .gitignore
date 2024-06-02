@@ -32,3 +32,5 @@ build/*
 !build/*.make
 *.swp
 tags
+tags.lock
+tags.temp

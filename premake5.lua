@@ -119,6 +119,15 @@ workspace "opengl_reference"
 			"src/glcommon/rsw_math.cpp",
 		}
 
+	project "multidraw2"
+		kind "ConsoleApp"
+		language "C++"
+		files {
+			"src/multidraw2.cpp",
+			"src/glcommon/gltools.cpp",
+			"src/glcommon/rsw_math.cpp",
+		}
+
 	project "texturing"
 		kind "ConsoleApp"
 		language "C++"
@@ -306,11 +315,27 @@ workspace "opengl_reference"
 			"src/tests/lines.c"
 		}
 
+	project "polylines"
+		kind "ConsoleApp"
+		language "C++"
+		files {
+			"src/tests/polylines.cpp",
+			"src/glcommon/gltools.cpp",
+			"src/glcommon/rsw_math.cpp"
+		}
+
 	project "client_arrays"
 		kind "ConsoleApp"
 		language "C"
 		files {
 			"src/tests/client_arrays.c"
+		}
+
+	project "color_masking"
+		kind "ConsoleApp"
+		language "C"
+		files {
+			"src/tests/color_masking.c"
 		}
 
 -- GLES programs have their own premake5.lua in src/tests/ and a build directory

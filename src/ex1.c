@@ -1,8 +1,5 @@
 #include <GL/glew.h>
 
-//included in SDL.h?
-//#include <GL/gl.h>
-
 #include <SDL2/SDL.h>
 
 #include <stdio.h>
@@ -10,6 +7,11 @@
 #define WIDTH 640
 #define HEIGHT 480
 
+#ifndef FPS_EVERY_N_SECS
+#define FPS_EVERY_N_SECS 1
+#endif
+
+#define FPS_DELAY (FPS_EVERY_N_SECS*1000)
 
 SDL_Window* window;
 SDL_GLContext glcontext;
@@ -66,7 +68,7 @@ int main(int argc, char** argv)
 	int loc = glGetUniformLocation(program, "color");
 	glUniform4fv(loc, 1, Red);
 
-	//no default vao in core profile ...
+	// no default vao in core profile ...
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -78,29 +80,26 @@ int main(int argc, char** argv)
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-
-
-	unsigned int old_time = 0, new_time=0, counter = 0;
-	while (1) {
-		if (handle_events())
-			break;
+	int old_time = 0, new_time=0, counter = 0;
+	int ms;
+	while (handle_events()) {
+		new_time = SDL_GetTicks();
 
 		counter++;
-		new_time = SDL_GetTicks();
-		if (new_time - old_time > 3000) {
-			printf("%f FPS\n", counter*1000.f/(new_time-old_time));
-			fflush(stdout); //stupid windows doesn't flush with \n >:-/
+		ms = new_time - old_time;
+		if (ms >= FPS_DELAY) {
+			printf("%d  %f FPS\n", ms, counter*1000.0f/ms);
 			old_time = new_time;
 			counter = 0;
 		}
 
-		
 		glClear(GL_COLOR_BUFFER_BIT);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		SDL_GL_SwapWindow(window);
 	}
 
+	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &triangle);
 	glDeleteProgram(program);
 
@@ -121,7 +120,7 @@ void setup_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	window = SDL_CreateWindow("Ex 1", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Ex 1", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
 		cleanup();
 		exit(0);
@@ -161,15 +160,15 @@ int handle_events()
 	int sc;
 	while (SDL_PollEvent(&e)) {
 		if (e.type == SDL_QUIT) {
-			return 1;
+			return 0;
 		} else if (e.type == SDL_KEYDOWN) {
 			sc = e.key.keysym.scancode;
 
 			if (sc == SDL_SCANCODE_ESCAPE)
-				return 1;
+				return 0;
 		}
 	}
-	return 0;
+	return 1;
 }
 
 

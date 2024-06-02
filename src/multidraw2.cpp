@@ -2,7 +2,7 @@
 #include <vector>
 
 #include <gltools.h>
-#include <rsw_matstack.h>
+#include <rsw_math.h>
 
 
 #include <SDL2/SDL.h>
@@ -10,7 +10,7 @@
 #include <stdio.h>
 
 #define WIDTH 640
-#define HEIGHT 480
+#define HEIGHT 640
 
 using namespace std;
 
@@ -23,8 +23,9 @@ SDL_GLContext glcontext;
 
 int polygon_mode;
 int use_elements;
-int minus_1 = GL_TRUE;
-matrix_stack mat_stack;
+int minus_1;
+mat4 mvp_mat;
+int mvp_loc;
 
 void cleanup();
 void setup_context();
@@ -37,6 +38,7 @@ int main(int argc, char** argv)
 
 
 	vector<vec3> tri_strips;
+	vector<vec3> colors;
 	vector<GLuint> strip_elems;
 	vec3 offset(10, 10, 0);
 
@@ -49,7 +51,7 @@ int main(int argc, char** argv)
 	vector<GLsizei> counts;
 
 	const int cols = 25;
-	const int rows = 19;
+	const int rows = 25;
 
 	for (int j=0; j<rows; j++) {
 		for (int i=0; i<cols; i++) {
@@ -62,11 +64,19 @@ int main(int argc, char** argv)
 			tri_strips.push_back(vec3(i*(sq_dim+5)+sq_dim, j*(sq_dim+5),        0));
 			tri_strips.push_back(vec3(i*(sq_dim+5)+sq_dim, j*(sq_dim+5)+sq_dim, 0));
 
+			colors.push_back(vec3(1,0,0));
+			colors.push_back(vec3(0,1,0));
+			colors.push_back(vec3(0,0,1));
+			colors.push_back(vec3(0,0,0));
+
 			strip_elems.push_back((j*cols+i)*4);
 			strip_elems.push_back((j*cols+i)*4+1);
 			strip_elems.push_back((j*cols+i)*4+2);
 			strip_elems.push_back((j*cols+i)*4+3);
 		}
+	}
+	for (int i=0; i<tri_strips.size(); i++) {
+		tri_strips[i] += offset;
 	}
 
 	GLuint vao;
@@ -79,6 +89,13 @@ int main(int argc, char** argv)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*tri_strips.size(), &tri_strips[0], GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
+	GLuint color_buf;
+	glGenBuffers(1, &color_buf);
+	glBindBuffer(GL_ARRAY_BUFFER, color_buf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*colors.size(), &colors[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(1);
+
 	GLuint elem_buf;
 	glGenBuffers(1, &elem_buf);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elem_buf);
@@ -86,8 +103,8 @@ int main(int argc, char** argv)
 
 	glEnableVertexAttribArray(0);
 
-	const char vs_file[] = "../media/shaders/basic_transform.vp";
-	const char fs_file[] = "../media/shaders/white.fp";
+	const char vs_file[] = "../media/shaders/transform_vertcolors.vp";
+	const char fs_file[] = "../media/shaders/smooth_color.fp";
 
 	GLuint program = load_shader_file_pair(vs_file, fs_file);
 	if (!program) {
@@ -96,11 +113,10 @@ int main(int argc, char** argv)
 	}
 	glUseProgram(program);
 
-	rsw::make_orthographic_matrix(mat_stack.stack[mat_stack.top], 0, WIDTH-1, 0, HEIGHT-1, 1, -1);
+	mvp_loc = glGetUniformLocation(program, "mvp_mat");
 
-	mat4 mvp_mat;
-
-	int mvp_loc = glGetUniformLocation(program, "mvp_mat");
+	rsw::make_orthographic_matrix(mvp_mat, 0, WIDTH, 0, HEIGHT, 1, -1);
+	glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mvp_mat);
 
 	unsigned int old_time = 0, new_time=0, counter = 0;
 	while (1) {
@@ -117,18 +133,12 @@ int main(int argc, char** argv)
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		mat_stack.push();
-		mat_stack.translate(10.0, 10.0, 0.0);
-
-		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mat_stack.get_matrix());
 
 		if (!use_elements) {
-			glMultiDrawArrays(GL_TRIANGLE_STRIP, &firsts[0], &counts[0], 100);
+			glMultiDrawArrays(GL_TRIANGLE_STRIP, &firsts[0], &counts[0], 300);
 		} else {
-			glMultiDrawElements(GL_TRIANGLE_STRIP, &counts[0], GL_UNSIGNED_INT, (GLvoid* const*)(&first_elems[0]), 475);
+			glMultiDrawElements(GL_TRIANGLE_STRIP, &counts[0], GL_UNSIGNED_INT, (GLvoid* const*)(&first_elems[0]), 625);
 		}
-
-		mat_stack.pop();
 
 		SDL_GL_SwapWindow(window);
 	}
@@ -219,10 +229,12 @@ int handle_events()
 				minus_1 = !minus_1;
 				if (minus_1) {
 					puts("minus_1");
-					rsw::make_orthographic_matrix(mat_stack.stack[mat_stack.top], 0, WIDTH-1, 0, HEIGHT-1, 1, -1);
+					rsw::make_orthographic_matrix(mvp_mat, 0, WIDTH-1, 0, HEIGHT-1, 1, -1);
+					glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mvp_mat);
 				} else {
 					puts("all the pixels");
-					rsw::make_orthographic_matrix(mat_stack.stack[mat_stack.top], 0, WIDTH, 0, HEIGHT, 1, -1);
+					rsw::make_orthographic_matrix(mvp_mat, 0, WIDTH, 0, HEIGHT, 1, -1);
+					glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mvp_mat);
 				}
 			}
 
@@ -230,6 +242,7 @@ int handle_events()
 	}
 	return 0;
 }
+
 
 
 

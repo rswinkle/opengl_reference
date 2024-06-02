@@ -19,6 +19,7 @@ ifeq ($(config),debug_linux)
   lesson6_config = debug_linux
   lesson7_config = debug_linux
   multidraw_config = debug_linux
+  multidraw2_config = debug_linux
   texturing_config = debug_linux
   modelviewer_config = debug_linux
   testprimitives_config = debug_linux
@@ -40,7 +41,9 @@ ifeq ($(config),debug_linux)
   test_depthclamp_config = debug_linux
   test_line_depth_config = debug_linux
   test_aliasing_lines_config = debug_linux
+  polylines_config = debug_linux
   client_arrays_config = debug_linux
+  color_masking_config = debug_linux
 endif
 ifeq ($(config),debug_windows)
   ex1_config = debug_windows
@@ -53,6 +56,7 @@ ifeq ($(config),debug_windows)
   lesson6_config = debug_windows
   lesson7_config = debug_windows
   multidraw_config = debug_windows
+  multidraw2_config = debug_windows
   texturing_config = debug_windows
   modelviewer_config = debug_windows
   testprimitives_config = debug_windows
@@ -74,7 +78,9 @@ ifeq ($(config),debug_windows)
   test_depthclamp_config = debug_windows
   test_line_depth_config = debug_windows
   test_aliasing_lines_config = debug_windows
+  polylines_config = debug_windows
   client_arrays_config = debug_windows
+  color_masking_config = debug_windows
 endif
 ifeq ($(config),release_linux)
   ex1_config = release_linux
@@ -87,6 +93,7 @@ ifeq ($(config),release_linux)
   lesson6_config = release_linux
   lesson7_config = release_linux
   multidraw_config = release_linux
+  multidraw2_config = release_linux
   texturing_config = release_linux
   modelviewer_config = release_linux
   testprimitives_config = release_linux
@@ -108,7 +115,9 @@ ifeq ($(config),release_linux)
   test_depthclamp_config = release_linux
   test_line_depth_config = release_linux
   test_aliasing_lines_config = release_linux
+  polylines_config = release_linux
   client_arrays_config = release_linux
+  color_masking_config = release_linux
 endif
 ifeq ($(config),release_windows)
   ex1_config = release_windows
@@ -121,6 +130,7 @@ ifeq ($(config),release_windows)
   lesson6_config = release_windows
   lesson7_config = release_windows
   multidraw_config = release_windows
+  multidraw2_config = release_windows
   texturing_config = release_windows
   modelviewer_config = release_windows
   testprimitives_config = release_windows
@@ -142,10 +152,12 @@ ifeq ($(config),release_windows)
   test_depthclamp_config = release_windows
   test_line_depth_config = release_windows
   test_aliasing_lines_config = release_windows
+  polylines_config = release_windows
   client_arrays_config = release_windows
+  color_masking_config = release_windows
 endif
 
-PROJECTS := ex1 ex2 lesson1 lesson2 lesson3 lesson4 lesson5 lesson6 lesson7 multidraw texturing modelviewer testprimitives grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites glm_sphereworld_color glm_grass glm_flying left_handed gears test_poly_modes test_scissoring test_viewport test_clipping test_depthclamp test_line_depth test_aliasing_lines client_arrays
+PROJECTS := ex1 ex2 lesson1 lesson2 lesson3 lesson4 lesson5 lesson6 lesson7 multidraw multidraw2 texturing modelviewer testprimitives grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites glm_sphereworld_color glm_grass glm_flying left_handed gears test_poly_modes test_scissoring test_viewport test_clipping test_depthclamp test_line_depth test_aliasing_lines polylines client_arrays color_masking
 
 .PHONY: all clean help $(PROJECTS) 
 
@@ -209,6 +221,12 @@ multidraw:
 ifneq (,$(multidraw_config))
 	@echo "==== Building multidraw ($(multidraw_config)) ===="
 	@${MAKE} --no-print-directory -C . -f multidraw.make config=$(multidraw_config)
+endif
+
+multidraw2:
+ifneq (,$(multidraw2_config))
+	@echo "==== Building multidraw2 ($(multidraw2_config)) ===="
+	@${MAKE} --no-print-directory -C . -f multidraw2.make config=$(multidraw2_config)
 endif
 
 texturing:
@@ -337,10 +355,22 @@ ifneq (,$(test_aliasing_lines_config))
 	@${MAKE} --no-print-directory -C . -f test_aliasing_lines.make config=$(test_aliasing_lines_config)
 endif
 
+polylines:
+ifneq (,$(polylines_config))
+	@echo "==== Building polylines ($(polylines_config)) ===="
+	@${MAKE} --no-print-directory -C . -f polylines.make config=$(polylines_config)
+endif
+
 client_arrays:
 ifneq (,$(client_arrays_config))
 	@echo "==== Building client_arrays ($(client_arrays_config)) ===="
 	@${MAKE} --no-print-directory -C . -f client_arrays.make config=$(client_arrays_config)
+endif
+
+color_masking:
+ifneq (,$(color_masking_config))
+	@echo "==== Building color_masking ($(color_masking_config)) ===="
+	@${MAKE} --no-print-directory -C . -f color_masking.make config=$(color_masking_config)
 endif
 
 clean:
@@ -354,6 +384,7 @@ clean:
 	@${MAKE} --no-print-directory -C . -f lesson6.make clean
 	@${MAKE} --no-print-directory -C . -f lesson7.make clean
 	@${MAKE} --no-print-directory -C . -f multidraw.make clean
+	@${MAKE} --no-print-directory -C . -f multidraw2.make clean
 	@${MAKE} --no-print-directory -C . -f texturing.make clean
 	@${MAKE} --no-print-directory -C . -f modelviewer.make clean
 	@${MAKE} --no-print-directory -C . -f testprimitives.make clean
@@ -375,7 +406,9 @@ clean:
 	@${MAKE} --no-print-directory -C . -f test_depthclamp.make clean
 	@${MAKE} --no-print-directory -C . -f test_line_depth.make clean
 	@${MAKE} --no-print-directory -C . -f test_aliasing_lines.make clean
+	@${MAKE} --no-print-directory -C . -f polylines.make clean
 	@${MAKE} --no-print-directory -C . -f client_arrays.make clean
+	@${MAKE} --no-print-directory -C . -f color_masking.make clean
 
 help:
 	@echo "Usage: make [config=name] [target]"
@@ -399,6 +432,7 @@ help:
 	@echo "   lesson6"
 	@echo "   lesson7"
 	@echo "   multidraw"
+	@echo "   multidraw2"
 	@echo "   texturing"
 	@echo "   modelviewer"
 	@echo "   testprimitives"
@@ -420,6 +454,8 @@ help:
 	@echo "   test_depthclamp"
 	@echo "   test_line_depth"
 	@echo "   test_aliasing_lines"
+	@echo "   polylines"
 	@echo "   client_arrays"
+	@echo "   color_masking"
 	@echo ""
 	@echo "For more information, see https://github.com/premake/premake-core/wiki"
