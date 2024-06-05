@@ -24,6 +24,7 @@ int compile_shader_str(GLuint shader, const char* shader_str);
 int link_program(GLuint program);
 GLuint load_shader_pair(const char* vert_shader_src, const char* frag_shader_src);
 
+void GLAPIENTRY debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 
 
 static const char vs_shader_str[] =
@@ -69,11 +70,29 @@ int main(int argc, char** argv)
 	printf("smooth granularity: %f\n", range[0]);
 	granularity = range[0];
 
+	glGetFloatv(GL_MAX_TEXTURE_SIZE, range);
+	printf("MAX_TEX_SIZE = %f\n", range[0]);
+
+	glGetFloatv(GL_MAX_3D_TEXTURE_SIZE, range);
+	printf("MAX_3D_TEX_SIZE = %f\n", range[0]);
+
+	glGetFloatv(GL_MAX_ARRAY_TEXTURE_LAYERS, range);
+	printf("MAX_ARRAY_TEX_LAYERS = %f\n", range[0]);
+
+	glGetFloatv(GL_MAX_DEBUG_MESSAGE_LENGTH, range);
+	printf("MAX_DEBUG_MESSAGE_LENGTH = %f\n", range[0]);
+
 	glHint(GL_LINE_SMOOTH_HINT, GL_FASTEST);
+
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback(debug_callback, NULL);
+	glDebugMessageControl(GL_DONT_CARE, GL_DEBUG_TYPE_OTHER, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
+
+	// testing debug output
+	//glEnable(GL_LINE);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 
 	float lines[] =
 	{
@@ -117,6 +136,10 @@ int main(int argc, char** argv)
 
 	glClearColor(0, 0, 0, 1.0);
 
+	//glDeleteVertexArrays(1, &vao);
+	//glDeleteVertexArrays(1, 0);
+	//check_errors(1, "hmmm");
+
 
 	unsigned int old_time = 0, new_time=0, counter = 0;
 	while (1) {
@@ -158,9 +181,14 @@ void setup_context()
 		exit(0);
 	}
 
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 
 	window = SDL_CreateWindow("Test Aliasing Lines", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
@@ -176,6 +204,9 @@ void setup_context()
 		printf("Error: %s\n", glewGetErrorString(err));
 		cleanup();
 		exit(0);
+	}
+	if (GLEW_ARB_debug_output) {
+		puts("we should have debug output");
 	}
 
 	check_errors(0, "Clearing stupid error after glewInit");
@@ -263,7 +294,58 @@ int handle_events()
 
 
 
+// adapted from learnopengl.com
+void GLAPIENTRY debug_callback(GLenum source,
+                               GLenum type,
+                               unsigned int id,
+                               GLenum severity,
+                               GLsizei length,
+                               const char *message,
+                               const void *userParam)
+{
+	// ignore non-significant error/warning codes
+	//
+	// TODO per the spec: "There can potentially be overlap between the
+	// namespaces of two different pairs of source and type, so messages can
+	// only be uniquely distinguished from each other by the full combination
+	// of source, type and ID." and "The assignment of IDs ... is implementation
+	// -dependent"
+	//
+	// so this is probably a bad idea
+	if(id == 131169 || id == 131185 || id == 131218 || id == 131204) return; 
 
+	puts("---------------");
+	printf("Debug message (%d): %s\n", id, message);
+
+	switch (source) {
+	case GL_DEBUG_SOURCE_API:             puts("Source: API"); break;
+	case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   puts("Source: Window System"); break;
+	case GL_DEBUG_SOURCE_SHADER_COMPILER: puts("Source: Shader Compiler"); break;
+	case GL_DEBUG_SOURCE_THIRD_PARTY:     puts("Source: Third Party"); break;
+	case GL_DEBUG_SOURCE_APPLICATION:     puts("Source: Application"); break;
+	case GL_DEBUG_SOURCE_OTHER:           puts("Source: Other"); break;
+	}
+
+	switch (type) {
+	case GL_DEBUG_TYPE_ERROR:               puts("Type: Error"); break;
+	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: puts("Type: Deprecated Behaviour"); break;
+	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  puts("Type: Undefined Behaviour"); break;
+	case GL_DEBUG_TYPE_PORTABILITY:         puts("Type: Portability"); break;
+	case GL_DEBUG_TYPE_PERFORMANCE:         puts("Type: Performance"); break;
+	case GL_DEBUG_TYPE_MARKER:              puts("Type: Marker"); break;
+	case GL_DEBUG_TYPE_PUSH_GROUP:          puts("Type: Push Group"); break;
+	case GL_DEBUG_TYPE_POP_GROUP:           puts("Type: Pop Group"); break;
+	case GL_DEBUG_TYPE_OTHER:               puts("Type: Other"); break;
+	}
+
+	switch (severity) {
+	case GL_DEBUG_SEVERITY_HIGH:         puts("Severity: high"); break;
+	case GL_DEBUG_SEVERITY_MEDIUM:       puts("Severity: medium"); break;
+	case GL_DEBUG_SEVERITY_LOW:          puts("Severity: low"); break;
+	case GL_DEBUG_SEVERITY_NOTIFICATION: puts("Severity: notification"); break;
+	}
+	puts("");
+}
 
 
 
