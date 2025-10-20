@@ -11,7 +11,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/random.hpp>
 #include <glm/gtc/constants.hpp>
-#include <glm/gtx/string_cast.hpp>
 
 
 #include <SDL2/SDL.h>

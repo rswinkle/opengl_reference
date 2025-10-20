@@ -6,7 +6,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/constants.hpp>
-#include <glm/gtx/string_cast.hpp>
 
 
 #include <SDL2/SDL.h>
@@ -173,9 +172,7 @@ int main(int argc, char** argv)
 
 
 		view_mat = glm::lookAt(camera.origin, camera.forward, camera.up);
-		//cout << glm::to_string(view_mat) << "\n";
 		view_mat = camera.get_camera_matrix();
-		//cout << glm::to_string(view_mat) << "\n\n";
 
 		mvp_mat = proj_mat * view_mat;
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp_mat));

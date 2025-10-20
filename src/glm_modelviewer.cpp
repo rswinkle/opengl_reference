@@ -6,7 +6,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/constants.hpp>
-#include <glm/gtx/string_cast.hpp>
 
 #include <GL/glew.h>
 
@@ -123,12 +122,6 @@ int main(int argc, char** argv)
 		normal_lines.push_back(verts[v]);
 		normal_lines.push_back(verts[v] + normals[j+2]*0.5f);
 	}
-
-
-	for (int i=0; i<normal_lines.size(); i+=2) {
-//		printf("%s\n%s\n\n", glm::to_string(normal_lines[i]).c_str(), glm::to_string(normal_lines[i+1]).c_str());
-	}
-
 
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
