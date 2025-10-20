@@ -23,6 +23,7 @@ int handle_events();
 
 
 float line_width;
+int line_width_changed;
 int aliased;
 int blending = 1;
 float granularity;
@@ -35,6 +36,7 @@ int main(int argc, char** argv)
 	line_width = 1;
 	float w2 = line_width/2.0f;
 	aliased = 1;
+	granularity = 1;
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -82,7 +84,7 @@ int main(int argc, char** argv)
 	GLuint line_buf;
 	glGenBuffers(1, &line_buf);
 	glBindBuffer(GL_ARRAY_BUFFER, line_buf);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(polyline), polyline, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(polyline), polyline, GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*7, 0);
 
@@ -98,6 +100,14 @@ int main(int argc, char** argv)
 		if (handle_events())
 			break;
 
+		if (line_width_changed) {
+			w2 = line_width/2.0f;
+			polyline[14] = 50+w2;
+			polyline[21] = 100+w2;
+			polyline[28] = 50+line_width;
+			polyline[35] = 100+line_width;
+			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(polyline), polyline);
+		}
 		counter++;
 		new_time = SDL_GetTicks();
 		if (new_time - old_time > 3000) {
@@ -109,7 +119,7 @@ int main(int argc, char** argv)
 
 		
 		glClear(GL_COLOR_BUFFER_BIT);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 		SDL_GL_SwapWindow(window);
 	}
@@ -172,6 +182,7 @@ int handle_events()
 {
 	SDL_Event e;
 	int sc;
+	line_width_changed = 0;
 	while (SDL_PollEvent(&e)) {
 		if (e.type == SDL_QUIT) {
 			return 1;
@@ -186,6 +197,7 @@ int handle_events()
 				line_width += granularity;
 				glLineWidth(line_width);
 				printf("line_width = %f\n", line_width);
+				line_width_changed = 1;
 				break;
 			case SDL_SCANCODE_DOWN:
 				line_width -= granularity;
@@ -194,6 +206,7 @@ int handle_events()
 				}
 				glLineWidth(line_width);
 				printf("line_width = %f\n", line_width);
+				line_width_changed = 1;
 				break;
 			case SDL_SCANCODE_SPACE:
 				aliased = !aliased;
