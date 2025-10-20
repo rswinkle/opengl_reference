@@ -346,7 +346,7 @@ GLboolean load_texture2D(const char* filename, GLenum min_filter, GLenum mag_fil
 
 #ifndef USING_GLES2
 	//TODO add parameter?
-	GLfloat green[4] = { 0.0, 1.0, 0.0, 0.5f };
+	GLfloat green[4] = { 0.0, 1.0, 0.0, 1.0f };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, (GLfloat*)&green);
 #endif
 
