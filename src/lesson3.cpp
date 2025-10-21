@@ -1,6 +1,6 @@
 #include <gltools.h>
-#include <rsw_matstack.h>
-
+#include <glm_matstack.h>
+#include <glm/glm.hpp>
 
 #include <SDL2/SDL.h>
 
@@ -11,8 +11,8 @@
 
 using namespace std;
 
-using rsw::vec3;
-using rsw::mat4;
+using glm::vec3;
+using glm::mat4;
 
 
 SDL_Window* window;
@@ -88,16 +88,14 @@ int main(int argc, char** argv)
 
 
 	matrix_stack mat_stack;
-	rsw::make_perspective_matrix(mat_stack.stack[mat_stack.top], DEG_TO_RAD(45), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
+	mat4 proj_mat = glm::perspective(glm::radians(45.0f), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
+	mat_stack.load_mat(proj_mat);
 
+	mat4 mvp_mat(1);
+	int mvp_loc = glGetUniformLocation(program, "mvp_mat");
 
 	float r_tri = 0, r_square = 0;
 	float elapsed;
-
-
-	mat4 mvp_mat;
-
-	int mvp_loc = glGetUniformLocation(program, "mvp_mat");
 
 	unsigned int last_time = SDL_GetTicks();
 	unsigned int old_time = 0, new_time=0, counter = 0;
@@ -125,7 +123,7 @@ int main(int argc, char** argv)
 		mat_stack.translate(-1.5, 0, -7.0);
 		mat_stack.push();
 
-		mat_stack.rotate(DEG_TO_RAD(r_tri), 0, 1, 0);
+		mat_stack.rotate(glm::radians(r_tri), 0, 1, 0);
 
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mat_stack.stack[mat_stack.top]);
 		glBindBuffer(GL_ARRAY_BUFFER, tri_buf);
@@ -136,7 +134,7 @@ int main(int argc, char** argv)
 		mat_stack.pop();
 
 		mat_stack.translate(3.0, 0.0, 0.0);
-		mat_stack.rotate(DEG_TO_RAD(r_square), 1, 0, 0);
+		mat_stack.rotate(glm::radians(r_square), 1, 0, 0);
 
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mat_stack.stack[mat_stack.top]);
 		glBindBuffer(GL_ARRAY_BUFFER, square_buf);

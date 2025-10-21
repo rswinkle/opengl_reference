@@ -1,6 +1,6 @@
 #include <gltools.h>
-#include <rsw_math.h>
-#include <rsw_matstack.h>
+#include <glm_matstack.h>
+#include <glm/glm.hpp>
 
 
 #include <SDL2/SDL.h>
@@ -12,8 +12,8 @@
 
 using namespace std;
 
-using rsw::vec3;
-using rsw::mat4;
+using glm::vec3;
+using glm::mat4;
 
 
 SDL_Window* window;
@@ -155,7 +155,8 @@ int main(int argc, char** argv)
 
 
 	matrix_stack mat_stack;
-	rsw::make_perspective_matrix(mat_stack.stack[mat_stack.top], DEG_TO_RAD(45), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
+	mat4 proj_mat = glm::perspective(glm::radians(45.0f), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
+	mat_stack.load_mat(proj_mat);
 
 	mat_stack.translate(0, 0, -5);
 
@@ -195,9 +196,9 @@ int main(int argc, char** argv)
 		z_rot += 90 * (elapsed / 1000.0f);
 
 
-		mat_stack.rotate(DEG_TO_RAD(x_rot), 1, 0, 0);
-		mat_stack.rotate(DEG_TO_RAD(y_rot), 0, 1, 0);
-		mat_stack.rotate(DEG_TO_RAD(z_rot), 0, 0, 1);
+		mat_stack.rotate(glm::radians(x_rot), 1, 0, 0);
+		mat_stack.rotate(glm::radians(y_rot), 0, 1, 0);
+		mat_stack.rotate(glm::radians(z_rot), 0, 0, 1);
 
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mat_stack.stack[mat_stack.top]);
 

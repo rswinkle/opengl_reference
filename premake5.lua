@@ -51,7 +51,6 @@ workspace "opengl_reference"
 		files {
 			"src/lesson1.cpp",
 			"src/glcommon/gltools.cpp",
-			"src/glcommon/rsw_math.cpp",
 		}
 
 	project "lesson2"
@@ -60,7 +59,6 @@ workspace "opengl_reference"
 		files {
 			"src/lesson2.cpp",
 			"src/glcommon/gltools.cpp",
-			"src/glcommon/rsw_math.cpp",
 		}
 
 
@@ -70,7 +68,6 @@ workspace "opengl_reference"
 		files {
 			"src/lesson3.cpp",
 			"src/glcommon/gltools.cpp",
-			"src/glcommon/rsw_math.cpp",
 		}
 
 
@@ -80,7 +77,6 @@ workspace "opengl_reference"
 		files {
 			"src/lesson4.cpp",
 			"src/glcommon/gltools.cpp",
-			"src/glcommon/rsw_math.cpp",
 		}
 
 	project "lesson5"
@@ -89,7 +85,6 @@ workspace "opengl_reference"
 		files {
 			"src/lesson5.cpp",
 			"src/glcommon/gltools.cpp",
-			"src/glcommon/rsw_math.cpp",
 		}
 
 	project "lesson6"
@@ -98,7 +93,6 @@ workspace "opengl_reference"
 		files {
 			"src/lesson6.cpp",
 			"src/glcommon/gltools.cpp",
-			"src/glcommon/rsw_math.cpp",
 		}
 
 	project "lesson7"
@@ -107,7 +101,6 @@ workspace "opengl_reference"
 		files {
 			"src/lesson7.cpp",
 			"src/glcommon/gltools.cpp",
-			"src/glcommon/rsw_math.cpp",
 		}
 
 	project "multidraw"

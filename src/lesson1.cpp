@@ -1,5 +1,7 @@
 #include <gltools.h>
-#include <rsw_matstack.h>
+
+#include <glm_matstack.h>
+#include <glm/glm.hpp>
 
 
 #include <SDL2/SDL.h>
@@ -11,8 +13,8 @@
 
 using namespace std;
 
-using rsw::vec3;
-using rsw::mat4;
+using glm::vec3;
+using glm::mat4;
 
 
 SDL_Window* window;
@@ -68,12 +70,10 @@ int main(int argc, char** argv)
 
 
 	matrix_stack mat_stack;
-	rsw::make_perspective_matrix(mat_stack.stack[mat_stack.top], DEG_TO_RAD(45), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
+	mat4 proj_mat = glm::perspective(glm::radians(45.0f), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
+	mat_stack.load_mat(proj_mat);
 
-
-	//mat_stack.load_mat(proj_mat);
-
-	mat4 mvp_mat;
+	mat4 mvp_mat(1);
 
 	int mvp_loc = glGetUniformLocation(program, "mvp_mat");
 

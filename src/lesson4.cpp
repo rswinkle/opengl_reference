@@ -1,6 +1,6 @@
 #include <gltools.h>
-#include <rsw_matstack.h>
-
+#include <glm_matstack.h>
+#include <glm/glm.hpp>
 
 #include <SDL2/SDL.h>
 
@@ -11,8 +11,8 @@
 
 using namespace std;
 
-using rsw::vec3;
-using rsw::mat4;
+using glm::vec3;
+using glm::mat4;
 
 
 SDL_Window* window;
@@ -21,8 +21,6 @@ SDL_GLContext glcontext;
 void cleanup();
 void setup_context();
 int handle_events();
-
-
 
 
 int main(int argc, char** argv)
@@ -182,18 +180,15 @@ int main(int argc, char** argv)
 	}
 	glUseProgram(program);
 
-
 	matrix_stack mat_stack;
-	rsw::make_perspective_matrix(mat_stack.stack[mat_stack.top], DEG_TO_RAD(45), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
+	mat4 proj_mat = glm::perspective(glm::radians(45.0f), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
+	mat_stack.load_mat(proj_mat);
 
+	mat4 mvp_mat(1);
+	int mvp_loc = glGetUniformLocation(program, "mvp_mat");
 
 	float r_pyramid = 0, r_cube = 0;
 	float elapsed;
-
-
-	mat4 mvp_mat;
-
-	int mvp_loc = glGetUniformLocation(program, "mvp_mat");
 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
@@ -224,7 +219,7 @@ int main(int argc, char** argv)
 		mat_stack.translate(-1.5, 0, -7.0);
 		mat_stack.push();
 
-		mat_stack.rotate(DEG_TO_RAD(r_pyramid), 0, 1, 0);
+		mat_stack.rotate(glm::radians(r_pyramid), 0, 1, 0);
 
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mat_stack.stack[mat_stack.top]);
 		glBindBuffer(GL_ARRAY_BUFFER, pyramid_buf);
@@ -235,7 +230,7 @@ int main(int argc, char** argv)
 		mat_stack.pop();
 
 		mat_stack.translate(3.0, 0.0, 0.0);
-		mat_stack.rotate(DEG_TO_RAD(r_cube), 1, 1, 1);
+		mat_stack.rotate(glm::radians(r_cube), 1, 1, 1);
 
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mat_stack.stack[mat_stack.top]);
 		glBindBuffer(GL_ARRAY_BUFFER, cube_buf);

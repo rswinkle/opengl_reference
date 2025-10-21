@@ -95,10 +95,8 @@ OBJECTS :=
 
 GENERATED += $(OBJDIR)/gltools.o
 GENERATED += $(OBJDIR)/lesson6.o
-GENERATED += $(OBJDIR)/rsw_math.o
 OBJECTS += $(OBJDIR)/gltools.o
 OBJECTS += $(OBJDIR)/lesson6.o
-OBJECTS += $(OBJDIR)/rsw_math.o
 
 # Rules
 # #############################################
@@ -163,9 +161,6 @@ endif
 # #############################################
 
 $(OBJDIR)/gltools.o: ../src/glcommon/gltools.cpp
-	@echo "$(notdir $<)"
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/rsw_math.o: ../src/glcommon/rsw_math.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/lesson6.o: ../src/lesson6.cpp
