@@ -25,9 +25,9 @@ workspace "opengl_reference"
 		buildoptions { "-O3" }
 
 	filter { "action:gmake", "language:C" }
-		buildoptions { "-std=c99", "-pedantic-errors", "-Wunused-variable", "-Wreturn-type", "-Wimplicit" }
+		buildoptions { "-std=c99", "-pedantic-errors", "-Wall", "-Wextra", "-Wno-sign-compare", "-Wno-unused-parameter" }
 	filter { "action:gmake", "language:C++" }
-		buildoptions { "-fno-rtti", "-fno-exceptions", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type" }
+		buildoptions { "-fno-rtti", "-fno-exceptions", "-fno-strict-aliasing", "-Wunused-variable", "-Wreturn-type", "-Wall", "-Wextra", "-Wno-sign-compare", "-Wno-unused-parameter", "-Wno-missing-field-initializers" }
 	
 	
 

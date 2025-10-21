@@ -44,8 +44,8 @@ ifeq ($(config),debug_linux)
   polylines_config = debug_linux
   client_arrays_config = debug_linux
   color_masking_config = debug_linux
-endif
-ifeq ($(config),debug_windows)
+
+else ifeq ($(config),debug_windows)
   ex1_config = debug_windows
   ex2_config = debug_windows
   lesson1_config = debug_windows
@@ -81,8 +81,8 @@ ifeq ($(config),debug_windows)
   polylines_config = debug_windows
   client_arrays_config = debug_windows
   color_masking_config = debug_windows
-endif
-ifeq ($(config),release_linux)
+
+else ifeq ($(config),release_linux)
   ex1_config = release_linux
   ex2_config = release_linux
   lesson1_config = release_linux
@@ -118,8 +118,8 @@ ifeq ($(config),release_linux)
   polylines_config = release_linux
   client_arrays_config = release_linux
   color_masking_config = release_linux
-endif
-ifeq ($(config),release_windows)
+
+else ifeq ($(config),release_windows)
   ex1_config = release_windows
   ex2_config = release_windows
   lesson1_config = release_windows
@@ -155,6 +155,9 @@ ifeq ($(config),release_windows)
   polylines_config = release_windows
   client_arrays_config = release_windows
   color_masking_config = release_windows
+
+else
+  $(error "invalid configuration $(config)")
 endif
 
 PROJECTS := ex1 ex2 lesson1 lesson2 lesson3 lesson4 lesson5 lesson6 lesson7 multidraw multidraw2 texturing modelviewer testprimitives grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites glm_sphereworld_color glm_grass glm_flying left_handed gears test_poly_modes test_scissoring test_viewport test_clipping test_depthclamp test_line_depth test_aliasing_lines polylines client_arrays color_masking
