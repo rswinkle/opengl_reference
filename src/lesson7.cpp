@@ -23,12 +23,15 @@
 #define MAX_ELEMENT_MEMORY 128 * 1024
 
 
-#define WIDTH 640
+#define WIDTH 800
 #define HEIGHT 480
+
+#define GUI_W 200
 
 using namespace std;
 
 using glm::vec3;
+using glm::mat3;
 using glm::mat4;
 
 
@@ -44,7 +47,27 @@ float z;
 float x_rot, y_rot;
 float x_speed, y_speed;
 
-int mvp_loc, normal_loc;
+
+// uniforms
+mat4 uMVMatrix;
+mat4 uPMatrix;
+mat3 uNMatrix;
+vec3 uAmbientColor(0.2);
+vec3 uLightingDirection(-0.25, -0.25, -1.0);
+vec3 uDirectionalColor(0.8);
+int uUseLighting; //bool
+int uSampler;
+
+int uMVMatrix_loc;
+int uPMatrix_loc;
+int uNMatrix_loc;
+int uAmbientColor_loc;
+int uLightingDirection_loc;
+int uDirectionalColor_loc;
+int uUseLighting_loc;
+int uSampler_loc;
+
+int update_vals_from_gui;
 
 int main(int argc, char** argv)
 {
@@ -182,8 +205,8 @@ int main(int argc, char** argv)
 	glGenBuffers(1, &normal_buf);
 	glBindBuffer(GL_ARRAY_BUFFER, normal_buf);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW);
-//	glEnableVertexAttribArray(1);
-//	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	GLuint tex_buf;
 	glGenBuffers(1, &tex_buf);
@@ -199,8 +222,8 @@ int main(int argc, char** argv)
 
 	glBindVertexArray(0);
 
-	const char vs_file[] = "../media/shaders/texturing.vp";
-	const char fs_file[] = "../media/shaders/texturing.fp";
+	const char vs_file[] = "../media/shaders/lesson7.vp";
+	const char fs_file[] = "../media/shaders/lesson7.fp";
 
 	GLuint program = load_shader_file_pair(vs_file, fs_file);
 	if (!program) {
@@ -217,9 +240,18 @@ int main(int argc, char** argv)
 	z = -5;
 
 	mat4 mvp_mat(1);
-	mvp_loc = glGetUniformLocation(program, "mvp_mat");
-	int tex_loc = glGetUniformLocation(program, "color_map");
-	glUniform1i(tex_loc, 0);
+	uMVMatrix_loc = glGetUniformLocation(program, "uMVMatrix");
+	uPMatrix_loc = glGetUniformLocation(program, "uPMatrix");
+	uNMatrix_loc = glGetUniformLocation(program, "uNMatrix");
+	uAmbientColor_loc = glGetUniformLocation(program, "uAmbientColor");
+	uLightingDirection_loc = glGetUniformLocation(program, "uLightingDirection");
+	uDirectionalColor_loc = glGetUniformLocation(program, "uDirectionalColor");
+	uUseLighting_loc = glGetUniformLocation(program, "uUseLighting");
+	uSampler_loc = glGetUniformLocation(program, "uSampler");
+
+	check_errors(0, "uniform locs");
+
+	glUniform1i(uSampler_loc, 0);
 
 	unsigned int old_time = 0, new_time=0, counter = 0, elapsed;
 	while (1) {
@@ -242,15 +274,27 @@ int main(int argc, char** argv)
 		glEnable(GL_DEPTH_TEST);
 		glUseProgram(program);
 		glBindTexture(GL_TEXTURE_2D, texture);
+		update_vals_from_gui = 0;
 
-		mat_stack.push();
-		mat_stack.translate(0, 0, z);
+		uPMatrix = glm::perspective(glm::radians(45.0f), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
+		uMVMatrix = glm::translate(mat4(1), vec3(0,0,z));
+		uMVMatrix = glm::rotate(uMVMatrix, glm::radians(x_rot), vec3(1, 0, 0));
+		uMVMatrix = glm::rotate(uMVMatrix, glm::radians(y_rot), vec3(0, 1, 0));
 
-		mat_stack.rotate(glm::radians(x_rot), 1, 0, 0);
-		mat_stack.rotate(glm::radians(y_rot), 0, 1, 0);
-		mvp_mat = mat_stack.get_matrix();
+		glUniformMatrix4fv(uMVMatrix_loc, 1, GL_FALSE, (float*)&uMVMatrix);
+		glUniformMatrix4fv(uPMatrix_loc, 1, GL_FALSE, (float*)&uPMatrix);
 
-		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mvp_mat);
+		// TODO
+		//normal_mat = mat3(view_mat*rot_mat);
+		uNMatrix = mat3(uMVMatrix);
+		glUniformMatrix3fv(uNMatrix_loc, 1, GL_FALSE, (float*)&uNMatrix);
+
+		glUniform1i(uSampler_loc, 0); // never changes
+		glUniform3fv(uAmbientColor_loc, 1, (float*)&uAmbientColor);
+		glUniform3fv(uLightingDirection_loc, 1, (float*)&uLightingDirection);
+		glUniform3fv(uDirectionalColor_loc, 1, (float*)&uDirectionalColor);
+		glUniform1i(uUseLighting_loc, uUseLighting);
+
 
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
@@ -258,16 +302,65 @@ int main(int argc, char** argv)
 		glDrawElements(GL_TRIANGLES, sizeof(triangles), GL_UNSIGNED_INT, 0);
 
 
-		if (nk_begin(ctx, "Demo", nk_rect(500, 340, 120, 120),
-		    NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
+		if (nk_begin(ctx, "Controls", nk_rect(WIDTH-GUI_W, 0, GUI_W, HEIGHT),
 		    NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
 		{
-			nk_layout_row_static(ctx, 30, 80, 1);
+			static struct nk_colorf dir_color = { 0.8, 0.8, 0.8, 1 };
+			static struct nk_colorf ambient_color = { 0.2, 0.2, 0.2, 1 };
+			//nk_layout_row_static(ctx, 30, GUI_W, 1);
+			nk_layout_row_dynamic(ctx, 0, 1);
+			if (nk_checkbox_label(ctx, "Use Lighting", &uUseLighting)) {
+				// flag to update relevant uniforms
+				update_vals_from_gui = 1;
+			}
+
+			nk_label(ctx, "Directional Light", NK_TEXT_CENTERED);
+			nk_label(ctx, "Direction", NK_TEXT_CENTERED);
+
+			//nk_layout_row_dynamic(ctx, 0, 2);
+
+			nk_layout_row_template_begin(ctx, 0);
+			nk_layout_row_template_push_static(ctx, 20);
+			nk_layout_row_template_push_dynamic(ctx);
+			nk_layout_row_template_end(ctx);
+
+			nk_label(ctx, "X", NK_TEXT_LEFT);
+			nk_property_float(ctx, "#", -1.0, &uLightingDirection.x, 1.0, 0.25, 0.08333);
+			nk_label(ctx, "Y", NK_TEXT_LEFT);
+			nk_property_float(ctx, "#", -1.0, &uLightingDirection.y, 1.0, 0.25, 0.08333);
+			nk_label(ctx, "Z", NK_TEXT_LEFT);
+			nk_property_float(ctx, "#", -1.0, &uLightingDirection.z, 1.0, 0.25, 0.08333);
+
+			//nk_layout_row_static(ctx, 30, GUI_W, 1);
+			nk_layout_row_dynamic(ctx, 0, 1);
+
+			nk_label(ctx, "Color", NK_TEXT_CENTERED);
+
+			nk_layout_row_dynamic(ctx, 100, 1);
+			dir_color = nk_color_picker(ctx, dir_color, NK_RGB);
+			nk_layout_row_dynamic(ctx, 0, 1);
+			dir_color.r = nk_propertyf(ctx, "#R:", 0, dir_color.r, 1.0f, 0.01f,0.005f);
+			dir_color.g = nk_propertyf(ctx, "#G:", 0, dir_color.g, 1.0f, 0.01f,0.005f);
+			dir_color.b = nk_propertyf(ctx, "#B:", 0, dir_color.b, 1.0f, 0.01f,0.005f);
+
+			uDirectionalColor = vec3(dir_color.r, dir_color.g, dir_color.b);
+
+			nk_label(ctx, "Ambient Light", NK_TEXT_CENTERED);
+			nk_label(ctx, "Color", NK_TEXT_CENTERED);
+
+			nk_layout_row_dynamic(ctx, 100, 1);
+			ambient_color = nk_color_picker(ctx, ambient_color, NK_RGB);
+			nk_layout_row_dynamic(ctx, 0, 1);
+			ambient_color.r = nk_propertyf(ctx, "#R:", 0, ambient_color.r, 1.0f, 0.01f,0.005f);
+			ambient_color.g = nk_propertyf(ctx, "#G:", 0, ambient_color.g, 1.0f, 0.01f,0.005f);
+			ambient_color.b = nk_propertyf(ctx, "#B:", 0, ambient_color.b, 1.0f, 0.01f,0.005f);
+
+			uAmbientColor = vec3(ambient_color.r, ambient_color.g, ambient_color.b);
+
 			if (nk_button_label(ctx, "button"))
 				printf("button pressed!\n");
 		}
 		nk_end(ctx);
-
 
 		/* IMPORTANT: `nk_sdl_render` modifies some global OpenGL state
 		 * with blending, scissor, face culling, depth test and viewport and
