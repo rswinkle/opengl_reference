@@ -1,4 +1,5 @@
 #include <gltools.h>
+#include <glm_matstack.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -8,6 +9,7 @@
 
 #include <iostream>
 #include <stdio.h>
+#include <vector>
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
@@ -29,6 +31,7 @@
 #define HEIGHT 480
 
 #define GUI_W 200
+#define NUM_STARS 50
 
 using namespace std;
 
@@ -45,11 +48,13 @@ void cleanup();
 void setup_context();
 int handle_events(unsigned int elapsed);
 
-float z;
-float x_rot, y_rot;
-float x_speed, y_speed;
+float zoom = -12;
+float tilt = 90;
+float spin;
 
-int use_blending = 1; // bool
+matrix_stack mvMatrixStack;
+
+int do_twinkle = 1; // bool
 
 // uniforms
 mat4 uMVMatrix;
@@ -62,6 +67,10 @@ int uPMatrix_loc;
 int uSampler_loc;
 int uColor_loc;
 
+
+// NOTE(rswinkle) I do not like this program structure but I am mostly
+// going for a straight port. Maybe later I'll refactor it the way I
+// would prefer it
 struct Star
 {
 	float angle;
@@ -74,7 +83,8 @@ struct Star
 	{
 		angle = 0;
 		dist = startingDistance;
-		rotationSpeed = rotationSpeed;
+		this->rotationSpeed = rotationSpeed;
+		printf("dist = %f\nrot_speed = %f\n", dist, rotationSpeed);
 
 		randomize_colors();
 	}
@@ -82,8 +92,68 @@ struct Star
 	void randomize_colors()
 	{
 		// TODO try different methods for random colors
-		color = glm::sphericalRand(1);
-		twinkle = glm::sphericalRand(1);
+		//
+		// not sure why sphericalRand isn't working like I expect
+		//color = glm::sphericalRand(1);
+		//twinkle = glm::sphericalRand(1);
+		color = vec3(rand()/(float)RAND_MAX,rand()/(float)RAND_MAX,rand()/(float)RAND_MAX);
+		twinkle = vec3(rand()/(float)RAND_MAX,rand()/(float)RAND_MAX,rand()/(float)RAND_MAX);
+	}
+
+	// angle, angle, bool, angles in degrees
+	void draw(float tilt, float spin, int do_twinkle)
+	{
+		mvMatrixStack.push();
+
+		// move to star's position
+		//
+		// these two make it work if you remove tilt
+		//mvMatrixStack.rotate(glm::radians(angle), vec3(0, 0, 1));
+		//mvMatrixStack.translate(dist, 0, 0);
+		
+		// with tilt
+		mvMatrixStack.rotate(glm::radians(angle), vec3(0, 1, 0));
+		mvMatrixStack.translate(dist, 0, 0);
+
+		// rotate back so star is facing viewer
+		mvMatrixStack.rotate(glm::radians(-angle), vec3(0, 1, 0));
+		mvMatrixStack.rotate(glm::radians(-tilt), vec3(1, 0, 0));
+
+		if (do_twinkle) {
+			// Draw a non-rotating star in the alternate "twinkling" color
+			glUniform3fv(uColor_loc, 1, glm::value_ptr(twinkle));
+        	//glUniformMatrix4fv(uMVMatrix_loc, 1,  false, glm::value_ptr(uMVMatrix));
+        	glUniformMatrix4fv(uMVMatrix_loc, 1, false, glm::value_ptr(mvMatrixStack.get_matrix()));
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // quad via tri strip
+		}
+
+		// all stars spin around z at same rate
+		mvMatrixStack.rotate(glm::radians(spin), vec3(0, 0, 1));
+
+		// draw star in main color
+		glUniform3fv(uColor_loc, 1, glm::value_ptr(color));
+		//glUniformMatrix4fv(uMVMatrix_loc, 1, false, glm::value_ptr(uMVMatrix));
+		glUniformMatrix4fv(uMVMatrix_loc, 1, false, glm::value_ptr(mvMatrixStack.get_matrix()));
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // quad via tri strip
+
+		mvMatrixStack.pop();
+	}
+
+	void animate(float elapsed_time)
+	{
+		float effectiveFPMS = 60/1000.0;
+		angle += rotationSpeed * effectiveFPMS * elapsed_time;
+
+		// decrease distance, resetting star to outside of spiral if it's
+		// at the center
+		dist -= 0.01 * effectiveFPMS * elapsed_time;
+		if (dist < 0) {
+			dist += 5;
+			randomize_colors();
+		}
+		//printf("angle %f\ndist = %f\n", angle, dist);
+		//printf("color = (%f, %f, %f)\n", color.x, color.y, color.z);
+		//printf("twinkle = (%f, %f, %f)\n", twinkle.x, twinkle.y, twinkle.z);
 	}
 };
 
@@ -91,6 +161,7 @@ int main(int argc, char** argv)
 {
 	setup_context();
 
+	mvMatrixStack.load_identity();
 
 	float vertices[] = {
 		-1.0, -1.0,  0.0,
@@ -106,14 +177,11 @@ int main(int argc, char** argv)
 		1.0, 1.0
 	};
 
-	GLuint triangles[] = {
-		0, 1, 2,      0, 2, 3,    // Front face
-		4, 5, 6,      4, 6, 7,    // Back face
-		8, 9, 10,     8, 10, 11,  // Top face
-		12, 13, 14,   12, 14, 15, // Bottom face
-		16, 17, 18,   16, 18, 19, // Right face
-		20, 21, 22,   20, 22, 23  // Left face
-	};
+	vector<Star> stars;
+	for (int i=0; i<NUM_STARS; i++) {
+		stars.push_back(Star((i/(float)NUM_STARS) * 5.0, i /(float)NUM_STARS));
+	}
+	//stars.push_back(Star(1.0f, 0.25));
 
 	GLuint texture;
 	glGenTextures(1, &texture);
@@ -142,11 +210,6 @@ int main(int argc, char** argv)
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-	GLuint elem_buf;
-	glGenBuffers(1, &elem_buf);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elem_buf);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangles), triangles, GL_STATIC_DRAW);
-
 	glBindVertexArray(0);
 
 	const char vs_file[] = "../media/shaders/lesson9.vp";
@@ -158,8 +221,6 @@ int main(int argc, char** argv)
 		exit(0);
 	}
 	glUseProgram(program);
-
-	z = -5;
 
 	mat4 mvp_mat(1);
 	uMVMatrix_loc = glGetUniformLocation(program, "uMVMatrix");
@@ -190,116 +251,48 @@ int main(int argc, char** argv)
 			counter = 0;
 		}
 
+		for (int i=0; i<stars.size(); i++) {
+			stars[i].animate(elapsed);
+		}
+
 		// reset state every frame due to GUI
 		//glEnable(GL_CULL_FACE);
 		glUseProgram(program);
 		glBindTexture(GL_TEXTURE_2D, texture);
 
-		if (use_blending) {
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-			glEnable(GL_BLEND);
-			glDisable(GL_DEPTH_TEST);
-			glUniform1f(uAlpha_loc, uAlpha);
-		} else {
-			glDisable(GL_BLEND);
-			glEnable(GL_DEPTH_TEST);
-		}
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		glEnable(GL_BLEND);
 
 		uPMatrix = glm::perspective(glm::radians(45.0f), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
-		uMVMatrix = glm::translate(mat4(1), vec3(0,0,z));
-		uMVMatrix = glm::rotate(uMVMatrix, glm::radians(x_rot), vec3(1, 0, 0));
-		uMVMatrix = glm::rotate(uMVMatrix, glm::radians(y_rot), vec3(0, 1, 0));
+		//uMVMatrix = glm::translate(mat(1), vec3(0, 0, zoom));
+		//uMVMatrix = glm::rotate(uMVMatrix, glm::radians(tilt), vec3(1,0,0));
+		mvMatrixStack.load_identity();
+		mvMatrixStack.translate(0, 0, zoom);
+		mvMatrixStack.rotate(glm::radians(tilt), vec3(1, 0, 0));
 
-		glUniformMatrix4fv(uMVMatrix_loc, 1, GL_FALSE, glm::value_ptr(uMVMatrix));
+
 		glUniformMatrix4fv(uPMatrix_loc, 1, GL_FALSE, glm::value_ptr(uPMatrix));
 
-		// transpose/inverse not necessary here but meh
-		//uNMatrix = mat3(uMVMatrix);
-		uNMatrix = glm::transpose(glm::inverse(mat3(uMVMatrix)));
-		glUniformMatrix3fv(uNMatrix_loc, 1, GL_FALSE, glm::value_ptr(uNMatrix));
-
-		glUniform1i(uSampler_loc, 0); // never changes
-		glUniform3fv(uAmbientColor_loc, 1, glm::value_ptr(uAmbientColor));
-		glUniform3fv(uLightingDirection_loc, 1, glm::value_ptr(uLightingDirection));
-		glUniform3fv(uDirectionalColor_loc, 1, glm::value_ptr(uDirectionalColor));
-		glUniform1i(uUseLighting_loc, uUseLighting);
-
+		//glUniformMatrix4fv(uMVMatrix_loc, 1, GL_FALSE, glm::value_ptr(uMVMatrix));
 
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 		glBindVertexArray(vao);
-		glDrawElements(GL_TRIANGLES, sizeof(triangles), GL_UNSIGNED_INT, 0);
 
+		for (int i=0; i<stars.size(); i++) {
+			stars[i].draw(tilt, spin, do_twinkle);
+			spin += 0.1;
+		}
 
 		if (nk_begin(ctx, "Controls", nk_rect(WIDTH-GUI_W, 0, GUI_W, HEIGHT),
 		    NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
 		{
-			static struct nk_colorf dir_color = { 0.8, 0.8, 0.8, 1 };
-			static struct nk_colorf ambient_color = { 0.2, 0.2, 0.2, 1 };
 			static const char* on_off[] = { "Off", "On" };
 			//nk_layout_row_static(ctx, 30, GUI_W, 1);
 			nk_layout_row_dynamic(ctx, 0, 1);
-			if (nk_checkbox_label(ctx, "Use Blending", &use_blending)) {
-				printf("Blending %s\n", on_off[use_blending]);
+			if (nk_checkbox_label(ctx, "Twinkle", &do_twinkle)) {
+				printf("Twinkle %s\n", on_off[do_twinkle]);
 			}
-
-			nk_layout_row_template_begin(ctx, 0);
-			nk_layout_row_template_push_static(ctx, 50);
-			nk_layout_row_template_push_dynamic(ctx);
-			nk_layout_row_template_end(ctx);
-			nk_label(ctx, "Alpha", NK_TEXT_LEFT);
-			nk_property_float(ctx, "#", 0.0, &uAlpha, 1.0, 0.25, 0.08333);
-
-			nk_layout_row_dynamic(ctx, 0, 1);
-			if (nk_checkbox_label(ctx, "Use Lighting", &uUseLighting)) {
-				printf("Lighting %s\n", on_off[uUseLighting]);
-			}
-
-			nk_label(ctx, "Directional Light", NK_TEXT_CENTERED);
-			nk_label(ctx, "Direction", NK_TEXT_CENTERED);
-
-			//nk_layout_row_dynamic(ctx, 0, 2);
-
-			nk_layout_row_template_begin(ctx, 0);
-			nk_layout_row_template_push_static(ctx, 20);
-			nk_layout_row_template_push_dynamic(ctx);
-			nk_layout_row_template_end(ctx);
-
-			nk_label(ctx, "X", NK_TEXT_LEFT);
-			nk_property_float(ctx, "#", -1.0, &uLightingDirection.x, 1.0, 0.25, 0.08333);
-			nk_label(ctx, "Y", NK_TEXT_LEFT);
-			nk_property_float(ctx, "#", -1.0, &uLightingDirection.y, 1.0, 0.25, 0.08333);
-			nk_label(ctx, "Z", NK_TEXT_LEFT);
-			nk_property_float(ctx, "#", -1.0, &uLightingDirection.z, 1.0, 0.25, 0.08333);
-
-			//nk_layout_row_static(ctx, 30, GUI_W, 1);
-			nk_layout_row_dynamic(ctx, 0, 1);
-
-			nk_label(ctx, "Color", NK_TEXT_CENTERED);
-
-			nk_layout_row_dynamic(ctx, 100, 1);
-			dir_color = nk_color_picker(ctx, dir_color, NK_RGB);
-			nk_layout_row_dynamic(ctx, 0, 1);
-			dir_color.r = nk_propertyf(ctx, "#R:", 0, dir_color.r, 1.0f, 0.01f,0.005f);
-			dir_color.g = nk_propertyf(ctx, "#G:", 0, dir_color.g, 1.0f, 0.01f,0.005f);
-			dir_color.b = nk_propertyf(ctx, "#B:", 0, dir_color.b, 1.0f, 0.01f,0.005f);
-
-			uDirectionalColor = vec3(dir_color.r, dir_color.g, dir_color.b);
-
-			nk_label(ctx, "Ambient Light", NK_TEXT_CENTERED);
-			nk_label(ctx, "Color", NK_TEXT_CENTERED);
-
-			nk_layout_row_dynamic(ctx, 100, 1);
-			ambient_color = nk_color_picker(ctx, ambient_color, NK_RGB);
-			nk_layout_row_dynamic(ctx, 0, 1);
-			ambient_color.r = nk_propertyf(ctx, "#R:", 0, ambient_color.r, 1.0f, 0.01f,0.005f);
-			ambient_color.g = nk_propertyf(ctx, "#G:", 0, ambient_color.g, 1.0f, 0.01f,0.005f);
-			ambient_color.b = nk_propertyf(ctx, "#B:", 0, ambient_color.b, 1.0f, 0.01f,0.005f);
-
-			uAmbientColor = vec3(ambient_color.r, ambient_color.g, ambient_color.b);
-
-			if (nk_button_label(ctx, "button"))
-				printf("button pressed!\n");
 		}
 		nk_end(ctx);
 
@@ -315,9 +308,7 @@ int main(int argc, char** argv)
 
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &vert_buf);
-	glDeleteBuffers(1, &normal_buf);
 	glDeleteBuffers(1, &tex_buf);
-	glDeleteBuffers(1, &elem_buf);
 	glDeleteProgram(program);
 
 	cleanup();
@@ -337,7 +328,7 @@ void setup_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	window = SDL_CreateWindow("Lesson 7", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Lesson 9", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
 		cleanup();
 		exit(0);
@@ -402,13 +393,15 @@ int handle_events(unsigned int elapsed)
 				return 1;
 
 			} else if (sc == SDL_SCANCODE_LEFT) {
-				y_speed -= 1;
+				//y_speed -= 1;
 			} else if (sc == SDL_SCANCODE_RIGHT) {
-				y_speed += 1;
+				//y_speed += 1;
 			} else if (sc == SDL_SCANCODE_UP) {
-				x_speed -= 1;
+				tilt += 2;
+				printf("tilt = %f\n", tilt);
 			} else if (sc == SDL_SCANCODE_DOWN) {
-				x_speed += 1;
+				tilt -= 2;
+				printf("tilt = %f\n", tilt);
 			}
 		}
 		nk_sdl_handle_event(&e);
@@ -417,14 +410,14 @@ int handle_events(unsigned int elapsed)
 	//SDL_PumpEvents() is called above in SDL_PollEvent()
 	const Uint8 *state = SDL_GetKeyboardState(NULL);
 
+	// TODO change all lessons to use page up/page down like
+	// the original
 	if (state[SDL_SCANCODE_EQUALS]) {
-		z += 0.05;
+		zoom += 0.05;
 	} else if (state[SDL_SCANCODE_MINUS]) {
-		z -= 0.05;
+		zoom -= 0.05;
 	}
 
-	x_rot += x_speed*elapsed / 1000.0f;
-	y_rot += y_speed*elapsed / 1000.0f;
 	return 0;
 }
 

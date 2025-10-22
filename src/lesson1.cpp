@@ -102,6 +102,8 @@ int main(int argc, char** argv)
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
+		//mvMatrixStack.rotate(glm::radians(tilt), vec3(1, 0, 0));
+		mat_stack.rotate(glm::radians(45.0f), vec3(0, 0, 1));
 		mat_stack.translate(3.0, 0.0, 0.0);
 
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mat_stack.stack[mat_stack.top]);

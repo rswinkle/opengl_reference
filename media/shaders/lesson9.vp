@@ -11,7 +11,7 @@ uniform mat4 uPMatrix;
 out vec2 vTextureCoord;
 
 void main(void) {
-	gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+	gl_Position = uPMatrix * uMVMatrix * aVertexPosition;
 	vTextureCoord = aTextureCoord;
 }
 
