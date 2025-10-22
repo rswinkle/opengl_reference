@@ -1,6 +1,7 @@
 #include <gltools.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <SDL2/SDL.h>
 
@@ -47,6 +48,7 @@ float z;
 float x_rot, y_rot;
 float x_speed, y_speed;
 
+int use_blending = 1; // bool
 
 // uniforms
 mat4 uMVMatrix;
@@ -55,8 +57,9 @@ mat3 uNMatrix;
 vec3 uAmbientColor(0.2);
 vec3 uLightingDirection(-0.25, -0.25, -1.0);
 vec3 uDirectionalColor(0.8);
-int uUseLighting; //bool
+int uUseLighting = 1; // bool
 int uSampler;
+float uAlpha = 0.5f;
 
 int uMVMatrix_loc;
 int uPMatrix_loc;
@@ -66,6 +69,7 @@ int uLightingDirection_loc;
 int uDirectionalColor_loc;
 int uUseLighting_loc;
 int uSampler_loc;
+int uAlpha_loc;
 
 
 int main(int argc, char** argv)
@@ -184,7 +188,7 @@ int main(int argc, char** argv)
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	if (!load_texture2D("../media/textures/crate.gif", GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, GL_MIRRORED_REPEAT, GL_FALSE, GL_FALSE)) {
+	if (!load_texture2D("../media/textures/glass.gif", GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, GL_MIRRORED_REPEAT, GL_TRUE, GL_FALSE)) {
 		printf("failed to load texture\n");
 		return 0;
 	}
@@ -222,7 +226,7 @@ int main(int argc, char** argv)
 	glBindVertexArray(0);
 
 	const char vs_file[] = "../media/shaders/lesson7.vp";
-	const char fs_file[] = "../media/shaders/lesson7.fp";
+	const char fs_file[] = "../media/shaders/lesson8.fp";
 
 	GLuint program = load_shader_file_pair(vs_file, fs_file);
 	if (!program) {
@@ -242,10 +246,14 @@ int main(int argc, char** argv)
 	uDirectionalColor_loc = glGetUniformLocation(program, "uDirectionalColor");
 	uUseLighting_loc = glGetUniformLocation(program, "uUseLighting");
 	uSampler_loc = glGetUniformLocation(program, "uSampler");
+	uAlpha_loc = glGetUniformLocation(program, "uAlpha");
 
 	check_errors(0, "uniform locs");
 
 	glUniform1i(uSampler_loc, 0);
+
+    glEnable(GL_DEPTH_TEST);
+    glClearColor(0, 0, 0, 1);
 
 	unsigned int old_time = 0, new_time=0, counter = 0, elapsed;
 	while (1) {
@@ -264,28 +272,37 @@ int main(int argc, char** argv)
 		}
 
 		// reset state every frame due to GUI
-		glEnable(GL_CULL_FACE);
-		glEnable(GL_DEPTH_TEST);
+		//glEnable(GL_CULL_FACE);
 		glUseProgram(program);
 		glBindTexture(GL_TEXTURE_2D, texture);
+
+		if (use_blending) {
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+			glEnable(GL_BLEND);
+			glDisable(GL_DEPTH_TEST);
+			glUniform1f(uAlpha_loc, uAlpha);
+		} else {
+			glDisable(GL_BLEND);
+			glEnable(GL_DEPTH_TEST);
+		}
 
 		uPMatrix = glm::perspective(glm::radians(45.0f), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
 		uMVMatrix = glm::translate(mat4(1), vec3(0,0,z));
 		uMVMatrix = glm::rotate(uMVMatrix, glm::radians(x_rot), vec3(1, 0, 0));
 		uMVMatrix = glm::rotate(uMVMatrix, glm::radians(y_rot), vec3(0, 1, 0));
 
-		glUniformMatrix4fv(uMVMatrix_loc, 1, GL_FALSE, (float*)&uMVMatrix);
-		glUniformMatrix4fv(uPMatrix_loc, 1, GL_FALSE, (float*)&uPMatrix);
+		glUniformMatrix4fv(uMVMatrix_loc, 1, GL_FALSE, glm::value_ptr(uMVMatrix));
+		glUniformMatrix4fv(uPMatrix_loc, 1, GL_FALSE, glm::value_ptr(uPMatrix));
 
 		// transpose/inverse not necessary here but meh
 		//uNMatrix = mat3(uMVMatrix);
 		uNMatrix = glm::transpose(glm::inverse(mat3(uMVMatrix)));
-		glUniformMatrix3fv(uNMatrix_loc, 1, GL_FALSE, (float*)&uNMatrix);
+		glUniformMatrix3fv(uNMatrix_loc, 1, GL_FALSE, glm::value_ptr(uNMatrix));
 
 		glUniform1i(uSampler_loc, 0); // never changes
-		glUniform3fv(uAmbientColor_loc, 1, (float*)&uAmbientColor);
-		glUniform3fv(uLightingDirection_loc, 1, (float*)&uLightingDirection);
-		glUniform3fv(uDirectionalColor_loc, 1, (float*)&uDirectionalColor);
+		glUniform3fv(uAmbientColor_loc, 1, glm::value_ptr(uAmbientColor));
+		glUniform3fv(uLightingDirection_loc, 1, glm::value_ptr(uLightingDirection));
+		glUniform3fv(uDirectionalColor_loc, 1, glm::value_ptr(uDirectionalColor));
 		glUniform1i(uUseLighting_loc, uUseLighting);
 
 
@@ -300,10 +317,23 @@ int main(int argc, char** argv)
 		{
 			static struct nk_colorf dir_color = { 0.8, 0.8, 0.8, 1 };
 			static struct nk_colorf ambient_color = { 0.2, 0.2, 0.2, 1 };
+			static const char* on_off[] = { "Off", "On" };
 			//nk_layout_row_static(ctx, 30, GUI_W, 1);
 			nk_layout_row_dynamic(ctx, 0, 1);
+			if (nk_checkbox_label(ctx, "Use Blending", &use_blending)) {
+				printf("Blending %s\n", on_off[use_blending]);
+			}
+
+			nk_layout_row_template_begin(ctx, 0);
+			nk_layout_row_template_push_static(ctx, 50);
+			nk_layout_row_template_push_dynamic(ctx);
+			nk_layout_row_template_end(ctx);
+			nk_label(ctx, "Alpha", NK_TEXT_LEFT);
+			nk_property_float(ctx, "#", 0.0, &uAlpha, 1.0, 0.25, 0.08333);
+
+			nk_layout_row_dynamic(ctx, 0, 1);
 			if (nk_checkbox_label(ctx, "Use Lighting", &uUseLighting)) {
-				printf("Lighting %s\n", (uUseLighting ? "On" : "Off"));
+				printf("Lighting %s\n", on_off[uUseLighting]);
 			}
 
 			nk_label(ctx, "Directional Light", NK_TEXT_CENTERED);
@@ -478,6 +508,7 @@ int handle_events(unsigned int elapsed)
 	y_rot += y_speed*elapsed / 1000.0f;
 	return 0;
 }
+
 
 
 
