@@ -1,11 +1,14 @@
 #include <gltools.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <SDL2/SDL.h>
 
 #include <iostream>
 #include <stdio.h>
+#include <vector>
+
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
@@ -30,6 +33,8 @@
 
 using namespace std;
 
+using glm::ivec3;
+using glm::vec2;
 using glm::vec3;
 using glm::mat3;
 using glm::mat4;
@@ -44,18 +49,18 @@ void setup_context();
 int handle_events(unsigned int elapsed);
 
 float z;
-float x_rot, y_rot;
-float x_speed, y_speed;
+int polygon_mode;
 
+mat4 moonRotationMatrix(1);
 
 // uniforms
 mat4 uMVMatrix;
 mat4 uPMatrix;
 mat3 uNMatrix;
 vec3 uAmbientColor(0.2);
-vec3 uLightingDirection(-0.25, -0.25, -1.0);
+vec3 uLightingDirection(-1.0f, -1.0f, -1.0f);
 vec3 uDirectionalColor(0.8);
-int uUseLighting; //bool
+int uUseLighting = 1; //bool
 int uSampler;
 
 int uMVMatrix_loc;
@@ -67,124 +72,61 @@ int uDirectionalColor_loc;
 int uUseLighting_loc;
 int uSampler_loc;
 
-
 int main(int argc, char** argv)
 {
 	setup_context();
 
+	polygon_mode = 2;
 
-	float vertices[] = {
-		// Front face
-		-1.0, -1.0,  1.0,
-		 1.0, -1.0,  1.0,
-		 1.0,  1.0,  1.0,
-		-1.0,  1.0,  1.0,
-		// Back face
-		-1.0, -1.0, -1.0,
-		-1.0,  1.0, -1.0,
-		 1.0,  1.0, -1.0,
-		 1.0, -1.0, -1.0,
-		// Top face
-		-1.0,  1.0, -1.0,
-		-1.0,  1.0,  1.0,
-		 1.0,  1.0,  1.0,
-		 1.0,  1.0, -1.0,
-		// Bottom face
-		-1.0, -1.0, -1.0,
-		 1.0, -1.0, -1.0,
-		 1.0, -1.0,  1.0,
-		-1.0, -1.0,  1.0,
-		// Right face
-		 1.0, -1.0, -1.0,
-		 1.0,  1.0, -1.0,
-		 1.0,  1.0,  1.0,
-		 1.0, -1.0,  1.0,
-		// Left face
-		-1.0, -1.0, -1.0,
-		-1.0, -1.0,  1.0,
-		-1.0,  1.0,  1.0,
-		-1.0,  1.0, -1.0
-	};
+	vector<vec3> verts;
+	vector<vec3> normals;
+	vector<vec2> texcoords;
+	vector<ivec3> tris;
 
-	float normals[] = {
-		// Front face
-		 0.0,  0.0,  1.0,
-		 0.0,  0.0,  1.0,
-		 0.0,  0.0,  1.0,
-		 0.0,  0.0,  1.0,
-		// Back face
-		 0.0,  0.0, -1.0,
-		 0.0,  0.0, -1.0,
-		 0.0,  0.0, -1.0,
-		 0.0,  0.0, -1.0,
-		// Top face
-		 0.0,  1.0,  0.0,
-		 0.0,  1.0,  0.0,
-		 0.0,  1.0,  0.0,
-		 0.0,  1.0,  0.0,
-		// Bottom face
-		 0.0, -1.0,  0.0,
-		 0.0, -1.0,  0.0,
-		 0.0, -1.0,  0.0,
-		 0.0, -1.0,  0.0,
-		// Right face
-		 1.0,  0.0,  0.0,
-		 1.0,  0.0,  0.0,
-		 1.0,  0.0,  0.0,
-		 1.0,  0.0,  0.0,
-		// Left face
-		-1.0,  0.0,  0.0,
-		-1.0,  0.0,  0.0,
-		-1.0,  0.0,  0.0,
-		-1.0,  0.0,  0.0
-	};
+	float lat_bands = 30;
+	float long_bands = 30;
+	float radius = 2;
 
-	float texcoords[] = {
-		// Front face
-		0.0, 0.0,
-		1.0, 0.0,
-		1.0, 1.0,
-		0.0, 1.0,
-		// Back face
-		1.0, 0.0,
-		1.0, 1.0,
-		0.0, 1.0,
-		0.0, 0.0,
-		// Top face
-		0.0, 1.0,
-		0.0, 0.0,
-		1.0, 0.0,
-		1.0, 1.0,
-		// Bottom face
-		1.0, 1.0,
-		0.0, 1.0,
-		0.0, 0.0,
-		1.0, 0.0,
-		// Right face
-		1.0, 0.0,
-		1.0, 1.0,
-		0.0, 1.0,
-		0.0, 0.0,
-		// Left face
-		0.0, 0.0,
-		1.0, 0.0,
-		1.0, 1.0,
-		0.0, 1.0
-	};
+	for (float lat_n = 0; lat_n <= lat_bands; lat_n++) {
+		float theta = lat_n * glm::pi<float>() / lat_bands;
+		float sin_theta = sin(theta);
+		float cos_theta = cos(theta);
+		
+		for (float long_n=0; long_n <= long_bands; long_n++) {
+			float phi = long_n * 2 * glm::pi<float>() / long_bands;
+			float sin_phi = sin(phi);
+			float cos_phi = cos(phi);
 
-	GLuint triangles[] = {
-		0, 1, 2,      0, 2, 3,    // Front face
-		4, 5, 6,      4, 6, 7,    // Back face
-		8, 9, 10,     8, 10, 11,  // Top face
-		12, 13, 14,   12, 14, 15, // Bottom face
-		16, 17, 18,   16, 18, 19, // Right face
-		20, 21, 22,   20, 22, 23  // Left face
-	};
+			float x = cos_phi * sin_theta;
+			float y = cos_theta;
+			float z = sin_phi * sin_theta;
+			float u = 1 - (long_n / long_bands);
+			float v = 1 - (lat_n / lat_bands);
+
+			normals.push_back(vec3(x, y, z));
+			texcoords.push_back(vec2(u, v));
+			verts.push_back(vec3(radius*x, radius*y, radius*z));
+		}
+	}
+
+	for (int i=0; i<lat_bands; i++) {
+		for (int j=0; j<long_bands; j++) {
+			float first = (i * (long_bands+1)) + j;
+			float second = first + long_bands + 1;
+
+			// original CW winding, means CULL_FACE messes it up
+			//tris.push_back(ivec3(first, second, first+1));
+			//tris.push_back(ivec3(second, second+1, first+1));
+			
+			tris.push_back(ivec3(first, first+1, second));
+			tris.push_back(ivec3(second, first+1, second+1));
+		}
+	}
 
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	if (!load_texture2D("../media/textures/crate.gif", GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, GL_REPEAT, GL_FALSE, GL_FALSE)) {
+	if (!load_texture2D("../media/textures/moon.gif", GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, GL_REPEAT, GL_TRUE, GL_FALSE)) {
 		printf("failed to load texture\n");
 		return 0;
 	}
@@ -196,33 +138,33 @@ int main(int argc, char** argv)
 	GLuint vert_buf;
 	glGenBuffers(1, &vert_buf);
 	glBindBuffer(GL_ARRAY_BUFFER, vert_buf);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, verts.size()*sizeof(vec3), &verts[0], GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	GLuint normal_buf;
 	glGenBuffers(1, &normal_buf);
 	glBindBuffer(GL_ARRAY_BUFFER, normal_buf);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, normals.size()*sizeof(vec3), &normals[0], GL_STATIC_DRAW);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	GLuint tex_buf;
 	glGenBuffers(1, &tex_buf);
 	glBindBuffer(GL_ARRAY_BUFFER, tex_buf);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(texcoords), texcoords, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, texcoords.size()*sizeof(vec2), &texcoords[0], GL_STATIC_DRAW);
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
 	GLuint elem_buf;
 	glGenBuffers(1, &elem_buf);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elem_buf);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangles), triangles, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, tris.size()*sizeof(ivec3), &tris[0], GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
 
-	const char vs_file[] = "../media/shaders/lesson7.vp";
-	const char fs_file[] = "../media/shaders/lesson7.fp";
+	const char vs_file[] = "../media/shaders/lesson11.vp";
+	const char fs_file[] = "../media/shaders/lesson11.fp";
 
 	GLuint program = load_shader_file_pair(vs_file, fs_file);
 	if (!program) {
@@ -230,8 +172,6 @@ int main(int argc, char** argv)
 		exit(0);
 	}
 	glUseProgram(program);
-
-	z = -5;
 
 	uMVMatrix_loc = glGetUniformLocation(program, "uMVMatrix");
 	uPMatrix_loc = glGetUniformLocation(program, "uPMatrix");
@@ -245,6 +185,9 @@ int main(int argc, char** argv)
 	check_errors(0, "uniform locs");
 
 	glUniform1i(uSampler_loc, 0);
+	glClearColor(0,0,0,1);
+
+	//SDL_SetRelativeMouseMode(SDL_TRUE);
 
 	unsigned int old_time = 0, new_time=0, counter = 0, elapsed;
 	while (1) {
@@ -269,29 +212,30 @@ int main(int argc, char** argv)
 		glBindTexture(GL_TEXTURE_2D, texture);
 
 		uPMatrix = glm::perspective(glm::radians(45.0f), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
-		uMVMatrix = glm::translate(mat4(1), vec3(0,0,z));
-		uMVMatrix = glm::rotate(uMVMatrix, glm::radians(x_rot), vec3(1, 0, 0));
-		uMVMatrix = glm::rotate(uMVMatrix, glm::radians(y_rot), vec3(0, 1, 0));
+		uMVMatrix = glm::translate(mat4(1), vec3(0,0,-6));
+		uMVMatrix = uMVMatrix * moonRotationMatrix;
 
-		glUniformMatrix4fv(uMVMatrix_loc, 1, GL_FALSE, (float*)&uMVMatrix);
-		glUniformMatrix4fv(uPMatrix_loc, 1, GL_FALSE, (float*)&uPMatrix);
+		glUniformMatrix4fv(uMVMatrix_loc, 1, GL_FALSE, glm::value_ptr(uMVMatrix));
+		glUniformMatrix4fv(uPMatrix_loc, 1, GL_FALSE, glm::value_ptr(uPMatrix));
 
 		// transpose/inverse not necessary here but meh
 		//uNMatrix = mat3(uMVMatrix);
 		uNMatrix = glm::transpose(glm::inverse(mat3(uMVMatrix)));
-		glUniformMatrix3fv(uNMatrix_loc, 1, GL_FALSE, (float*)&uNMatrix);
+		glUniformMatrix3fv(uNMatrix_loc, 1, GL_FALSE, glm::value_ptr(uNMatrix));
 
 		glUniform1i(uSampler_loc, 0); // never changes
-		glUniform3fv(uAmbientColor_loc, 1, (float*)&uAmbientColor);
-		glUniform3fv(uLightingDirection_loc, 1, (float*)&uLightingDirection);
-		glUniform3fv(uDirectionalColor_loc, 1, (float*)&uDirectionalColor);
+		glUniform3fv(uAmbientColor_loc, 1, glm::value_ptr(uAmbientColor));
+
+		vec3 adjusted_ld = glm::normalize(-uLightingDirection);
+		glUniform3fv(uLightingDirection_loc, 1, glm::value_ptr(adjusted_ld));
+		glUniform3fv(uDirectionalColor_loc, 1, glm::value_ptr(uDirectionalColor));
 		glUniform1i(uUseLighting_loc, uUseLighting);
 
 
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 		glBindVertexArray(vao);
-		glDrawElements(GL_TRIANGLES, sizeof(triangles), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, tris.size()*3, GL_UNSIGNED_INT, 0);
 
 
 		if (nk_begin(ctx, "Controls", nk_rect(WIDTH-GUI_W, 0, GUI_W, HEIGHT),
@@ -387,7 +331,7 @@ void setup_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	window = SDL_CreateWindow("Lesson 7", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Lesson 11", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
 		cleanup();
 		exit(0);
@@ -452,13 +396,26 @@ int handle_events(unsigned int elapsed)
 				return 1;
 
 			} else if (sc == SDL_SCANCODE_LEFT) {
-				y_speed -= 1;
 			} else if (sc == SDL_SCANCODE_RIGHT) {
-				y_speed += 1;
 			} else if (sc == SDL_SCANCODE_UP) {
-				x_speed -= 1;
 			} else if (sc == SDL_SCANCODE_DOWN) {
-				x_speed += 1;
+			} else if (sc == SDL_SCANCODE_P) {
+				polygon_mode = (polygon_mode + 1) % 3;
+				if (polygon_mode == 0)
+					glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+				else if (polygon_mode == 1)
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				else
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			}
+		} else if (e.type == SDL_MOUSEMOTION) {
+			if (SDL_BUTTON_LMASK & SDL_GetMouseState(NULL, NULL)) {
+				float dx = e.motion.xrel;
+				float dy = e.motion.yrel;
+
+				mat4 newRotation = glm::rotate(mat4(1), glm::radians(dx/10), vec3(0, 1, 0));
+				newRotation = glm::rotate(newRotation, glm::radians(dy/10), vec3(1, 0, 0));
+				moonRotationMatrix = newRotation * moonRotationMatrix;
 			}
 		}
 		nk_sdl_handle_event(&e);
@@ -473,10 +430,9 @@ int handle_events(unsigned int elapsed)
 		z -= 0.05;
 	}
 
-	x_rot += x_speed*elapsed / 1000.0f;
-	y_rot += y_speed*elapsed / 1000.0f;
 	return 0;
 }
+
 
 
 
