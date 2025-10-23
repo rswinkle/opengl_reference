@@ -22,6 +22,7 @@ ifeq ($(config),debug_linux)
   lesson9_config = debug_linux
   lesson10_config = debug_linux
   lesson11_config = debug_linux
+  lesson12_config = debug_linux
   multidraw_config = debug_linux
   multidraw2_config = debug_linux
   texturing_config = debug_linux
@@ -63,6 +64,7 @@ else ifeq ($(config),debug_windows)
   lesson9_config = debug_windows
   lesson10_config = debug_windows
   lesson11_config = debug_windows
+  lesson12_config = debug_windows
   multidraw_config = debug_windows
   multidraw2_config = debug_windows
   texturing_config = debug_windows
@@ -104,6 +106,7 @@ else ifeq ($(config),release_linux)
   lesson9_config = release_linux
   lesson10_config = release_linux
   lesson11_config = release_linux
+  lesson12_config = release_linux
   multidraw_config = release_linux
   multidraw2_config = release_linux
   texturing_config = release_linux
@@ -145,6 +148,7 @@ else ifeq ($(config),release_windows)
   lesson9_config = release_windows
   lesson10_config = release_windows
   lesson11_config = release_windows
+  lesson12_config = release_windows
   multidraw_config = release_windows
   multidraw2_config = release_windows
   texturing_config = release_windows
@@ -176,7 +180,7 @@ else
   $(error "invalid configuration $(config)")
 endif
 
-PROJECTS := ex1 ex2 lesson1 lesson2 lesson3 lesson4 lesson5 lesson6 lesson7 lesson8 lesson9 lesson10 lesson11 multidraw multidraw2 texturing modelviewer testprimitives grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites glm_sphereworld_color glm_grass glm_flying left_handed gears test_poly_modes test_scissoring test_viewport test_clipping test_depthclamp test_line_depth test_aliasing_lines polylines client_arrays color_masking
+PROJECTS := ex1 ex2 lesson1 lesson2 lesson3 lesson4 lesson5 lesson6 lesson7 lesson8 lesson9 lesson10 lesson11 lesson12 multidraw multidraw2 texturing modelviewer testprimitives grass sphereworld_color flying glm_modelviewer glm_texturing point_sprites glm_sphereworld_color glm_grass glm_flying left_handed gears test_poly_modes test_scissoring test_viewport test_clipping test_depthclamp test_line_depth test_aliasing_lines polylines client_arrays color_masking
 
 .PHONY: all clean help $(PROJECTS) 
 
@@ -258,6 +262,12 @@ lesson11:
 ifneq (,$(lesson11_config))
 	@echo "==== Building lesson11 ($(lesson11_config)) ===="
 	@${MAKE} --no-print-directory -C . -f lesson11.make config=$(lesson11_config)
+endif
+
+lesson12:
+ifneq (,$(lesson12_config))
+	@echo "==== Building lesson12 ($(lesson12_config)) ===="
+	@${MAKE} --no-print-directory -C . -f lesson12.make config=$(lesson12_config)
 endif
 
 multidraw:
@@ -430,6 +440,7 @@ clean:
 	@${MAKE} --no-print-directory -C . -f lesson9.make clean
 	@${MAKE} --no-print-directory -C . -f lesson10.make clean
 	@${MAKE} --no-print-directory -C . -f lesson11.make clean
+	@${MAKE} --no-print-directory -C . -f lesson12.make clean
 	@${MAKE} --no-print-directory -C . -f multidraw.make clean
 	@${MAKE} --no-print-directory -C . -f multidraw2.make clean
 	@${MAKE} --no-print-directory -C . -f texturing.make clean
@@ -482,6 +493,7 @@ help:
 	@echo "   lesson9"
 	@echo "   lesson10"
 	@echo "   lesson11"
+	@echo "   lesson12"
 	@echo "   multidraw"
 	@echo "   multidraw2"
 	@echo "   texturing"

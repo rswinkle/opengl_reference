@@ -93,7 +93,7 @@ int file_open_read(const char* filename, const char* mode, char** out)
 }
 
 
-#define BUF_SIZE 1000
+#define BUF_SIZE 4096
 
 int link_program(GLuint program)
 {

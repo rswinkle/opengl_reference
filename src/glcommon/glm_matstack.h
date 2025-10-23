@@ -45,7 +45,7 @@ struct matrix_stack
 	*/
 
 	//one of these days I should really try restrict keyword and see if it makes a significant difference
-	void mult_mat(const glm::mat4 m)
+	void multiply(const glm::mat4 m)
 	{
 		stack[top] = stack[top] * m;
 	}
