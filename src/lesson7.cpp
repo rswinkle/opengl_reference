@@ -1,6 +1,7 @@
 #include <gltools.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <SDL2/SDL.h>
 
@@ -273,18 +274,21 @@ int main(int argc, char** argv)
 		uMVMatrix = glm::rotate(uMVMatrix, glm::radians(x_rot), vec3(1, 0, 0));
 		uMVMatrix = glm::rotate(uMVMatrix, glm::radians(y_rot), vec3(0, 1, 0));
 
-		glUniformMatrix4fv(uMVMatrix_loc, 1, GL_FALSE, (float*)&uMVMatrix);
-		glUniformMatrix4fv(uPMatrix_loc, 1, GL_FALSE, (float*)&uPMatrix);
+		glUniformMatrix4fv(uMVMatrix_loc, 1, GL_FALSE, glm::value_ptr(uMVMatrix));
+		glUniformMatrix4fv(uPMatrix_loc, 1, GL_FALSE, glm::value_ptr(uPMatrix));
 
 		// transpose/inverse not necessary here but meh
 		//uNMatrix = mat3(uMVMatrix);
 		uNMatrix = glm::transpose(glm::inverse(mat3(uMVMatrix)));
-		glUniformMatrix3fv(uNMatrix_loc, 1, GL_FALSE, (float*)&uNMatrix);
+		glUniformMatrix3fv(uNMatrix_loc, 1, GL_FALSE, glm::value_ptr(uNMatrix));
 
 		glUniform1i(uSampler_loc, 0); // never changes
-		glUniform3fv(uAmbientColor_loc, 1, (float*)&uAmbientColor);
-		glUniform3fv(uLightingDirection_loc, 1, (float*)&uLightingDirection);
-		glUniform3fv(uDirectionalColor_loc, 1, (float*)&uDirectionalColor);
+		glUniform3fv(uAmbientColor_loc, 1, glm::value_ptr(uAmbientColor));
+
+		vec3 adjusted_ld = glm::normalize(-uLightingDirection);
+		glUniform3fv(uLightingDirection_loc, 1, glm::value_ptr(adjusted_ld));
+
+		glUniform3fv(uDirectionalColor_loc, 1, glm::value_ptr(uDirectionalColor));
 		glUniform1i(uUseLighting_loc, uUseLighting);
 
 

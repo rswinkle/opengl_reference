@@ -301,7 +301,10 @@ int main(int argc, char** argv)
 
 		glUniform1i(uSampler_loc, 0); // never changes
 		glUniform3fv(uAmbientColor_loc, 1, glm::value_ptr(uAmbientColor));
-		glUniform3fv(uLightingDirection_loc, 1, glm::value_ptr(uLightingDirection));
+
+		vec3 adjusted_ld = glm::normalize(-uLightingDirection);
+		glUniform3fv(uLightingDirection_loc, 1, glm::value_ptr(adjusted_ld));
+
 		glUniform3fv(uDirectionalColor_loc, 1, glm::value_ptr(uDirectionalColor));
 		glUniform1i(uUseLighting_loc, uUseLighting);
 
