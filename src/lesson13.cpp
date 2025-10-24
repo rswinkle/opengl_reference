@@ -64,6 +64,7 @@ vec3 uAmbientColor(0.2);
 vec3 uPointLight(0.0f, 0.0f, -20.0f);
 vec3 uPointLightColor(0.8);
 int uUseLighting = 1; //bool
+int uUseTextures = 1; //bool
 int uSampler;
 
 int uMVMatrix_loc;
@@ -73,6 +74,7 @@ int uAmbientColor_loc;
 int uPointLight_loc;
 int uPointLightColor_loc;
 int uUseLighting_loc;
+int uUseTextures_loc;
 int uSampler_loc;
 
 int main(int argc, char** argv)
@@ -99,14 +101,26 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	const char vs_file[] = "../media/shaders/lesson12.vp";
-	const char fs_file[] = "../media/shaders/lesson12.fp";
+	// gouraud shaders
+	const char vert_vs_file[] = "../media/shaders/lesson13_per_vertex_lighting.vp";
+	const char vert_fs_file[] = "../media/shaders/lesson13_per_vertex_lighting.fp";
 
-	GLuint program = load_shader_file_pair(vs_file, fs_file);
+	GLuint vertex_lighting = load_shader_file_pair(vert_vs_file, vert_fs_file);
 	if (!program) {
 		printf("failed to compile/link shaders\n");
 		exit(0);
 	}
+
+	// phong shaders
+	const char frag_vs_file[] = "../media/shaders/lesson13_per_vertex_lighting.vp";
+	const char frag_fs_file[] = "../media/shaders/lesson13_per_vertex_lighting.fp";
+
+	GLuint frag_lighting = load_shader_file_pair(frag_vs_file, frag_fs_file);
+	if (!program) {
+		printf("failed to compile/link shaders\n");
+		exit(0);
+	}
+
 	glUseProgram(program);
 
 	uMVMatrix_loc = glGetUniformLocation(program, "uMVMatrix");
@@ -116,6 +130,7 @@ int main(int argc, char** argv)
 	uPointLight_loc = glGetUniformLocation(program, "uPointLightingLocation");
 	uPointLightColor_loc = glGetUniformLocation(program, "uPointLightingColor");
 	uUseLighting_loc = glGetUniformLocation(program, "uUseLighting");
+	uUseTextures_loc = glGetUniformLocation(program, "uUseTextures");
 	uSampler_loc = glGetUniformLocation(program, "uSampler");
 
 	check_errors(0, "uniform locs");
@@ -299,7 +314,7 @@ void setup_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	window = SDL_CreateWindow("Lesson 12", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Lesson 13", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
 		cleanup();
 		exit(0);
@@ -610,6 +625,7 @@ void setup_buffers()
 
 	glBindVertexArray(0);
 }
+
 
 
 
