@@ -52,6 +52,7 @@ void setup_buffers();
 
 float z;
 int polygon_mode;
+int use_frag_lighting = 1;
 
 GLuint cube_vao, moon_vao;
 int cube_tris, moon_tris;
@@ -61,21 +62,11 @@ mat4 uMVMatrix;
 mat4 uPMatrix;
 mat3 uNMatrix;
 vec3 uAmbientColor(0.2);
-vec3 uPointLight(0.0f, 0.0f, -20.0f);
+vec3 uPointLight(0.0f, 0.0f, -5.0f);
 vec3 uPointLightColor(0.8);
 int uUseLighting = 1; //bool
 int uUseTextures = 1; //bool
 int uSampler;
-
-int uMVMatrix_loc;
-int uPMatrix_loc;
-int uNMatrix_loc;
-int uAmbientColor_loc;
-int uPointLight_loc;
-int uPointLightColor_loc;
-int uUseLighting_loc;
-int uUseTextures_loc;
-int uSampler_loc;
 
 int main(int argc, char** argv)
 {
@@ -106,36 +97,36 @@ int main(int argc, char** argv)
 	const char vert_fs_file[] = "../media/shaders/lesson13_per_vertex_lighting.fp";
 
 	GLuint vertex_lighting = load_shader_file_pair(vert_vs_file, vert_fs_file);
-	if (!program) {
+	if (!vertex_lighting) {
 		printf("failed to compile/link shaders\n");
 		exit(0);
 	}
 
 	// phong shaders
-	const char frag_vs_file[] = "../media/shaders/lesson13_per_vertex_lighting.vp";
-	const char frag_fs_file[] = "../media/shaders/lesson13_per_vertex_lighting.fp";
+	const char frag_vs_file[] = "../media/shaders/lesson13_per_frag_lighting.vp";
+	const char frag_fs_file[] = "../media/shaders/lesson13_per_frag_lighting.fp";
 
 	GLuint frag_lighting = load_shader_file_pair(frag_vs_file, frag_fs_file);
-	if (!program) {
+	if (!frag_lighting) {
 		printf("failed to compile/link shaders\n");
 		exit(0);
 	}
 
-	glUseProgram(program);
+	GLuint cur_program = (use_frag_lighting) ? frag_lighting : vertex_lighting;
 
-	uMVMatrix_loc = glGetUniformLocation(program, "uMVMatrix");
-	uPMatrix_loc = glGetUniformLocation(program, "uPMatrix");
-	uNMatrix_loc = glGetUniformLocation(program, "uNMatrix");
-	uAmbientColor_loc = glGetUniformLocation(program, "uAmbientColor");
-	uPointLight_loc = glGetUniformLocation(program, "uPointLightingLocation");
-	uPointLightColor_loc = glGetUniformLocation(program, "uPointLightingColor");
-	uUseLighting_loc = glGetUniformLocation(program, "uUseLighting");
-	uUseTextures_loc = glGetUniformLocation(program, "uUseTextures");
-	uSampler_loc = glGetUniformLocation(program, "uSampler");
+	uPMatrix = glm::perspective(glm::radians(45.0f), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
 
-	check_errors(0, "uniform locs");
+	// These never change so set up here
+	glUseProgram(vertex_lighting);
+	set_uniform1i(vertex_lighting, "uSampler", 0);
+	set_uniform_mat4f(vertex_lighting, "uPMatrix", glm::value_ptr(uPMatrix));
 
-	glUniform1i(uSampler_loc, 0);
+	glUseProgram(frag_lighting);
+	set_uniform1i(frag_lighting, "uSampler", 0);
+	set_uniform_mat4f(frag_lighting, "uPMatrix", glm::value_ptr(uPMatrix));
+
+	glUseProgram(cur_program);
+
 	glClearColor(0,0,0,1);
 
 	float moonAngle = 180;
@@ -143,7 +134,8 @@ int main(int argc, char** argv)
 
 	matrix_stack mvstack;
 	mvstack.load_identity();
-	mvstack.translate(vec3(0,0,-20));
+	mvstack.translate(vec3(0,0,-5));
+	mvstack.rotate(glm::radians(30.0f), vec3(1, 0, 0));
 
 
 	//SDL_SetRelativeMouseMode(SDL_TRUE);
@@ -170,32 +162,32 @@ int main(int argc, char** argv)
 		// reset state every frame due to GUI, TODO double check exactly what changes
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
-		glUseProgram(program);
 
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-		glBindTexture(GL_TEXTURE_2D, moon_tex);
+		glUseProgram(cur_program);
 
-		uPMatrix = glm::perspective(glm::radians(45.0f), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
+		set_uniform1i(cur_program, "uUseTextures", uUseTextures);
+
 
 		mvstack.push();
 		mvstack.rotate(glm::radians(moonAngle), vec3(0, 1, 0));
-		mvstack.translate(5, 0, 0);
+		mvstack.translate(2, 0, 0);
 
-		glUniformMatrix4fv(uMVMatrix_loc, 1, GL_FALSE, glm::value_ptr(mvstack.get_matrix()));
-		glUniformMatrix4fv(uPMatrix_loc, 1, GL_FALSE, glm::value_ptr(uPMatrix));
+		glBindTexture(GL_TEXTURE_2D, moon_tex);
+		set_uniform_mat4f(cur_program, "uMVMatrix", glm::value_ptr(mvstack.get_matrix()));
 
 		// transpose/inverse not necessary here but meh
 		//uNMatrix = mat3(uMVMatrix);
 		uNMatrix = glm::transpose(glm::inverse(mat3(mvstack.get_matrix())));
-		glUniformMatrix3fv(uNMatrix_loc, 1, GL_FALSE, glm::value_ptr(uNMatrix));
+		set_uniform_mat3f(cur_program, "uNMatrix", glm::value_ptr(uNMatrix));
 
-		glUniform1i(uSampler_loc, 0); // never changes
-		glUniform3fv(uAmbientColor_loc, 1, glm::value_ptr(uAmbientColor));
+		set_uniform3fv(cur_program, "uAmbientColor", glm::value_ptr(uAmbientColor));
 
-		glUniform3fv(uPointLight_loc, 1, glm::value_ptr(uPointLight));
-		glUniform3fv(uPointLightColor_loc, 1, glm::value_ptr(uPointLightColor));
-		glUniform1i(uUseLighting_loc, uUseLighting);
+		set_uniform3fv(cur_program, "uPointLightingLocation", glm::value_ptr(uPointLight));
+		set_uniform3fv(cur_program, "uPointLightingColor", glm::value_ptr(uPointLightColor));
+
+		set_uniform1i(cur_program, "uUseLighting", uUseLighting);
 
 		glBindVertexArray(moon_vao);
 		glDrawElements(GL_TRIANGLES, moon_tris*3, GL_UNSIGNED_INT, 0);
@@ -206,16 +198,15 @@ int main(int argc, char** argv)
 		glBindTexture(GL_TEXTURE_2D, box_tex);
 
 		mvstack.rotate(glm::radians(cubeAngle), vec3(0, 1, 0));
-		mvstack.translate(5, 0, 0);
+		mvstack.translate(1.25, 0, 0);
 
 		// Only MVmatrix and NMatrix change
-		glUniformMatrix4fv(uMVMatrix_loc, 1, GL_FALSE, glm::value_ptr(mvstack.get_matrix()));
-		//glUniformMatrix4fv(uPMatrix_loc, 1, GL_FALSE, glm::value_ptr(uPMatrix));
+		set_uniform_mat4f(cur_program, "uMVMatrix", glm::value_ptr(mvstack.get_matrix()));
 
 		// transpose/inverse not necessary here but meh
 		//uNMatrix = mat3(uMVMatrix);
 		uNMatrix = glm::transpose(glm::inverse(mat3(mvstack.get_matrix())));
-		glUniformMatrix3fv(uNMatrix_loc, 1, GL_FALSE, glm::value_ptr(uNMatrix));
+		set_uniform_mat3f(cur_program, "uNMatrix", glm::value_ptr(uNMatrix));
 
 		glBindVertexArray(cube_vao);
 		glDrawElements(GL_TRIANGLES, cube_tris*3, GL_UNSIGNED_INT, 0);
@@ -232,6 +223,17 @@ int main(int argc, char** argv)
 			if (nk_checkbox_label(ctx, "Use Lighting", &uUseLighting)) {
 				printf("Lighting %s\n", (uUseLighting ? "On" : "Off"));
 			}
+			if (nk_checkbox_label(ctx, "Per-fragment lighting", &use_frag_lighting)) {
+				printf("Frag Lighting %s\n", (use_frag_lighting ? "On" : "Off"));
+				if (use_frag_lighting) {
+					cur_program = frag_lighting;
+				} else {
+					cur_program = vertex_lighting;
+				}
+			}
+			if (nk_checkbox_label(ctx, "Use Textures", &uUseTextures)) {
+				printf("Textures %s\n", (uUseTextures ? "On" : "Off"));
+			}
 
 			nk_label(ctx, "Point Light", NK_TEXT_CENTERED);
 			nk_label(ctx, "Location", NK_TEXT_CENTERED);
@@ -244,11 +246,11 @@ int main(int argc, char** argv)
 			nk_layout_row_template_end(ctx);
 
 			nk_label(ctx, "X", NK_TEXT_LEFT);
-			nk_property_float(ctx, "#", -40.0, &uPointLight.x, 20.0, 1.0, 0.2);
+			nk_property_float(ctx, "#", -10.0, &uPointLight.x, 5.0, 1.0, 0.2);
 			nk_label(ctx, "Y", NK_TEXT_LEFT);
-			nk_property_float(ctx, "#", -40.0, &uPointLight.y, 20.0, 1.0, 0.2);
+			nk_property_float(ctx, "#", -10.0, &uPointLight.y, 5.0, 1.0, 0.2);
 			nk_label(ctx, "Z", NK_TEXT_LEFT);
-			nk_property_float(ctx, "#", -40.0, &uPointLight.z, 20.0, 1.0, 0.2);
+			nk_property_float(ctx, "#", -10.0, &uPointLight.z, 5.0, 1.0, 0.2);
 
 
 			//nk_layout_row_static(ctx, 30, GUI_W, 1);
@@ -295,7 +297,8 @@ int main(int argc, char** argv)
 
 	glDeleteVertexArrays(1, &moon_vao);
 	glDeleteVertexArrays(1, &cube_vao);
-	glDeleteProgram(program);
+	glDeleteProgram(vertex_lighting);
+	glDeleteProgram(frag_lighting);
 
 	cleanup();
 
@@ -562,7 +565,7 @@ void setup_buffers()
 
 	float lat_bands = 30;
 	float long_bands = 30;
-	float radius = 2;
+	float radius = 1;
 
 	for (float lat_n = 0; lat_n <= lat_bands; lat_n++) {
 		float theta = lat_n * glm::pi<float>() / lat_bands;
