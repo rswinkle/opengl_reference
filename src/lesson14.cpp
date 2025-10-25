@@ -44,6 +44,7 @@ struct nk_context* ctx;
 void cleanup();
 void setup_context();
 int handle_events(unsigned int elapsed);
+int setup_buffers();
 
 float z;
 float x_rot, y_rot;
@@ -56,9 +57,10 @@ mat4 uMVMatrix;
 mat4 uPMatrix;
 mat3 uNMatrix;
 vec3 uAmbientColor(0.2);
-vec3 uPntLight(-10.0, -4.0, -16.0);
-vec3 uPntLightSpec(0.8)
+vec3 uPntLight(-10.0, 4.0, -20.0);
+vec3 uPntLightSpec(0.8);
 vec3 uPntLightDiff(0.8);
+float uShininess = 32;
 int uUseLighting = 1;
 int uShowSpecular = 1;
 int uUseTextures = 1;
@@ -86,18 +88,18 @@ int main(int argc, char** argv)
 	GLuint earth_tex, galvanized_tex;
 	glGenTextures(1, &earth_tex);
 	glBindTexture(GL_TEXTURE_2D, earth_tex);
-	if (!load_texture2D("../media/textures/earth.jpg", GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, GL_REPEAT, GL_FALSE, GL_FALSE)) {
+	if (!load_texture2D("../media/textures/earth.jpg", GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, GL_REPEAT, GL_TRUE, GL_FALSE)) {
 		printf("failed to load texture\n");
 		return 0;
 	}
-	glGenTextures(1, &galvanazied_tex);
+	glGenTextures(1, &galvanized_tex);
 	glBindTexture(GL_TEXTURE_2D, galvanized_tex);
-	if (!load_texture2D("../media/textures/arroway.de_metal+structure+06_d100_flat.jpg", GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, GL_REPEAT, GL_FALSE, GL_FALSE)) {
+	if (!load_texture2D("../media/textures/arroway.de_metal+structure+06_d100_flat.jpg", GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, GL_REPEAT, GL_TRUE, GL_FALSE)) {
 		printf("failed to load texture\n");
 		return 0;
 	}
 
-	setup_buffers();
+	int num_teapot_indices = setup_buffers();
 
 	glBindVertexArray(0);
 
@@ -125,12 +127,14 @@ int main(int argc, char** argv)
 	uUseLighting_loc = glGetUniformLocation(program, "uUseLighting");
 	uUseTextures_loc = glGetUniformLocation(program, "uUseTextures");
 	uShowSpecular_loc = glGetUniformLocation(program, "uShowSpecular");
+	uShininess_loc = glGetUniformLocation(program, "uShininess");
 	uSampler_loc = glGetUniformLocation(program, "uSampler");
 
 	check_errors(0, "uniform locs");
 
 	glUniform1i(uSampler_loc, 0);
 
+	int which_texture = 1;
 	float teapotAngle = 180;
 	glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -150,6 +154,8 @@ int main(int argc, char** argv)
 			counter = 0;
 		}
 
+		teapotAngle += 0.05 * elapsed;
+
 		// reset state every frame due to GUI
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
@@ -157,7 +163,7 @@ int main(int argc, char** argv)
 
 		uPMatrix = glm::perspective(glm::radians(45.0f), WIDTH/(float)HEIGHT, 0.1f, 100.0f);
 		uMVMatrix = glm::translate(mat4(1), vec3(0,0,-40));
-		uMVMatrix = glm::rotate(uMVMatrix, glm::radians(23.4), vec3(1, 0, -1));
+		uMVMatrix = glm::rotate(uMVMatrix, glm::radians(23.4f), vec3(1, 0, -1));
 		uMVMatrix = glm::rotate(uMVMatrix, glm::radians(teapotAngle), vec3(0, 1, 0));
 
 		glUniformMatrix4fv(uMVMatrix_loc, 1, GL_FALSE, glm::value_ptr(uMVMatrix));
@@ -173,6 +179,7 @@ int main(int argc, char** argv)
 		glUniform3fv(uPntLightSpec_loc, 1, glm::value_ptr(uPntLightSpec));
 		glUniform3fv(uPntLightDiff_loc, 1, glm::value_ptr(uPntLightDiff));
 
+		glUniform1f(uShininess_loc, uShininess);
 		glUniform1i(uUseLighting_loc, uUseLighting);
 		glUniform1i(uUseTextures_loc, uUseTextures);
 		glUniform1i(uShowSpecular_loc, uShowSpecular);
@@ -181,28 +188,45 @@ int main(int argc, char** argv)
 			glBindTexture(GL_TEXTURE_2D, galvanized_tex);
 		} else if (which_texture == 2) {
 			glBindTexture(GL_TEXTURE_2D, earth_tex);
+		//} else {
+		//	glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
 
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 		glBindVertexArray(vao);
-		glDrawElements(GL_TRIANGLES, sizeof(triangles), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, num_teapot_indices, GL_UNSIGNED_INT, 0);
 
 
 		if (nk_begin(ctx, "Controls", nk_rect(WIDTH-GUI_W, 0, GUI_W, HEIGHT),
 		    NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
 		{
-			static struct nk_colorf dir_color = { 0.8, 0.8, 0.8, 1 };
+			static struct nk_colorf spec_color = { 0.8, 0.8, 0.8, 1 };
+			static struct nk_colorf diff_color = { 0.8, 0.8, 0.8, 1 };
 			static struct nk_colorf ambient_color = { 0.2, 0.2, 0.2, 1 };
+			static const char* texture_opts[] = { "None", "Galvanized", "Earth" };
 			//nk_layout_row_static(ctx, 30, GUI_W, 1);
 			nk_layout_row_dynamic(ctx, 0, 1);
+			if (nk_checkbox_label(ctx, "Show Specular", &uShowSpecular)) {
+				printf("Lighting %s\n", (uShowSpecular ? "On" : "Off"));
+			}
 			if (nk_checkbox_label(ctx, "Use Lighting", &uUseLighting)) {
 				printf("Lighting %s\n", (uUseLighting ? "On" : "Off"));
 			}
 
-			nk_label(ctx, "Directional Light", NK_TEXT_CENTERED);
-			nk_label(ctx, "Direction", NK_TEXT_CENTERED);
+			nk_label(ctx, "Texture:", NK_TEXT_LEFT);
+			// TODO look up nuklear default font size
+			struct nk_rect bounds = nk_widget_bounds(ctx);
+			which_texture = nk_combo(ctx, texture_opts, NK_LEN(texture_opts), which_texture, 11, nk_vec2(bounds.w, 300));
+			uUseTextures = !!which_texture;
+
+			nk_label(ctx, "Material", NK_TEXT_CENTERED);
+			nk_label(ctx, "Shininess", NK_TEXT_LEFT);
+			nk_property_float(ctx, "#", 0, &uShininess, 1024, 1, 0.1);
+
+			nk_label(ctx, "Point Light", NK_TEXT_CENTERED);
+			nk_label(ctx, "Location", NK_TEXT_CENTERED);
 
 			//nk_layout_row_dynamic(ctx, 0, 2);
 
@@ -212,25 +236,35 @@ int main(int argc, char** argv)
 			nk_layout_row_template_end(ctx);
 
 			nk_label(ctx, "X", NK_TEXT_LEFT);
-			nk_property_float(ctx, "#", -1.0, &uLightingDirection.x, 1.0, 0.25, 0.08333);
+			nk_property_float(ctx, "#", -20.0, &uPntLight.x, 20.0, 0.25, 0.08333);
 			nk_label(ctx, "Y", NK_TEXT_LEFT);
-			nk_property_float(ctx, "#", -1.0, &uLightingDirection.y, 1.0, 0.25, 0.08333);
+			nk_property_float(ctx, "#", -20.0, &uPntLight.y, 20.0, 0.25, 0.08333);
 			nk_label(ctx, "Z", NK_TEXT_LEFT);
-			nk_property_float(ctx, "#", -1.0, &uLightingDirection.z, 1.0, 0.25, 0.08333);
+			nk_property_float(ctx, "#", -20.0, &uPntLight.z, 20.0, 0.25, 0.08333);
 
 			//nk_layout_row_static(ctx, 30, GUI_W, 1);
 			nk_layout_row_dynamic(ctx, 0, 1);
 
-			nk_label(ctx, "Color", NK_TEXT_CENTERED);
+			nk_label(ctx, "Specular Color", NK_TEXT_CENTERED);
 
 			nk_layout_row_dynamic(ctx, 100, 1);
-			dir_color = nk_color_picker(ctx, dir_color, NK_RGB);
+			spec_color = nk_color_picker(ctx, spec_color, NK_RGB);
 			nk_layout_row_dynamic(ctx, 0, 1);
-			dir_color.r = nk_propertyf(ctx, "#R:", 0, dir_color.r, 1.0f, 0.01f,0.005f);
-			dir_color.g = nk_propertyf(ctx, "#G:", 0, dir_color.g, 1.0f, 0.01f,0.005f);
-			dir_color.b = nk_propertyf(ctx, "#B:", 0, dir_color.b, 1.0f, 0.01f,0.005f);
+			spec_color.r = nk_propertyf(ctx, "#R:", 0, spec_color.r, 1.0f, 0.01f,0.005f);
+			spec_color.g = nk_propertyf(ctx, "#G:", 0, spec_color.g, 1.0f, 0.01f,0.005f);
+			spec_color.b = nk_propertyf(ctx, "#B:", 0, spec_color.b, 1.0f, 0.01f,0.005f);
+			uPntLightSpec = vec3(spec_color.r, spec_color.g, spec_color.b);
 
-			uDirectionalColor = vec3(dir_color.r, dir_color.g, dir_color.b);
+			nk_label(ctx, "Diffuse Color", NK_TEXT_CENTERED);
+
+			nk_layout_row_dynamic(ctx, 100, 1);
+			diff_color = nk_color_picker(ctx, diff_color, NK_RGB);
+			nk_layout_row_dynamic(ctx, 0, 1);
+			diff_color.r = nk_propertyf(ctx, "#R:", 0, diff_color.r, 1.0f, 0.01f,0.005f);
+			diff_color.g = nk_propertyf(ctx, "#G:", 0, diff_color.g, 1.0f, 0.01f,0.005f);
+			diff_color.b = nk_propertyf(ctx, "#B:", 0, diff_color.b, 1.0f, 0.01f,0.005f);
+
+			uPntLightDiff = vec3(diff_color.r, diff_color.g, diff_color.b);
 
 			nk_label(ctx, "Ambient Light", NK_TEXT_CENTERED);
 			nk_label(ctx, "Color", NK_TEXT_CENTERED);
@@ -243,9 +277,6 @@ int main(int argc, char** argv)
 			ambient_color.b = nk_propertyf(ctx, "#B:", 0, ambient_color.b, 1.0f, 0.01f,0.005f);
 
 			uAmbientColor = vec3(ambient_color.r, ambient_color.g, ambient_color.b);
-
-			if (nk_button_label(ctx, "button"))
-				printf("button pressed!\n");
 		}
 		nk_end(ctx);
 
@@ -279,7 +310,7 @@ void setup_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	window = SDL_CreateWindow("Lesson 7", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Lesson 14", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
 		cleanup();
 		exit(0);
@@ -373,7 +404,7 @@ int handle_events(unsigned int elapsed)
 
 // TODO convert teapot to text file
 // or download it in another format and convert
-void setup_buffers()
+int setup_buffers()
 {
 #include "../media/models/teapot.h"
 
@@ -407,6 +438,8 @@ void setup_buffers()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
+
+	return sizeof(indices)/sizeof(indices[0]);
 }
 
 
