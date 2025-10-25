@@ -160,6 +160,14 @@ workspace "opengl_reference"
 			"src/glcommon/gltools.cpp",
 		}
 
+	project "lesson15"
+		kind "ConsoleApp"
+		language "C++"
+		files {
+			"src/lesson15.cpp",
+			"src/glcommon/gltools.cpp",
+		}
+
 	project "multidraw"
 		kind "ConsoleApp"
 		language "C++"
