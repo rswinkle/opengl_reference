@@ -203,7 +203,7 @@ int main(int argc, char** argv)
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, (float*)&mat_stack.stack[mat_stack.top]);
 
 		glBindVertexArray(vao);
-		glDrawElements(GL_TRIANGLES, sizeof(triangles), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, sizeof(triangles)/sizeof(triangles[0]), GL_UNSIGNED_INT, 0);
 
 		mat_stack.pop();
 
