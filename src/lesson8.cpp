@@ -46,7 +46,8 @@ int handle_events(unsigned int elapsed);
 
 float z;
 float x_rot, y_rot;
-float x_speed, y_speed;
+float x_speed = 3;
+float y_speed = -3;
 
 int use_blending = 1; // bool
 
@@ -381,9 +382,6 @@ int main(int argc, char** argv)
 			ambient_color.b = nk_propertyf(ctx, "#B:", 0, ambient_color.b, 1.0f, 0.01f,0.005f);
 
 			uAmbientColor = vec3(ambient_color.r, ambient_color.g, ambient_color.b);
-
-			if (nk_button_label(ctx, "button"))
-				printf("button pressed!\n");
 		}
 		nk_end(ctx);
 

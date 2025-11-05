@@ -46,7 +46,8 @@ int handle_events(unsigned int elapsed);
 
 float z;
 float x_rot, y_rot;
-float x_speed, y_speed;
+float x_speed = 3;
+float y_speed = -3;
 
 
 // uniforms
@@ -351,9 +352,6 @@ int main(int argc, char** argv)
 			ambient_color.b = nk_propertyf(ctx, "#B:", 0, ambient_color.b, 1.0f, 0.01f,0.005f);
 
 			uAmbientColor = vec3(ambient_color.r, ambient_color.g, ambient_color.b);
-
-			if (nk_button_label(ctx, "button"))
-				printf("button pressed!\n");
 		}
 		nk_end(ctx);
 
@@ -435,6 +433,8 @@ void setup_context()
 
 void cleanup()
 {
+	nk_sdl_shutdown();
+
 	SDL_GL_DeleteContext(glcontext);
 	SDL_DestroyWindow(window);
 
@@ -467,6 +467,7 @@ int handle_events(unsigned int elapsed)
 		}
 		nk_sdl_handle_event(&e);
 	}
+	nk_input_end(ctx);
 
 	//SDL_PumpEvents() is called above in SDL_PollEvent()
 	const Uint8 *state = SDL_GetKeyboardState(NULL);

@@ -54,7 +54,7 @@ float spin;
 
 matrix_stack mvMatrixStack;
 
-int do_twinkle = 1; // bool
+int do_twinkle = GL_FALSE; // bool
 
 // uniforms
 mat4 uMVMatrix;
@@ -232,7 +232,7 @@ int main(int argc, char** argv)
 
 	glUniform1i(uSampler_loc, 0);
 
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
     glClearColor(0, 0, 0, 1);
 
 	unsigned int old_time = 0, new_time=0, counter = 0, elapsed;
